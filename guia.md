@@ -1,4 +1,4 @@
-# Guía de The Boyz Comics
+# Guía de Elseframe Comics
 
 Documento de referencia rápida para desarrollo, publicación y control de acceso.
 
