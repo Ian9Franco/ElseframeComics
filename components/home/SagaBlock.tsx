@@ -4,6 +4,14 @@ import { motion, AnimatePresence } from "framer-motion";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { getComicPageUrl } from "@/components/reader/readerUtils";
+import {
+  getChapterGuideStatus,
+  getPublishedChapters,
+  getSagaCtaLabel,
+  getSagaReadingProgress,
+  isChapterLocked,
+  type ChapterGuideStatus,
+} from "@/lib/chapterDiscovery";
 
 function getTextColor(hexColor: string) {
   if (!hexColor) return "white";
@@ -30,19 +38,7 @@ function FeaturedMobileChapters({
   unlockAll: boolean;
   onBack: () => void;
 }) {
-  const publishedChapters = saga.chapters
-    .filter((c: any) => c.status === "published" || !saga.chapters.some((x: any) => x.status === "published"))
-    .sort((a: any, b: any) => a.number - b.number);
-
-  const getChapterLockStatus = (chapter: any) => {
-    if (!isClient || unlockAll) return false;
-    const readIdx = publishedChapters.findIndex((c: any) => c.id === chapter.id);
-    if (readIdx <= 0) return false;
-    const prevChapter = publishedChapters[readIdx - 1];
-    const normalizedRead = readChapters.map(r => decodeURIComponent(r).toLowerCase().trim());
-    return !normalizedRead.includes(decodeURIComponent(prevChapter.id).toLowerCase().trim());
-  };
-
+  const publishedChapters = getPublishedChapters(saga.chapters);
   const displayChapters = [...publishedChapters].sort((a: any, b: any) => b.number - a.number);
 
   return (
@@ -60,9 +56,18 @@ function FeaturedMobileChapters({
         </button>
       </div>
 
+      <SagaProgressHint
+        publishedChapters={publishedChapters}
+        readChapters={readChapters}
+        isClient={isClient}
+        unlockAll={unlockAll}
+        dark={false}
+      />
+
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
         {displayChapters.map((chapter: any) => {
-          const isLocked = getChapterLockStatus(chapter);
+          const isLocked = isChapterLocked(chapter, publishedChapters, readChapters, isClient, unlockAll);
+          const guideStatus = getChapterGuideStatus(chapter, publishedChapters, readChapters, isClient, unlockAll);
           return (
             <ChapterCard
               key={chapter.id}
@@ -71,6 +76,7 @@ function FeaturedMobileChapters({
               sagaColor={colorPrimary}
               index={chapter.number - 1}
               isLocked={isLocked}
+              guideStatus={guideStatus}
               sagaCover={saga.cover}
               compact
             />
@@ -160,6 +166,8 @@ export function SagaBlock({
 
   const isNuevo = saga.nuevo === true;
   const isProximamente = isDrawerItem || saga.proximamente === true || !saga.chapters.some((c: any) => c.status === "published");
+  const publishedChapters = getPublishedChapters(saga.chapters);
+  const sagaCtaLabel = getSagaCtaLabel(publishedChapters, readChapters, isClient, unlockAll, showChapters);
 
   const colorPrimary = "#D7263D";
   const colorSecondary = "#D7263D";
@@ -445,7 +453,7 @@ export function SagaBlock({
                     alt="Boom" 
                     className={`w-4 h-4 object-contain transition-transform duration-300 ${showChapters ? "rotate-45" : ""}`} 
                   />
-                  {showChapters ? "Ocultar Episodios" : "Ver Episodios"}
+                  {sagaCtaLabel}
                 </button>
               </div>
             </div>
@@ -473,25 +481,21 @@ export function SagaBlock({
                       <div className="h-[1px] flex-1 bg-[#001419]/10" />
                     </div>
 
+                    <SagaProgressHint
+                      publishedChapters={publishedChapters}
+                      readChapters={readChapters}
+                      isClient={isClient}
+                      unlockAll={unlockAll}
+                      dark={false}
+                    />
+
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 items-stretch">
                       {(() => {
-                        const publishedChapters = saga.chapters
-                          .filter((c: any) => c.status === "published" || !saga.chapters.some((x: any) => x.status === "published"))
-                          .sort((a: any, b: any) => a.number - b.number);
-
-                        const getChapterLockStatus = (chapter: any) => {
-                          if (!isClient || unlockAll) return false;
-                          const readIdx = publishedChapters.findIndex((c: any) => c.id === chapter.id);
-                          if (readIdx <= 0) return false;
-                          const prevChapter = publishedChapters[readIdx - 1];
-                          const normalizedRead = readChapters.map(r => decodeURIComponent(r).toLowerCase().trim());
-                          return !normalizedRead.includes(decodeURIComponent(prevChapter.id).toLowerCase().trim());
-                        };
-
                         const displayChapters = [...publishedChapters].sort((a: any, b: any) => b.number - a.number);
 
                         return displayChapters.map((chapter: any) => {
-                          const isLocked = getChapterLockStatus(chapter);
+                          const isLocked = isChapterLocked(chapter, publishedChapters, readChapters, isClient, unlockAll);
+                          const guideStatus = getChapterGuideStatus(chapter, publishedChapters, readChapters, isClient, unlockAll);
                           return (
                             <ChapterCard
                               key={chapter.id}
@@ -500,6 +504,7 @@ export function SagaBlock({
                               sagaColor={colorPrimary}
                               index={chapter.number - 1}
                               isLocked={isLocked}
+                              guideStatus={guideStatus}
                               sagaCover={saga.cover}
                             />
                           );
@@ -660,7 +665,7 @@ export function SagaBlock({
                     alt="Boom" 
                     className={`w-4 h-4 object-contain transition-transform duration-300 ${showChapters ? "rotate-45" : ""}`} 
                   />
-                  {showChapters ? "Ocultar Episodios" : "Ver Episodios"}
+                  {sagaCtaLabel}
                 </button>
               </div>
             </div>
@@ -688,25 +693,21 @@ export function SagaBlock({
                       <div className="h-[1px] flex-1 bg-[#001419]/10" />
                     </div>
 
+                    <SagaProgressHint
+                      publishedChapters={publishedChapters}
+                      readChapters={readChapters}
+                      isClient={isClient}
+                      unlockAll={unlockAll}
+                      dark={false}
+                    />
+
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 items-stretch">
                       {(() => {
-                        const publishedChapters = saga.chapters
-                          .filter((c: any) => c.status === "published" || !saga.chapters.some((x: any) => x.status === "published"))
-                          .sort((a: any, b: any) => a.number - b.number);
-
-                        const getChapterLockStatus = (chapter: any) => {
-                          if (!isClient || unlockAll) return false;
-                          const readIdx = publishedChapters.findIndex((c: any) => c.id === chapter.id);
-                          if (readIdx <= 0) return false;
-                          const prevChapter = publishedChapters[readIdx - 1];
-                          const normalizedRead = readChapters.map(r => decodeURIComponent(r).toLowerCase().trim());
-                          return !normalizedRead.includes(decodeURIComponent(prevChapter.id).toLowerCase().trim());
-                        };
-
                         const displayChapters = [...publishedChapters].sort((a: any, b: any) => b.number - a.number);
 
                         return displayChapters.map((chapter: any) => {
-                          const isLocked = getChapterLockStatus(chapter);
+                          const isLocked = isChapterLocked(chapter, publishedChapters, readChapters, isClient, unlockAll);
+                          const guideStatus = getChapterGuideStatus(chapter, publishedChapters, readChapters, isClient, unlockAll);
                           return (
                             <ChapterCard
                               key={chapter.id}
@@ -715,6 +716,7 @@ export function SagaBlock({
                               sagaColor={colorPrimary}
                               index={chapter.number - 1}
                               isLocked={isLocked}
+                              guideStatus={guideStatus}
                               sagaCover={saga.cover}
                             />
                           );
@@ -902,10 +904,9 @@ export function SagaBlock({
               alt="Icon" 
               className={`w-6 h-6 object-contain transition-transform duration-300 ${showChapters ? "rotate-45" : ""}`} 
             />
-            {isProximamente 
+            {isProximamente
               ? (showChapters ? "Ocultar Avance" : "Ver Episodios Planeados")
-              : (showChapters ? "Ocultar Episodios" : "Ver Episodios")
-            }
+              : sagaCtaLabel}
           </button>
         </div>
       </div>
@@ -933,26 +934,31 @@ export function SagaBlock({
                 <div className="h-[2px] flex-1 bg-[#001419]/10" />
               </div>
 
+              {!isProximamente && (
+                <SagaProgressHint
+                  publishedChapters={publishedChapters}
+                  readChapters={readChapters}
+                  isClient={isClient}
+                  unlockAll={unlockAll}
+                  dark={false}
+                />
+              )}
+
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 items-stretch">
                 {(() => {
-                  const filteredChapters = saga.chapters
-                    .filter((c: any) => isProximamente || c.status === "published" || !saga.chapters.some((x: any) => x.status === "published"))
-                    .sort((a: any, b: any) => a.number - b.number);
-
-                  const getChapterLockStatus = (chapter: any) => {
-                    if (isProximamente) return true;
-                    if (!isClient || unlockAll) return false;
-                    const readIdx = filteredChapters.findIndex((c: any) => c.id === chapter.id);
-                    if (readIdx <= 0) return false;
-                    const prevChapter = filteredChapters[readIdx - 1];
-                    const normalizedRead = readChapters.map(r => decodeURIComponent(r).toLowerCase().trim());
-                    return !normalizedRead.includes(decodeURIComponent(prevChapter.id).toLowerCase().trim());
-                  };
+                  const filteredChapters = isProximamente
+                    ? saga.chapters.sort((a: any, b: any) => a.number - b.number)
+                    : publishedChapters;
 
                   const displayChapters = [...filteredChapters].sort((a: any, b: any) => b.number - a.number);
 
                   return displayChapters.map((chapter: any) => {
-                    const isLocked = getChapterLockStatus(chapter);
+                    const isLocked = isProximamente
+                      ? true
+                      : isChapterLocked(chapter, publishedChapters, readChapters, isClient, unlockAll);
+                    const guideStatus = isProximamente
+                      ? "locked"
+                      : getChapterGuideStatus(chapter, publishedChapters, readChapters, isClient, unlockAll);
                     return (
                       <ChapterCard
                         key={chapter.id}
@@ -961,6 +967,7 @@ export function SagaBlock({
                         sagaColor={colorPrimary}
                         index={chapter.number - 1}
                         isLocked={isLocked}
+                        guideStatus={guideStatus}
                         sagaCover={saga.cover}
                         isSagaProximamente={isProximamente}
                       />
@@ -1025,15 +1032,108 @@ export function SagaBlock({
   );
 }
 
+function ChapterGuideBadge({ status, compact = false }: { status: ChapterGuideStatus; compact?: boolean }) {
+  if (!status || status === "locked") return null;
+
+  const styles: Record<Exclude<ChapterGuideStatus, null | "locked">, string> = {
+    start: "bg-[#f5e642] text-[#001419] border-[#001419] rotate-[-3deg]",
+    continue: "bg-[#D7263D] text-white border-white animate-pulse",
+    read: "bg-[#001419]/80 text-white/90 border-white/30",
+  };
+
+  const labels: Record<Exclude<ChapterGuideStatus, null | "locked">, string> = {
+    start: "EMPEZÁ ACÁ",
+    continue: "SEGUÍ POR ACÁ",
+    read: "LEÍDO",
+  };
+
+  return (
+    <div
+      className={`absolute top-2 left-2 z-40 font-[var(--font-bangers)] tracking-widest uppercase border-2 shadow-[2px_2px_0_#000] ${
+        compact ? "text-[8px] px-1.5 py-0.5" : "text-[10px] px-2 py-0.5"
+      } ${styles[status]}`}
+    >
+      {labels[status]}
+    </div>
+  );
+}
+
+function SagaProgressHint({
+  publishedChapters,
+  readChapters,
+  isClient,
+  unlockAll,
+  dark = false,
+}: {
+  publishedChapters: any[];
+  readChapters: string[];
+  isClient: boolean;
+  unlockAll: boolean;
+  dark?: boolean;
+}) {
+  const { readCount, totalPublished } = getSagaReadingProgress(publishedChapters, readChapters);
+  if (totalPublished === 0) return null;
+
+  const startChapter = publishedChapters[0];
+  const continueChapter = publishedChapters.find(
+    (c) => getChapterGuideStatus(c, publishedChapters, readChapters, isClient, unlockAll) === "continue"
+  );
+
+  const textClass = dark ? "text-gray-300" : "text-gray-700";
+  const labelClass = dark ? "text-[#ff6b7d]" : "text-[#D7263D]";
+
+  return (
+    <div
+      className={`mb-4 p-3 border-2 border-dashed rounded flex flex-col sm:flex-row sm:items-center gap-3 sm:justify-between ${
+        dark ? "border-[#D7263D]/30 bg-[#D7263D]/10" : "border-[#D7263D]/40 bg-[#D7263D]/5"
+      }`}
+    >
+      <div>
+        <p className={`font-[var(--font-bangers)] text-xs tracking-wider uppercase ${labelClass}`}>
+          {readCount === 0 ? "¿Por dónde arranco?" : "Tu progreso"}
+        </p>
+        <p className={`font-sans text-sm ${textClass}`}>
+          {readCount === 0
+            ? `Empezá por «${startChapter?.title}» — el primer capítulo publicado.`
+            : `Leíste ${readCount} de ${totalPublished} capítulo${totalPublished !== 1 ? "s" : ""} publicado${totalPublished !== 1 ? "s" : ""}.${
+                continueChapter ? ` Seguí con «${continueChapter.title}».` : " ¡Completaste todo lo publicado!"
+              }`}
+        </p>
+      </div>
+      <div className="flex gap-1.5 shrink-0">
+        {publishedChapters.map((ch) => {
+          const status = getChapterGuideStatus(ch, publishedChapters, readChapters, isClient, unlockAll);
+          return (
+            <div
+              key={ch.id}
+              title={ch.title}
+              className={`w-3 h-3 rounded-full border ${
+                status === "read"
+                  ? "bg-[#D7263D] border-[#D7263D]"
+                  : status === "continue"
+                    ? "bg-[#f5e642] border-[#001419]"
+                    : status === "start"
+                      ? "bg-[#f5e642] border-[#001419]"
+                      : "bg-gray-200 border-gray-400"
+              }`}
+            />
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
 /* ── CHAPTER CARD ── */
 const ACCENTS = ["#D7263D", "#D7263D", "#D7263D", "#D7263D", "#D7263D"];
 
-function ChapterCard({ chapter, sagaId, sagaColor, index, isLocked, sagaCover, isSagaProximamente, compact = false }: {
+function ChapterCard({ chapter, sagaId, sagaColor, index, isLocked, guideStatus = null, sagaCover, isSagaProximamente, compact = false }: {
   chapter: any;
   sagaId: string;
   sagaColor: string;
   index: number;
   isLocked: boolean;
+  guideStatus?: ChapterGuideStatus;
   sagaCover?: string | null;
   isSagaProximamente?: boolean;
   compact?: boolean;
@@ -1060,12 +1160,21 @@ function ChapterCard({ chapter, sagaId, sagaColor, index, isLocked, sagaCover, i
     const isBlueprintTheme = isDraftChapter || isSagaProximamente;
     const cardContent = (
       <div
-        className={`flex flex-col h-full overflow-hidden border-[3px] border-[#001419] ${isDraftChapter ? "cursor-pointer hover:scale-[1.01] transition-transform" : ""}`}
+        className={`relative flex flex-col h-full overflow-hidden border-[3px] ${
+          guideStatus === "locked" || isLocked
+            ? "border-dashed border-[#D7263D]/60"
+            : "border-[#001419]"
+        } ${isDraftChapter ? "cursor-pointer hover:scale-[1.01] transition-transform" : ""}`}
         style={{
           background: isBlueprintTheme ? "linear-gradient(135deg, #002229, #001217)" : "#e5e5eb",
           boxShadow: isBlueprintTheme ? "5px 5px 0 #D7263D" : "5px 5px 0 #001419",
         }}
       >
+        {guideStatus === "locked" && !isDraftChapter && !isSagaProximamente && (
+          <div className="absolute top-2 left-2 z-40 font-[var(--font-bangers)] text-[9px] tracking-widest uppercase px-2 py-0.5 border-2 border-[#D7263D]/50 bg-[#001419]/70 text-[#D7263D]">
+            BLOQUEADO
+          </div>
+        )}
         {/* Cover image area locked */}
         <div
           className="relative w-full overflow-hidden shrink-0 flex items-center justify-center"
@@ -1172,7 +1281,13 @@ function ChapterCard({ chapter, sagaId, sagaColor, index, isLocked, sagaCover, i
     >
       <Link
         href={`/chapters/${chapter.id}`}
-        className="group flex flex-col h-full panel panel-lg overflow-hidden"
+        className={`group flex flex-col h-full panel panel-lg overflow-hidden ${
+          guideStatus === "start"
+            ? "ring-2 ring-[#f5e642] ring-offset-2 ring-offset-white"
+            : guideStatus === "continue"
+              ? "ring-2 ring-[#D7263D] ring-offset-2 ring-offset-white"
+              : ""
+        }`}
         style={{ background: "white" }}
       >
         {/* Cover image — fixed aspect ratio so all cards are the same height */}
@@ -1185,6 +1300,7 @@ function ChapterCard({ chapter, sagaId, sagaColor, index, isLocked, sagaCover, i
               : `linear-gradient(145deg, #001419 0%, ${accent}33 100%)`,
           }}
         >
+          <ChapterGuideBadge status={guideStatus} compact={compact} />
           {/* Actual cover image */}
           {(cover || chapter.cover || sagaCover) && (
             <img
