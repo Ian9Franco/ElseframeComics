@@ -4,6 +4,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { getComicPageUrl } from "@/components/reader/readerUtils";
+import { getSagaProgress, type ChapterHighlight, type SagaProgress } from "@/components/home/sagaProgress";
 
 function getTextColor(hexColor: string) {
   if (!hexColor) return "white";
@@ -15,35 +16,97 @@ function getTextColor(hexColor: string) {
   return yiq >= 140 ? "#001419" : "white";
 }
 
+/* ── Start / Next / Complete summary shown above an expanded chapter list ── */
+function SagaProgressBanner({ progress, compact = false }: { progress: SagaProgress; compact?: boolean }) {
+  const { startChapter, nextChapter, readCount, total, isComplete, hasProgress } = progress;
+  if (total === 0) return null;
+
+  const target = startChapter ?? nextChapter;
+  const percent = Math.round((readCount / total) * 100);
+
+  const mode: "start" | "next" | "complete" | "blocked" = !hasProgress
+    ? "start"
+    : isComplete
+      ? "complete"
+      : nextChapter
+        ? "next"
+        : "blocked";
+
+  const accent = mode === "start" ? "#f5e642" : mode === "complete" ? "#16a34a" : "#D7263D";
+  const accentText = mode === "start" ? "#001419" : "white";
+
+  const eyebrow =
+    mode === "start" ? "¿PRIMERA VEZ ACÁ?" :
+    mode === "next" ? "TENÉS PROGRESO" :
+    mode === "complete" ? "SAGA AL DÍA" :
+    "TENÉS PROGRESO";
+
+  const headline =
+    mode === "start" ? "Empezá acá" :
+    mode === "next" ? "Seguí por acá" :
+    mode === "complete" ? "Leíste todo lo publicado" :
+    "Nada nuevo por ahora";
+
+  return (
+    <div
+      className={`relative overflow-hidden border-[3px] border-[#001419] bg-white shadow-[4px_4px_0_#001419] rounded-md ${compact ? "p-3" : "p-4 sm:p-5"} mb-5`}
+    >
+      <div className="absolute left-0 top-0 bottom-0 w-2" style={{ background: accent }} />
+      <div className={`flex flex-col ${compact ? "gap-3" : "sm:flex-row sm:items-center gap-4"} pl-2`}>
+        <div className="flex-1 min-w-0">
+          <p className="font-[var(--font-bangers)] text-[10px] tracking-[0.25em] uppercase" style={{ color: mode === "start" ? "#a08a00" : accent }}>
+            {eyebrow}
+          </p>
+          <h5 className={`font-[var(--font-bangers)] ${compact ? "text-xl" : "text-2xl sm:text-3xl"} leading-none tracking-wider text-[#001419] mt-0.5`}>
+            {headline}
+          </h5>
+          {target && (
+            <p className="font-sans text-xs sm:text-sm text-gray-700 mt-1.5 truncate">
+              Cap. {target.number}: <span className="font-semibold text-[#001419]">{target.title}</span>
+            </p>
+          )}
+          {mode === "complete" && (
+            <p className="font-sans text-xs sm:text-sm text-gray-700 mt-1.5">
+              Cuando salga un episodio nuevo, va a aparecer acá.
+            </p>
+          )}
+
+          <div className="mt-3 flex items-center gap-3">
+            <div className="h-2 flex-1 max-w-[220px] bg-[#001419]/10 border border-[#001419]/20 overflow-hidden">
+              <div className="h-full transition-all duration-500" style={{ width: `${percent}%`, background: accent }} />
+            </div>
+            <span className="font-mono text-[10px] text-gray-600 tracking-wide whitespace-nowrap">
+              {readCount}/{total} leídos
+            </span>
+          </div>
+        </div>
+
+        {target && (
+          <Link
+            href={`/chapters/${target.id}`}
+            className={`shrink-0 font-[var(--font-bangers)] ${compact ? "text-sm px-4 py-2" : "text-base sm:text-lg px-6 py-3"} tracking-wider border-[3px] border-[#001419] uppercase transition-all shadow-[3px_3px_0_#001419] hover:-translate-y-0.5 hover:shadow-[4px_4px_0_#001419] active:translate-x-0.5 active:translate-y-0.5 active:shadow-[1px_1px_0_#001419] flex items-center justify-center gap-2`}
+            style={{ background: accent, color: accentText }}
+          >
+            {mode === "start" ? "Leer Cap. 1" : `Leer Cap. ${target.number}`} →
+          </Link>
+        )}
+      </div>
+    </div>
+  );
+}
+
 function FeaturedMobileChapters({
   saga,
   colorPrimary,
-  readChapters,
-  isClient,
-  unlockAll,
+  progress,
   onBack,
 }: {
   saga: any;
   colorPrimary: string;
-  readChapters: string[];
-  isClient: boolean;
-  unlockAll: boolean;
+  progress: SagaProgress;
   onBack: () => void;
 }) {
-  const publishedChapters = saga.chapters
-    .filter((c: any) => c.status === "published" || !saga.chapters.some((x: any) => x.status === "published"))
-    .sort((a: any, b: any) => a.number - b.number);
-
-  const getChapterLockStatus = (chapter: any) => {
-    if (!isClient || unlockAll) return false;
-    const readIdx = publishedChapters.findIndex((c: any) => c.id === chapter.id);
-    if (readIdx <= 0) return false;
-    const prevChapter = publishedChapters[readIdx - 1];
-    const normalizedRead = readChapters.map(r => decodeURIComponent(r).toLowerCase().trim());
-    return !normalizedRead.includes(decodeURIComponent(prevChapter.id).toLowerCase().trim());
-  };
-
-  const displayChapters = [...publishedChapters].sort((a: any, b: any) => b.number - a.number);
+  const displayChapters = [...progress.publishedChapters].sort((a: any, b: any) => b.number - a.number);
 
   return (
     <div className="mobile-chapter-view hidden relative z-10 flex-col gap-5 p-5">
@@ -60,9 +123,10 @@ function FeaturedMobileChapters({
         </button>
       </div>
 
+      <SagaProgressBanner progress={progress} compact />
+
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
         {displayChapters.map((chapter: any) => {
-          const isLocked = getChapterLockStatus(chapter);
           return (
             <ChapterCard
               key={chapter.id}
@@ -70,7 +134,9 @@ function FeaturedMobileChapters({
               sagaId={saga.id}
               sagaColor={colorPrimary}
               index={chapter.number - 1}
-              isLocked={isLocked}
+              isLocked={progress.isLocked(chapter)}
+              highlight={progress.getHighlight(chapter)}
+              unlockAfterTitle={progress.getPrevChapter(chapter)?.title}
               sagaCover={saga.cover}
               compact
             />
@@ -160,6 +226,8 @@ export function SagaBlock({
 
   const isNuevo = saga.nuevo === true;
   const isProximamente = isDrawerItem || saga.proximamente === true || !saga.chapters.some((c: any) => c.status === "published");
+
+  const progress = getSagaProgress(saga, readChapters, { isClient, unlockAll });
 
   const colorPrimary = "#D7263D";
   const colorSecondary = "#D7263D";
@@ -365,9 +433,7 @@ export function SagaBlock({
           <FeaturedMobileChapters
             saga={saga}
             colorPrimary={colorPrimary}
-            readChapters={readChapters}
-            isClient={isClient}
-            unlockAll={unlockAll}
+            progress={progress}
             onBack={() => setShowChapters(false)}
           />
           {/* Horizontal Banner for nuevo - un poco más grande */}
@@ -473,38 +539,24 @@ export function SagaBlock({
                       <div className="h-[1px] flex-1 bg-[#001419]/10" />
                     </div>
 
+                    <SagaProgressBanner progress={progress} />
+
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 items-stretch">
-                      {(() => {
-                        const publishedChapters = saga.chapters
-                          .filter((c: any) => c.status === "published" || !saga.chapters.some((x: any) => x.status === "published"))
-                          .sort((a: any, b: any) => a.number - b.number);
-
-                        const getChapterLockStatus = (chapter: any) => {
-                          if (!isClient || unlockAll) return false;
-                          const readIdx = publishedChapters.findIndex((c: any) => c.id === chapter.id);
-                          if (readIdx <= 0) return false;
-                          const prevChapter = publishedChapters[readIdx - 1];
-                          const normalizedRead = readChapters.map(r => decodeURIComponent(r).toLowerCase().trim());
-                          return !normalizedRead.includes(decodeURIComponent(prevChapter.id).toLowerCase().trim());
-                        };
-
-                        const displayChapters = [...publishedChapters].sort((a: any, b: any) => b.number - a.number);
-
-                        return displayChapters.map((chapter: any) => {
-                          const isLocked = getChapterLockStatus(chapter);
-                          return (
-                            <ChapterCard
-                              key={chapter.id}
-                              chapter={chapter}
-                              sagaId={saga.id}
-                              sagaColor={colorPrimary}
-                              index={chapter.number - 1}
-                              isLocked={isLocked}
-                              sagaCover={saga.cover}
-                            />
-                          );
-                        });
-                      })()}
+                      {[...progress.publishedChapters]
+                        .sort((a: any, b: any) => b.number - a.number)
+                        .map((chapter: any) => (
+                          <ChapterCard
+                            key={chapter.id}
+                            chapter={chapter}
+                            sagaId={saga.id}
+                            sagaColor={colorPrimary}
+                            index={chapter.number - 1}
+                            isLocked={progress.isLocked(chapter)}
+                            highlight={progress.getHighlight(chapter)}
+                            unlockAfterTitle={progress.getPrevChapter(chapter)?.title}
+                            sagaCover={saga.cover}
+                          />
+                        ))}
                       {/* Special draft/upcoming block */}
                       {saga.chapters.some((c: any) => c.status === "published") &&
                         saga.chapters.filter((c: any) => c.status !== "published").slice(0, 1).map((chapter: any) => (
@@ -578,9 +630,7 @@ export function SagaBlock({
           <FeaturedMobileChapters
             saga={saga}
             colorPrimary={colorPrimary}
-            readChapters={readChapters}
-            isClient={isClient}
-            unlockAll={unlockAll}
+            progress={progress}
             onBack={() => setShowChapters(false)}
           />
           <div className="p-6 sm:p-8 relative z-10 flex flex-col justify-between">
@@ -688,38 +738,24 @@ export function SagaBlock({
                       <div className="h-[1px] flex-1 bg-[#001419]/10" />
                     </div>
 
+                    <SagaProgressBanner progress={progress} />
+
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 items-stretch">
-                      {(() => {
-                        const publishedChapters = saga.chapters
-                          .filter((c: any) => c.status === "published" || !saga.chapters.some((x: any) => x.status === "published"))
-                          .sort((a: any, b: any) => a.number - b.number);
-
-                        const getChapterLockStatus = (chapter: any) => {
-                          if (!isClient || unlockAll) return false;
-                          const readIdx = publishedChapters.findIndex((c: any) => c.id === chapter.id);
-                          if (readIdx <= 0) return false;
-                          const prevChapter = publishedChapters[readIdx - 1];
-                          const normalizedRead = readChapters.map(r => decodeURIComponent(r).toLowerCase().trim());
-                          return !normalizedRead.includes(decodeURIComponent(prevChapter.id).toLowerCase().trim());
-                        };
-
-                        const displayChapters = [...publishedChapters].sort((a: any, b: any) => b.number - a.number);
-
-                        return displayChapters.map((chapter: any) => {
-                          const isLocked = getChapterLockStatus(chapter);
-                          return (
-                            <ChapterCard
-                              key={chapter.id}
-                              chapter={chapter}
-                              sagaId={saga.id}
-                              sagaColor={colorPrimary}
-                              index={chapter.number - 1}
-                              isLocked={isLocked}
-                              sagaCover={saga.cover}
-                            />
-                          );
-                        });
-                      })()}
+                      {[...progress.publishedChapters]
+                        .sort((a: any, b: any) => b.number - a.number)
+                        .map((chapter: any) => (
+                          <ChapterCard
+                            key={chapter.id}
+                            chapter={chapter}
+                            sagaId={saga.id}
+                            sagaColor={colorPrimary}
+                            index={chapter.number - 1}
+                            isLocked={progress.isLocked(chapter)}
+                            highlight={progress.getHighlight(chapter)}
+                            unlockAfterTitle={progress.getPrevChapter(chapter)?.title}
+                            sagaCover={saga.cover}
+                          />
+                        ))}
                       {/* Special draft/upcoming block */}
                       {saga.chapters.some((c: any) => c.status === "published") &&
                         saga.chapters.filter((c: any) => c.status !== "published").slice(0, 1).map((chapter: any) => (
@@ -933,39 +969,30 @@ export function SagaBlock({
                 <div className="h-[2px] flex-1 bg-[#001419]/10" />
               </div>
 
+              {!isProximamente && <SagaProgressBanner progress={progress} />}
+
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 items-stretch">
                 {(() => {
-                  const filteredChapters = saga.chapters
-                    .filter((c: any) => isProximamente || c.status === "published" || !saga.chapters.some((x: any) => x.status === "published"))
-                    .sort((a: any, b: any) => a.number - b.number);
-
-                  const getChapterLockStatus = (chapter: any) => {
-                    if (isProximamente) return true;
-                    if (!isClient || unlockAll) return false;
-                    const readIdx = filteredChapters.findIndex((c: any) => c.id === chapter.id);
-                    if (readIdx <= 0) return false;
-                    const prevChapter = filteredChapters[readIdx - 1];
-                    const normalizedRead = readChapters.map(r => decodeURIComponent(r).toLowerCase().trim());
-                    return !normalizedRead.includes(decodeURIComponent(prevChapter.id).toLowerCase().trim());
-                  };
+                  const filteredChapters = isProximamente
+                    ? [...saga.chapters].sort((a: any, b: any) => a.number - b.number)
+                    : progress.publishedChapters;
 
                   const displayChapters = [...filteredChapters].sort((a: any, b: any) => b.number - a.number);
 
-                  return displayChapters.map((chapter: any) => {
-                    const isLocked = getChapterLockStatus(chapter);
-                    return (
-                      <ChapterCard
-                        key={chapter.id}
-                        chapter={chapter}
-                        sagaId={saga.id}
-                        sagaColor={colorPrimary}
-                        index={chapter.number - 1}
-                        isLocked={isLocked}
-                        sagaCover={saga.cover}
-                        isSagaProximamente={isProximamente}
-                      />
-                    );
-                  });
+                  return displayChapters.map((chapter: any) => (
+                    <ChapterCard
+                      key={chapter.id}
+                      chapter={chapter}
+                      sagaId={saga.id}
+                      sagaColor={colorPrimary}
+                      index={chapter.number - 1}
+                      isLocked={isProximamente ? true : progress.isLocked(chapter)}
+                      highlight={isProximamente ? null : progress.getHighlight(chapter)}
+                      unlockAfterTitle={isProximamente ? undefined : progress.getPrevChapter(chapter)?.title}
+                      sagaCover={saga.cover}
+                      isSagaProximamente={isProximamente}
+                    />
+                  ));
                 })()}
                 {/* Special draft/upcoming block */}
                 {!isProximamente && saga.chapters.some((c: any) => c.status === "published") &&
@@ -1028,7 +1055,13 @@ export function SagaBlock({
 /* ── CHAPTER CARD ── */
 const ACCENTS = ["#D7263D", "#D7263D", "#D7263D", "#D7263D", "#D7263D"];
 
-function ChapterCard({ chapter, sagaId, sagaColor, index, isLocked, sagaCover, isSagaProximamente, compact = false }: {
+const HIGHLIGHT_STYLES: Record<Exclude<ChapterHighlight, null>, { label: string; bg: string; color: string; ring: string; hint: string }> = {
+  start: { label: "EMPEZÁ ACÁ", bg: "#f5e642", color: "#001419", ring: "#f5e642", hint: "Tu punto de partida en esta saga." },
+  next: { label: "SEGUÍ POR ACÁ", bg: "#D7263D", color: "white", ring: "#D7263D", hint: "Siguiente episodio para vos." },
+  read: { label: "LEÍDO ✓", bg: "#001419", color: "white", ring: "transparent", hint: "" },
+};
+
+function ChapterCard({ chapter, sagaId, sagaColor, index, isLocked, sagaCover, isSagaProximamente, compact = false, highlight = null, unlockAfterTitle }: {
   chapter: any;
   sagaId: string;
   sagaColor: string;
@@ -1037,9 +1070,13 @@ function ChapterCard({ chapter, sagaId, sagaColor, index, isLocked, sagaCover, i
   sagaCover?: string | null;
   isSagaProximamente?: boolean;
   compact?: boolean;
+  highlight?: ChapterHighlight;
+  unlockAfterTitle?: string;
 }) {
   const accent = ACCENTS[index % ACCENTS.length];
   const [cover, setCover] = useState<string | null>(null);
+  const highlightStyle = highlight ? HIGHLIGHT_STYLES[highlight] : null;
+  const isCallToAction = highlight === "start" || highlight === "next";
 
   useEffect(() => {
     if (chapter.cover) {
@@ -1127,7 +1164,9 @@ function ChapterCard({ chapter, sagaId, sagaColor, index, isLocked, sagaCover, i
                 ? "Borrador — ingresá la contraseña para previsualizar."
                 : isSagaProximamente
                   ? "Este capítulo estará disponible próximamente."
-                  : "Leé el capítulo anterior para poder desbloquear este."}
+                  : unlockAfterTitle
+                    ? <>Se desbloquea al leer <span className="font-semibold text-gray-600">«{unlockAfterTitle}»</span>.</>
+                    : "Leé el capítulo anterior para poder desbloquear este."}
             </p>
           </div>
           {isDraftChapter && (
@@ -1173,8 +1212,22 @@ function ChapterCard({ chapter, sagaId, sagaColor, index, isLocked, sagaCover, i
       <Link
         href={`/chapters/${chapter.id}`}
         className="group flex flex-col h-full panel panel-lg overflow-hidden"
-        style={{ background: "white" }}
+        style={{
+          background: "white",
+          ...(isCallToAction && highlightStyle
+            ? { boxShadow: `0 0 0 3px ${highlightStyle.ring}, 6px 6px 0 #001419` }
+            : {}),
+        }}
       >
+        {/* Start / Next / Read badge */}
+        {highlightStyle && (
+          <div
+            className={`absolute top-3 left-3 z-30 font-[var(--font-bangers)] ${compact ? "text-[10px] px-2" : "text-xs sm:text-sm px-2.5"} py-0.5 tracking-widest border-2 border-[#001419] ${isCallToAction ? "rotate-[-4deg] animate-pulse" : ""}`}
+            style={{ background: highlightStyle.bg, color: highlightStyle.color, boxShadow: "2px 2px 0 #001419" }}
+          >
+            {highlightStyle.label}
+          </div>
+        )}
         {/* Cover image — fixed aspect ratio so all cards are the same height */}
         <div
           className="relative w-full overflow-hidden shrink-0"
@@ -1265,9 +1318,12 @@ function ChapterCard({ chapter, sagaId, sagaColor, index, isLocked, sagaCover, i
             <h3 className={`font-[var(--font-bangers)] ${compact ? "text-base" : "text-2xl sm:text-3xl"} leading-tight uppercase tracking-wide text-[#001419]`}>
               {chapter.title}
             </h3>
+            {isCallToAction && highlightStyle && (
+              <p className="font-sans text-[11px] text-gray-600 mt-1">{highlightStyle.hint}</p>
+            )}
           </div>
           {/* Bottom accent bar */}
-          <div className="h-1 w-12" style={{ background: accent }} />
+          <div className="h-1 w-12" style={{ background: isCallToAction && highlightStyle ? highlightStyle.ring : accent }} />
         </div>
       </Link>
     </motion.div>

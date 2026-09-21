@@ -6,6 +6,7 @@ import { HeroSection } from "@/components/home/HeroSection";
 import { SagaBlock } from "@/components/home/SagaBlock";
 import { CharacterRoster } from "@/components/home/CharacterRoster";
 import { ImageLightbox } from "@/components/home/CharacterModal/ImageLightbox";
+import { getRecommendedRead, readReadChapters } from "@/components/home/sagaProgress";
 
 export default function Home() {
   const [sagasList, setSagasList] = useState<any[]>([]);
@@ -13,20 +14,32 @@ export default function Home() {
   const [showClassic, setShowClassic] = useState(false);
   const [lightboxSaga, setLightboxSaga] = useState<{ url: string; title: string } | null>(null);
   const [isUpcomingExpanded, setIsUpcomingExpanded] = useState(false);
+  const [readChapters, setReadChapters] = useState<string[]>([]);
+  const [unlockAll, setUnlockAll] = useState(false);
+  const [isClient, setIsClient] = useState(false);
 
   useEffect(() => {
+    const checkUnlock = () => setUnlockAll(localStorage.getItem("unlock-all") === "true");
     const load = () => {
       fetch("/api/sagas")
         .then((r) => r.json())
         .then((d) => {
           setSagasList(d);
           setLoading(false);
+          // Reader progress drives the hero CTA; read it once the saga data is here.
+          setReadChapters(readReadChapters());
+          checkUnlock();
+          setIsClient(true);
         })
         .catch(() => setLoading(false));
     };
     load();
     window.addEventListener("previewStateChanged", load);
-    return () => window.removeEventListener("previewStateChanged", load);
+    window.addEventListener("unlockAllChanged", checkUnlock);
+    return () => {
+      window.removeEventListener("previewStateChanged", load);
+      window.removeEventListener("unlockAllChanged", checkUnlock);
+    };
   }, []);
 
   const officialSagas = sagasList.filter((s) => s.order >= 3);
@@ -69,6 +82,8 @@ export default function Home() {
 
   const publishedSagas = [...nuevoSagas, ...[...otherOfficialSagas].reverse()];
 
+  const recommendedRead = getRecommendedRead(sagasList, readChapters, { isClient, unlockAll });
+
   const renderSagaGrid = (sagas: any[], isDrawerItem = false) => (
     <div className={`grid grid-cols-1 items-start gap-5 ${isDrawerItem ? "" : "sm:grid-cols-2 sm:gap-8"}`}>
       {sagas.map((saga) => (
@@ -86,7 +101,7 @@ export default function Home() {
 
   return (
     <div className="flex flex-col" style={{ background: "#002a32" }}>
-      <HeroSection />
+      <HeroSection recommended={recommendedRead} />
       <section id="sagas" className="brand-grain py-16 px-4 sm:px-6 relative">
         {/* Subtle halftone grid */}
         <div className="absolute inset-0 pointer-events-none opacity-[0.025]"

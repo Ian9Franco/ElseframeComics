@@ -1,16 +1,25 @@
 "use client";
 
 import { motion, AnimatePresence } from "framer-motion";
+import Link from "next/link";
 import { useEffect, useState } from "react";
+import type { RecommendedRead } from "@/components/home/sagaProgress";
 
-export function HeroSection() {
+const DEFAULT_RECOMMENDED: RecommendedRead = {
+  href: "/#sagas",
+  label: "Empezá a leer",
+  caption: null,
+  mode: "browse",
+};
+
+export function HeroSection({ recommended = DEFAULT_RECOMMENDED }: { recommended?: RecommendedRead }) {
   const [showLightbox, setShowLightbox] = useState(false);
 
   return (
     <div className="flex flex-col w-full">
       {/* ── Banner Section (Hero) ── */}
       <section
-        className="relative flex flex-col overflow-hidden min-h-[60vh] md:min-h-[75vh] justify-center cursor-zoom-in"
+        className="relative flex flex-col overflow-hidden min-h-[60vh] md:min-h-[75vh] justify-end cursor-zoom-in"
         style={{ background: "#0A0A0A" }}
         onClick={() => setShowLightbox(true)}
       >
@@ -53,6 +62,75 @@ export function HeroSection() {
             backgroundSize: "10px 10px",
           }}
         />
+
+        {/* ── Value proposition + primary CTA ── */}
+        <div
+          className="relative z-20 w-full max-w-7xl mx-auto px-4 sm:px-6 pb-8 sm:pb-12 pt-24 cursor-default"
+          onClick={(e) => e.stopPropagation()}
+        >
+          {/* Legibility scrim behind the copy; the art stays fully visible above it */}
+          <div
+            className="absolute inset-x-0 bottom-0 top-0 pointer-events-none -z-10"
+            style={{ background: "linear-gradient(to top, rgba(10,10,15,0.92) 0%, rgba(10,10,15,0.7) 55%, transparent 100%)" }}
+          />
+
+          <div className="max-w-2xl flex flex-col items-start gap-4 sm:gap-5 text-left">
+            <div className="flex items-center gap-2">
+              <div className="w-2 h-6 bg-[#D7263D]" />
+              <span className="font-[var(--font-bangers)] text-[10px] sm:text-xs tracking-[0.3em] text-[#D7263D] uppercase border border-[#D7263D] px-2 py-0.5 bg-black/40">
+                Elseframe Comics · Cómic indie
+              </span>
+            </div>
+
+            <h1
+              className="font-[var(--font-bangers)] text-4xl sm:text-6xl lg:text-7xl leading-[0.95] tracking-wider text-white uppercase"
+              style={{ textShadow: "4px 4px 0 #D7263D, 6px 6px 0 rgba(0,0,0,0.6)" }}
+            >
+              Historietas indie,
+              <br />
+              saga por saga.
+            </h1>
+
+            <p className="font-sans text-sm sm:text-base text-gray-200 leading-relaxed max-w-xl">
+              Seguí a <strong className="text-white">los pibes</strong> por el Mativerso en sagas de cómic hechas en casa.
+              Se lee gratis, capítulo a capítulo, desde el celu o la compu.
+            </p>
+
+            <div className="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-4 w-full sm:w-auto">
+              <Link
+                href={recommended.href}
+                className="font-[var(--font-bangers)] text-xl sm:text-2xl tracking-wider px-8 py-3.5 border-4 border-white bg-[#D7263D] hover:bg-[#ff3b51] text-white uppercase transition-all shadow-[5px_5px_0_#000] hover:shadow-[7px_7px_0_#000] hover:-translate-y-0.5 active:translate-y-0.5 active:translate-x-0.5 active:shadow-[2px_2px_0_#000] flex items-center justify-center gap-3"
+              >
+                <img src="/boom-white.webp" alt="" className="w-6 h-6 object-contain" />
+                {recommended.label} →
+              </Link>
+
+              <div className="flex items-center gap-4 sm:gap-5 pl-1">
+                <Link
+                  href="/#sagas"
+                  className="font-[var(--font-bangers)] text-sm sm:text-base tracking-widest uppercase text-white/80 hover:text-white underline decoration-[#D7263D] decoration-2 underline-offset-4 transition-colors"
+                >
+                  Ver sagas
+                </Link>
+                <Link
+                  href="/#pibes"
+                  className="font-[var(--font-bangers)] text-sm sm:text-base tracking-widest uppercase text-white/80 hover:text-white underline decoration-[#D7263D] decoration-2 underline-offset-4 transition-colors"
+                >
+                  Conocé a los pibes
+                </Link>
+              </div>
+            </div>
+
+            {recommended.caption && (
+              <p className="font-mono text-[10px] sm:text-[11px] text-gray-300 bg-black/50 border border-white/15 px-2.5 py-1 rounded inline-flex items-center gap-1.5 tracking-wide">
+                <span className={recommended.mode === "continue" ? "text-[#f5e642]" : "text-[#D7263D]"}>
+                  {recommended.mode === "continue" ? "▶ SEGUÍS EN:" : "▶ ARRANCÁS EN:"}
+                </span>
+                {recommended.caption}
+              </p>
+            )}
+          </div>
+        </div>
       </section>
 
       <AnimatePresence>
