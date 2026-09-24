@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getDynamicSagas } from "@/lib/serverData";
+import { isMasterPassword } from "@/lib/masterPassword";
 
 export async function POST(request: NextRequest) {
   try {
@@ -8,8 +9,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ success: false, error: "Contraseña requerida" }, { status: 400 });
     }
 
-    const masterPassword = process.env.PREVIEW_PASSWORD || "spiderman1999";
-    let isValid = (password === masterPassword);
+    let isValid = isMasterPassword(password);
 
     if (!isValid && !onlyMaster) {
       const sagas = getDynamicSagas();

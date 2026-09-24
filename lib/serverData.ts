@@ -1,5 +1,6 @@
 import fs from "fs";
 import path from "path";
+import { isMasterPassword } from "@/lib/masterPassword";
 
 export type Chapter = {
   id: string;
@@ -260,8 +261,7 @@ export function validatePreviewAccess(request: NextRequest, sagaId?: string): bo
     return false;
   }
 
-  const masterPassword = process.env.PREVIEW_PASSWORD || "spiderman1999";
-  if (providedPassword === masterPassword) {
+  if (isMasterPassword(providedPassword)) {
     return true;
   }
 

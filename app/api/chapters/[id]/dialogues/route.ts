@@ -14,7 +14,7 @@ export async function POST(
     const { id } = await params;
 
     // Validate access
-    if (!validateEditorAccess(request, id)) {
+    if (!validateEditorAccess(request)) {
       return NextResponse.json({ error: "Unauthorized: Invalid editor password" }, { status: 401 });
     }
 

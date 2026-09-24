@@ -6,24 +6,14 @@
  */
 
 import { NextRequest, NextResponse } from "next/server";
-import { getDynamicSagas, parsePrefix, getAssetsComicsDir } from "@/lib/serverData";
+import { parsePrefix, getAssetsComicsDir } from "@/lib/serverData";
+import { validateMasterEditorAccess as validateAccess } from "@/lib/masterPassword";
 import fs from "fs";
 import path from "path";
 
 export const dynamic = "force-dynamic";
 
 const ASSETS_COMICS_DIR = getAssetsComicsDir();
-
-function validateAccess(request: NextRequest): boolean {
-  const masterPassword = process.env.PREVIEW_PASSWORD || "spiderman1999";
-  const headerPass = request.headers.get("x-editor-password");
-  const cookiePass = request.cookies.get("preview_password")?.value;
-  const provided = headerPass || cookiePass;
-  if (!provided) return false;
-  if (provided === masterPassword) return true;
-  const sagas = getDynamicSagas();
-  return sagas.some((s) => s.password && provided === s.password);
-}
 
 function findChapterDir(chapterId: string): { sagaDir: string; chapterDir: string } | null {
   const comicsDir = path.join(process.cwd(), "public", "comics");

@@ -165,7 +165,7 @@ Hay **dos niveles** de contraseña:
 
 | Tipo | Dónde se define | Quién la usa |
 |---|---|---|
-| **Master** | Variable de entorno `PREVIEW_PASSWORD` (`.env.local` + Vercel) | Desbloquea cualquier saga/capítulo + acceso al editor de diálogos |
+| **Master** | Variable de entorno `PREVIEW_PASSWORD` (`.env.local` + Vercel). Si no está definida, se usa el valor por defecto de `lib/masterPassword.ts` | Desbloquea cualquier saga/capítulo + **única** contraseña que habilita el modo edición |
 | **Por saga** | Campo `"password"` en `saga.json` | Desbloquea solo esa saga (sin dar acceso al editor) |
 
 **Ejemplo saga con contraseña propia:**

@@ -148,7 +148,7 @@ export async function POST(
   { params }: { params: Promise<{ id: string }> }
 ) {
   const { id } = await params;
-  if (!validateEditorAccess(request, id)) {
+  if (!validateEditorAccess(request)) {
     return NextResponse.json({ error: "No autorizado para usar el editor." }, { status: 401 });
   }
 
