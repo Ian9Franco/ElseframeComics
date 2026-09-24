@@ -1,11 +1,40 @@
 import type { NextRequest } from "next/server";
 import { getDynamicSagas } from "@/lib/serverData";
+import { isPreviewAuthBypassed } from "@/lib/previewAuth";
 
-export function validateEditorAccess(request: NextRequest, chapterId: string): boolean {
-  const masterPassword = process.env.PREVIEW_PASSWORD || "spiderman1999";
+function getProvidedPassword(request: NextRequest): string | undefined {
   const headerPass = request.headers.get("x-editor-password");
   const cookiePass = request.cookies.get("preview_password")?.value;
-  const providedPassword = headerPass || cookiePass;
+  return headerPass || cookiePass || undefined;
+}
+
+export function validateMasterEditorAccess(request: NextRequest): boolean {
+  if (isPreviewAuthBypassed()) return true;
+
+  const masterPassword = process.env.PREVIEW_PASSWORD || "spiderman1999";
+  const providedPassword = getProvidedPassword(request);
+  if (!providedPassword) return false;
+  return providedPassword === masterPassword;
+}
+
+export function validateEditorApiAccess(request: NextRequest): boolean {
+  if (isPreviewAuthBypassed()) return true;
+
+  const masterPassword = process.env.PREVIEW_PASSWORD || "spiderman1999";
+  const providedPassword = getProvidedPassword(request);
+  if (!providedPassword) return false;
+  if (providedPassword === masterPassword) return true;
+
+  return getDynamicSagas().some(
+    (saga) => Boolean(saga.password) && saga.password === providedPassword
+  );
+}
+
+export function validateEditorAccess(request: NextRequest, chapterId: string): boolean {
+  if (isPreviewAuthBypassed()) return true;
+
+  const masterPassword = process.env.PREVIEW_PASSWORD || "spiderman1999";
+  const providedPassword = getProvidedPassword(request);
 
   if (!providedPassword) return false;
   if (providedPassword === masterPassword) return true;
@@ -17,4 +46,3 @@ export function validateEditorAccess(request: NextRequest, chapterId: string): b
       saga.password === providedPassword
   );
 }
-

@@ -248,8 +248,11 @@ export function findDynamicChapter(chapterId: string): { chapter: Chapter; saga:
 }
 
 import { NextRequest } from "next/server";
+import { isPreviewAuthBypassed } from "@/lib/previewAuth";
 
 export function validatePreviewAccess(request: NextRequest, sagaId?: string): boolean {
+  if (isPreviewAuthBypassed()) return true;
+
   const cookiePass = request.cookies.get("preview_password")?.value;
   const headerPass = request.headers.get("x-preview-password");
   const urlPass = request.nextUrl.searchParams.get("password") || request.nextUrl.searchParams.get("preview_password");

@@ -10,6 +10,7 @@ import { BlueprintsTab } from "@/components/lore/BlueprintsTab";
 import { CharacterModal } from "@/components/home/CharacterModal";
 import { CHARACTER_DETAILS } from "@/lib/characterData";
 import { PasswordPromptModal } from "@/components/PasswordPromptModal";
+import { isPreviewAuthBypassedClient } from "@/lib/previewAuthClient";
 
 type TabId = "dossier" | "timeline" | "blueprints";
 
@@ -29,7 +30,12 @@ export default function LorePage() {
     try {
       const read = localStorage.getItem("read-chapters");
       if (read) setReadChapters(JSON.parse(read));
-      setUnlockAll(localStorage.getItem("unlock-all") === "true");
+      if (isPreviewAuthBypassedClient()) {
+        localStorage.setItem("unlock-all", "true");
+        setUnlockAll(true);
+      } else {
+        setUnlockAll(localStorage.getItem("unlock-all") === "true");
+      }
     } catch (e) {
       console.error(e);
     }
@@ -55,6 +61,12 @@ export default function LorePage() {
   const toggleUnlockAll = () => {
     const next = !unlockAll;
     if (next) {
+      if (isPreviewAuthBypassedClient()) {
+        setUnlockAll(true);
+        localStorage.setItem("unlock-all", "true");
+        window.dispatchEvent(new Event("unlockAllChanged"));
+        return;
+      }
       setIsPasswordModalOpen(true);
     } else {
       setUnlockAll(false);

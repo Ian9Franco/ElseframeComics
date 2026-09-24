@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getDynamicSagas, getAssetsComicsDir } from "@/lib/serverData";
+import { validateEditorApiAccess } from "@/lib/editorAccess";
 import fs from "fs";
 import path from "path";
 
@@ -7,19 +8,8 @@ export const dynamic = "force-dynamic";
 
 const ASSETS_COMICS_DIR = getAssetsComicsDir();
 
-function validateAccess(request: NextRequest): boolean {
-  const masterPassword = process.env.PREVIEW_PASSWORD || "spiderman1999";
-  const headerPass = request.headers.get("x-editor-password");
-  const cookiePass = request.cookies.get("preview_password")?.value;
-  const provided = headerPass || cookiePass;
-  if (!provided) return false;
-  if (provided === masterPassword) return true;
-  const sagas = getDynamicSagas();
-  return sagas.some((s) => s.password && provided === s.password);
-}
-
 export async function POST(request: NextRequest) {
-  if (!validateAccess(request)) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  if (!validateEditorApiAccess(request)) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
   const body = await request.json();
   const { type, sagaId, name, number, title, color } = body;
@@ -96,7 +86,7 @@ export async function POST(request: NextRequest) {
 }
 
 export async function PATCH(request: NextRequest) {
-  if (!validateAccess(request)) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  if (!validateEditorApiAccess(request)) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
   const body = await request.json();
   const { type, sagaId, chapterId, newName, newNumber, newTitle } = body;

@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useState, useEffect } from "react";
 import { Users, BookOpen, Lock, Unlock, Menu, X, Compass } from "lucide-react";
 import { PasswordPromptModal } from "./PasswordPromptModal";
+import { isPreviewAuthBypassedClient } from "@/lib/previewAuthClient";
 
 /**
  * NavBar — Elseframe Comics
@@ -37,10 +38,20 @@ export default function NavBar() {
     };
     loadSagas();
 
-    setUnlockAll(localStorage.getItem("unlock-all") === "true");
-
-    const checkUnlock = () =>
+    if (isPreviewAuthBypassedClient()) {
+      localStorage.setItem("unlock-all", "true");
+      setUnlockAll(true);
+    } else {
       setUnlockAll(localStorage.getItem("unlock-all") === "true");
+    }
+
+    const checkUnlock = () => {
+      if (isPreviewAuthBypassedClient()) {
+        setUnlockAll(true);
+        return;
+      }
+      setUnlockAll(localStorage.getItem("unlock-all") === "true");
+    };
     const onScroll    = () => setScrolled(window.scrollY > 8);
 
     window.addEventListener("unlockAllChanged",   checkUnlock);
@@ -58,6 +69,12 @@ export default function NavBar() {
   const toggleUnlockAll = () => {
     const next = !unlockAll;
     if (next) {
+      if (isPreviewAuthBypassedClient()) {
+        localStorage.setItem("unlock-all", "true");
+        setUnlockAll(true);
+        window.dispatchEvent(new Event("unlockAllChanged"));
+        return;
+      }
       setIsPasswordModalOpen(true);
     } else {
       localStorage.setItem("unlock-all", "false");

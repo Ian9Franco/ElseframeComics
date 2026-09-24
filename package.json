@@ -3,7 +3,11 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "predev": "node scripts/assets/generate-character-images.js && node scripts/assets/generate-concept-arts.js",
+    "postinstall": "node scripts/config/persist-env.js restore",
+    "config:save": "node scripts/config/persist-env.js save",
+    "config:restore": "node scripts/config/persist-env.js restore",
+    "config:status": "node scripts/config/persist-env.js status",
+    "predev": "node scripts/config/persist-env.js restore && node scripts/assets/generate-character-images.js && node scripts/assets/generate-concept-arts.js",
     "dev": "next dev --webpack",
     "prebuild": "node scripts/assets/generate-character-images.js && node scripts/assets/generate-concept-arts.js",
     "build": "next build",

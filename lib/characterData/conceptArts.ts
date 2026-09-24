@@ -573,7 +573,7 @@ export const conceptArts: Record<string, ConceptArtItem[]> = {
     },
     {
       "name": "Jaz Sheet",
-      "path": "/personajes/GUIAS/boyz/SIGIL/JAZ_sheet.webp",
+      "path": "/personajes/GUIAS/boyz/SIGIL/Jaz_sheet.webp",
       "section": "base",
       "sectionLabel": "Base",
       "isAlt": false
@@ -591,6 +591,20 @@ export const conceptArts: Record<string, ConceptArtItem[]> = {
       "section": "base",
       "sectionLabel": "Base",
       "isAlt": false
+    },
+    {
+      "name": "Sigil Sheet",
+      "path": "/personajes/GUIAS/boyz/SIGIL/Sigil_sheet_.webp",
+      "section": "base",
+      "sectionLabel": "Base",
+      "isAlt": false
+    },
+    {
+      "name": "Jaz Sheet",
+      "path": "/personajes/GUIAS/boyz/SIGIL/old/JAZ_sheet.webp",
+      "section": "old",
+      "sectionLabel": "Old",
+      "isAlt": true
     }
   ],
   "ian": [
@@ -623,13 +637,6 @@ export const conceptArts: Record<string, ConceptArtItem[]> = {
       "isAlt": false
     },
     {
-      "name": "Ian New Sheet",
-      "path": "/personajes/GUIAS/boyz/VESPERWING/ian_new_sheet.webp",
-      "section": "base",
-      "sectionLabel": "Base",
-      "isAlt": false
-    },
-    {
       "name": "Ian Sheet",
       "path": "/personajes/GUIAS/boyz/VESPERWING/ian_sheet.webp",
       "section": "base",
@@ -649,6 +656,20 @@ export const conceptArts: Record<string, ConceptArtItem[]> = {
       "section": "base",
       "sectionLabel": "Base",
       "isAlt": false
+    },
+    {
+      "name": "Ian New Sheet",
+      "path": "/personajes/GUIAS/boyz/VESPERWING/alt/ian_new_sheet.webp",
+      "section": "alt",
+      "sectionLabel": "Alt",
+      "isAlt": true
+    },
+    {
+      "name": "Ian Old Sheet",
+      "path": "/personajes/GUIAS/boyz/VESPERWING/alt/ian_old_sheet.webp",
+      "section": "alt",
+      "sectionLabel": "Alt",
+      "isAlt": true
     },
     {
       "name": "Ian Siut Sheet",
@@ -1164,8 +1185,8 @@ export const conceptArts: Record<string, ConceptArtItem[]> = {
   ],
   "pirata_capitan": [
     {
-      "name": "Pirata Capitan Sheet",
-      "path": "/personajes/GUIAS/Secundarios/Pirata Capitan/Pirata Capitan_sheet.webp",
+      "name": "Capitan Sheet",
+      "path": "/personajes/GUIAS/Secundarios/Pirata Capitan/capitan_sheet.webp",
       "section": "base",
       "sectionLabel": "Base",
       "isAlt": false

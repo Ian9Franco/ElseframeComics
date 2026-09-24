@@ -19,6 +19,7 @@ import { getComicPageUrl, getPageKeyFromUrl } from "./readerUtils";
 import { Dialogues, PanelStop } from "./audioPlayer";
 import { UnlockNotificationModal } from "@/components/UnlockNotificationModal";
 import { markChapterCompletionUnlock } from "@/lib/characterData/completionUnlocks";
+import { isPreviewAuthBypassedClient } from "@/lib/previewAuthClient";
 
 export function CinematicReader({
   pages: rawPages,
@@ -264,6 +265,10 @@ export function CinematicReader({
 
   useEffect(() => {
     if (typeof window !== "undefined") {
+      if (isPreviewAuthBypassedClient()) {
+        setIsAuthorized(true);
+        return;
+      }
       const auth = sessionStorage.getItem("editor_authorized") === "true";
       setIsAuthorized(auth);
       if (auth && sessionStorage.getItem("editor_mode") === "edit") {
@@ -588,7 +593,7 @@ export function CinematicReader({
       setMode("read");
       if (typeof window !== "undefined") sessionStorage.setItem("editor_mode", "read");
     } else {
-      if (isAuthorized) {
+      if (isAuthorized || isPreviewAuthBypassedClient()) {
         setMode("edit");
         if (typeof window !== "undefined") sessionStorage.setItem("editor_mode", "edit");
       } else {

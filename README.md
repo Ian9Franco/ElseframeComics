@@ -161,15 +161,21 @@ npm run sync-assets
 ```
 
 ### ⚙️ Variables de Entorno (`.env.local`)
+
+Copiá `.env.example` → `.env.local` y completá tus claves. El archivo **no se commitea** a git.
+
+**Persistencia automática:** al correr `npm install` o `npm run dev`, la config se restaura desde:
+
+- Windows: `%LOCALAPPDATA%\the-boys\config\.env.local`
+- macOS/Linux: `~/.config/the-boys/.env.local`
+
+Después de editar `.env.local`, guardala con `npm run config:save` (o simplemente corré `npm run dev`, que sincroniza si el archivo local es más reciente).
+
 ```env
-# En desarrollo local (con servidor the-boyz-comic en puerto 8080):
-NEXT_PUBLIC_ASSETS_BASE_URL="http://localhost:8080"
-
-# En producción (Vercel):
-# NEXT_PUBLIC_ASSETS_BASE_URL="https://cdn.jsdelivr.net/gh/Ian9Franco/theboyz-comic-v1@main"
-
-# Contraseña maestra para acceder a borradores y editor visual:
+OPENAI_API_KEY="sk-..."
 PREVIEW_PASSWORD="tu_password_maestra"
+NEXT_PUBLIC_ASSETS_BASE_URL="http://localhost:8080"
+# GITHUB_TOKEN="..."  # opcional
 ```
 
 ---

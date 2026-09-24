@@ -1,28 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getDynamicSagas } from "@/lib/serverData";
+import { validateEditorApiAccess } from "@/lib/editorAccess";
 import fs from "fs";
 import path from "path";
 
 export const dynamic = "force-dynamic";
-
-function validateAccess(request: NextRequest): boolean {
-  const masterPassword = process.env.PREVIEW_PASSWORD || "spiderman1999";
-  const headerPass = request.headers.get("x-editor-password");
-  const cookiePass = request.cookies.get("preview_password")?.value;
-  const providedPassword = headerPass || cookiePass;
-
-  if (!providedPassword) return false;
-  if (providedPassword === masterPassword) return true;
-
-  const sagas = getDynamicSagas();
-  for (const saga of sagas) {
-    if (saga.password && providedPassword === saga.password) {
-      return true;
-    }
-  }
-
-  return false;
-}
 
 function buildTree(dirPath: string, relativePath: string): any {
   if (!fs.existsSync(dirPath)) return null;
@@ -85,7 +66,7 @@ function buildTree(dirPath: string, relativePath: string): any {
 }
 
 export async function GET(request: NextRequest) {
-  if (!validateAccess(request)) {
+  if (!validateEditorApiAccess(request)) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
@@ -127,7 +108,7 @@ export async function GET(request: NextRequest) {
 }
 
 export async function PUT(request: NextRequest) {
-  if (!validateAccess(request)) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  if (!validateEditorApiAccess(request)) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   
   const { file, content } = await request.json();
   if (!file) return NextResponse.json({ error: "File param missing" }, { status: 400 });
@@ -146,7 +127,7 @@ export async function PUT(request: NextRequest) {
 }
 
 export async function POST(request: NextRequest) {
-  if (!validateAccess(request)) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  if (!validateEditorApiAccess(request)) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   
   const { parent, name, type } = await request.json();
   if (!parent || !name || !type) return NextResponse.json({ error: "Missing params" }, { status: 400 });
@@ -178,7 +159,7 @@ export async function POST(request: NextRequest) {
 }
 
 export async function PATCH(request: NextRequest) {
-  if (!validateAccess(request)) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  if (!validateEditorApiAccess(request)) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
   const { filePath, newName } = await request.json();
   if (!filePath || !newName) return NextResponse.json({ error: "Missing params" }, { status: 400 });
@@ -209,7 +190,7 @@ export async function PATCH(request: NextRequest) {
 }
 
 export async function DELETE(request: NextRequest) {
-  if (!validateAccess(request)) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  if (!validateEditorApiAccess(request)) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
   const filePath = request.nextUrl.searchParams.get("file");
   if (!filePath) return NextResponse.json({ error: "Missing file param" }, { status: 400 });

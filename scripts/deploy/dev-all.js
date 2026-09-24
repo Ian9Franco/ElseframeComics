@@ -123,9 +123,12 @@ function killPortSync(port) {
   }
 }
 
-function runProcess(name, command, args, cwd) {
+const NEXT_DEV_PORT = 616;
+
+function runProcess(name, command, args, cwd, env = process.env) {
   const child = spawn(command, args, {
     cwd,
+    env,
     stdio: "pipe",
     shell: true,
   });
@@ -151,11 +154,27 @@ function runProcess(name, command, args, cwd) {
   return child;
 }
 
-// Free port 8080 in case a previous dev:all left a zombie serve process
-console.log("🔍 Verificando puerto 8080...");
+// Free ports in case a previous dev:all left zombie processes
+console.log(`🔍 Verificando puertos ${NEXT_DEV_PORT} y 8080...`);
+killPortSync(NEXT_DEV_PORT);
 killPortSync(8080);
 
-const p1 = runProcess("Next.js App", "npm", ["run", "dev"], projectRoot);
+const nextDevEnv = {
+  ...process.env,
+  PORT: String(NEXT_DEV_PORT),
+  SKIP_PREVIEW_AUTH: "true",
+  NEXT_PUBLIC_SKIP_PREVIEW_AUTH: "true",
+};
+
+console.log(`🌐 Next.js → http://localhost:${NEXT_DEV_PORT} (auth bypass activo)\n`);
+
+const p1 = runProcess(
+  "Next.js App",
+  "npm",
+  ["run", "dev", "--", "-p", String(NEXT_DEV_PORT)],
+  projectRoot,
+  nextDevEnv
+);
 const p2 = runProcess("Comic Assets", "npm", ["run", "dev"], siblingRoot);
 
 // Handle graceful termination

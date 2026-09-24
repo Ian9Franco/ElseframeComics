@@ -8,7 +8,7 @@ Documento de referencia rápida para desarrollo, publicación y control de acces
 
 | Repo | Propósito | Puerto Dev |
 |---|---|---|
-| `the-boys` | App Next.js — UI, diálogos, código | `3000` |
+| `the-boys` | App Next.js — UI, diálogos, código | `616` con `dev:all`, `3000` con `dev` |
 | `the-boyz-comic` | Assets pesados — imágenes en alta resolución | `8080` |
 
 ---
@@ -18,6 +18,7 @@ Documento de referencia rápida para desarrollo, publicación y control de acces
 ### `the-boys`
 ```bash
 npm run dev          # Levanta la web en localhost:3000
+npm run dev:all      # Levanta web + assets: localhost:616 + localhost:8080 (sin contraseñas)
 npm run sync-assets  # Sincroniza marcadores de assets desde the-boyz-comic
 npm run build        # Verifica que compila sin errores antes de pushear
 ```
@@ -52,8 +53,8 @@ npm run sync    # Sincroniza hacia the-boys (equivalente a sync-assets)
    → Crea marcadores vacíos (0 bytes) para el resto
 
 4. Editar diálogos:
-   - Tener corriendo ambos dev servers (3000 y 8080)
-   - Ir a localhost:3000, entrar al capítulo, activar editor con contraseña
+   - Tener corriendo ambos dev servers (`npm run dev:all` → 616 y 8080)
+   - Ir a localhost:616, entrar al capítulo y activar el editor (sin contraseña en dev:all)
    - Posicionar globos, zooms, guardar
 
 5. Publicar (ver sección de bloqueo abajo)
@@ -183,7 +184,11 @@ Cualquiera que ingrese `hush` en el modal de contraseña podrá ver esa saga, si
 ## Variables de entorno
 
 ### `.env.local` (desarrollo)
+
+Copiá `.env.example` → `.env.local`. Las claves **no van a git**; se guardan automáticamente en `%LOCALAPPDATA%\the-boys\config\` (Windows) al correr `npm run dev` o con `npm run config:save`. Se restauran solas en `npm install`.
+
 ```env
+OPENAI_API_KEY="sk-..."
 NEXT_PUBLIC_ASSETS_BASE_URL="http://localhost:8080"
 PREVIEW_PASSWORD="tu_contraseña_secreta"
 ```
@@ -215,7 +220,7 @@ window.dispatchEvent(new Event("unlockAllChanged"))
 
 
 
-comando para correr el entorno: npm run dev:all
+comando para correr el entorno: `npm run dev:all` → http://localhost:616 (drafts, editor y spoilers sin contraseña)
 comando para publicar: npm run publish:all
 
 ---

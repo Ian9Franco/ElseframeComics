@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { exec, ChildProcess } from "child_process";
 import path from "path";
+import { validateMasterEditorAccess } from "@/lib/editorAccess";
 
 export const dynamic = "force-dynamic";
 
@@ -8,22 +9,13 @@ let currentProcess: ChildProcess | null = null;
 let publishLog: string[] = [];
 let publishStatus: "idle" | "running" | "success" | "error" = "idle";
 
-function validateAccess(request: NextRequest): boolean {
-  const masterPassword = process.env.PREVIEW_PASSWORD || "spiderman1999";
-  const headerPass = request.headers.get("x-editor-password");
-  const cookiePass = request.cookies.get("preview_password")?.value;
-  const provided = headerPass || cookiePass;
-  if (!provided) return false;
-  return provided === masterPassword;
-}
-
 export async function GET(request: NextRequest) {
-  if (!validateAccess(request)) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  if (!validateMasterEditorAccess(request)) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   return NextResponse.json({ status: publishStatus, log: publishLog });
 }
 
 export async function POST(request: NextRequest) {
-  if (!validateAccess(request)) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  if (!validateMasterEditorAccess(request)) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
   if (publishStatus === "running") {
     return NextResponse.json({ error: "Publish already in progress" }, { status: 409 });
