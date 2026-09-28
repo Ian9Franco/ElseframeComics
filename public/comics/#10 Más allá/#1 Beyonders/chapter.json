@@ -1,5 +1,9 @@
 {
   "title": "Beyonders",
   "number": 1,
-  "status": "draft"
+  "status": "published",
+  "date": "30/07/2026",
+  "estimatedTime": "20 días",
+  "nuevo": true,
+  "releaseDate": "27/09/2026"
 }

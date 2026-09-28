@@ -69,6 +69,16 @@ export default function Home() {
 
   const publishedSagas = [...nuevoSagas, ...[...otherOfficialSagas].reverse()];
 
+  const isPatriaProximamenteItem = (item: { title?: string }) =>
+    /patria de la libertad/i.test(item.title ?? "");
+
+  const sortedProximamenteSagas = [...proximamenteSagas].sort((a, b) => {
+    const aPatria = isPatriaProximamenteItem(a);
+    const bPatria = isPatriaProximamenteItem(b);
+    if (aPatria === bPatria) return 0;
+    return aPatria ? 1 : -1;
+  });
+
   const renderSagaGrid = (sagas: any[], isDrawerItem = false) => (
     <div className={`grid grid-cols-1 items-start gap-5 ${isDrawerItem ? "" : "sm:grid-cols-2 sm:gap-8"}`}>
       {sagas.map((saga) => (
@@ -216,7 +226,7 @@ export default function Home() {
         )}
       </AnimatePresence>
 
-      {proximamenteSagas.length > 0 && (
+      {sortedProximamenteSagas.length > 0 && (
         <motion.aside
           key="upcoming-drawer"
           initial={{ x: "100%" }}
@@ -259,7 +269,7 @@ export default function Home() {
               </div>
             </div>
             <div className="flex-1 overflow-y-auto pr-1 pb-8 scrollbar-thin scrollbar-thumb-[#D7263D]/40 scrollbar-track-transparent">
-              {renderSagaGrid(proximamenteSagas, true)}
+              {renderSagaGrid(sortedProximamenteSagas, true)}
             </div>
           </div>
         </motion.aside>

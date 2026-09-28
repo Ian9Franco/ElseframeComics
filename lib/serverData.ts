@@ -286,10 +286,10 @@ export function validatePreviewAccess(request: NextRequest, sagaId?: string): bo
   return false;
 }
 
-export function getAssetsComicsDir(): string {
+function resolveSiblingAssetsSubdir(subdir: "comics" | "sounds"): string {
   const possibleNames = ["the-boyz-comic", "theboyz-comic-v1", "theboyz-comic"];
   for (const name of possibleNames) {
-    const p = path.join(process.cwd(), "..", name, "comics");
+    const p = path.join(process.cwd(), "..", name, subdir);
     if (fs.existsSync(p)) {
       return p;
     }
@@ -299,12 +299,23 @@ export function getAssetsComicsDir(): string {
     const files = fs.readdirSync(parentDir);
     for (const file of files) {
       if (file.toLowerCase().includes("the-boyz-comic") || file.toLowerCase().includes("theboyz-comic")) {
-        const p = path.join(parentDir, file, "comics");
+        const p = path.join(parentDir, file, subdir);
         if (fs.existsSync(p)) {
           return p;
         }
       }
     }
   } catch (e) {}
-  return path.join(process.cwd(), "..", "the-boyz-comic", "comics");
+  return path.join(process.cwd(), "..", "the-boyz-comic", subdir);
 }
+
+export function getAssetsComicsDir(): string {
+  return resolveSiblingAssetsSubdir("comics");
+}
+
+export function getAssetsSoundsDir(): string {
+  return resolveSiblingAssetsSubdir("sounds");
+}
+
+/** Matches audio files under public/sounds or the-boyz-comic/sounds (incl. .mpeg voice lines). */
+export const AUDIO_FILE_NAME_REGEX = /\.(mp3|wav|ogg|m4a|mpeg|aac|webm|flac)$/i;

@@ -8,7 +8,7 @@
   "order": 8,
   "password": "vuelo",
   "cinematic": true,
-  "nuevo": true,
+  "nuevo": false,
   "proximamente": false,
   "date": "26/07/2026",
   "estimatedTime": "27 días"

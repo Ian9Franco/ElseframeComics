@@ -1,5 +1,6 @@
 import { readdirSync, statSync, existsSync } from 'fs';
 import { join, relative } from 'path';
+import { AUDIO_FILE_NAME_REGEX, getAssetsSoundsDir } from '@/lib/serverData';
 
 function getFilesRecursively(dir: string, baseDir: string, filesList: Array<{ name: string; path: string }> = []) {
   if (!existsSync(dir)) return filesList;
@@ -9,9 +10,8 @@ function getFilesRecursively(dir: string, baseDir: string, filesList: Array<{ na
     const stat = statSync(fullPath);
     if (stat.isDirectory()) {
       getFilesRecursively(fullPath, baseDir, filesList);
-    } else if (stat.isFile() && /\.(mp3|wav|ogg|m4a)$/i.test(item)) {
-      const relPath = '/sounds/' + relative(dir === baseDir ? dir : baseDir, fullPath).replace(/\\/g, '/');
-      // Normalize to always start with /sounds/
+    } else if (stat.isFile() && AUDIO_FILE_NAME_REGEX.test(item)) {
+      const relPath = '/sounds/' + relative(baseDir, fullPath).replace(/\\/g, '/');
       const cleanPath = relPath.startsWith('/sounds/sounds/') ? relPath.replace('/sounds/sounds/', '/sounds/') : relPath;
       filesList.push({
         name: item,
@@ -25,20 +25,16 @@ function getFilesRecursively(dir: string, baseDir: string, filesList: Array<{ na
 export async function GET() {
   try {
     const publicSounds = join(process.cwd(), 'public', 'sounds');
-    const comicAssetsSounds = join(process.cwd(), '..', 'the-boyz-comic', 'sounds');
-    const altAssetsSounds = 'D:\\.CodeProjects\\the-boyz-comic\\sounds';
+    const comicAssetsSounds = getAssetsSoundsDir();
 
     const map = new Map<string, { name: string; path: string }>();
 
-    // 1. Scan public/sounds if it exists
     if (existsSync(publicSounds)) {
       getFilesRecursively(publicSounds, publicSounds).forEach((s) => map.set(s.path, s));
     }
 
-    // 2. Scan external comic assets sounds if it exists
-    const externalDir = existsSync(comicAssetsSounds) ? comicAssetsSounds : (existsSync(altAssetsSounds) ? altAssetsSounds : null);
-    if (externalDir) {
-      getFilesRecursively(externalDir, externalDir).forEach((s) => {
+    if (existsSync(comicAssetsSounds)) {
+      getFilesRecursively(comicAssetsSounds, comicAssetsSounds).forEach((s) => {
         if (!map.has(s.path)) {
           map.set(s.path, s);
         }
