@@ -2099,7 +2099,7 @@
           "dialogue": [
             { "text": "Acepté la misión. Mañana empiezo las pruebas. Sé que estás ocupada, pero quería que lo supieras por mí. Te veo mañana", "speaker": "Julián", "style": "electronic", "tail": "none", "offscreen": true, "showSpeakerName": true, "size": "small", "posX": 105, "posY": 55, "tailX": 35, "tailY": 58, "tailWidth": 6, "tailCurvature": -22, "width": 160, "fontSize": 8, "borderRadius": 18 },
             { "text": "Lo empujé directo hacia Parker.", "speaker": "Severine", "style": "thought", "tail": "none", "size": "small", "posX": 105, "posY": 65, "tailX": 65, "tailY": 58, "tailWidth": 6, "tailCurvature": 22, "width": 142, "fontSize": 8, "borderRadius": 18 },
-            { "text": "Les envio el plan, y todo lo que necesan saber para mañana", "size": "small", "posX": 35, "posY": 45, "tailX": 15, "tailY": 60, "tailWidth": 6, "tailCurvature": -22, "width": 120, "fontSize": 8, "borderRadius": 18 }
+            { "text": "Les envio el plan, y todo lo que necesitan saber para mañana", "size": "small", "posX": 35, "posY": 45, "tailX": 15, "tailY": 60, "tailWidth": 6, "tailCurvature": -22, "width": 120, "fontSize": 8, "borderRadius": 18 }
           ],
           "zoomRects": [
             { "x": 0, "y": 50, "w": 100, "h": 23 }
