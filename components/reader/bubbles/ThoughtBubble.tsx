@@ -15,6 +15,7 @@ import {
   resolveBgColor,
   renderStyledText,
 } from "./bubbleHelpers";
+import { BubbleInlineEditor } from "./BubbleInlineEditor";
 
 interface ThoughtBubbleProps {
   line: DialogueLine;
@@ -27,6 +28,7 @@ interface ThoughtBubbleProps {
   textScale?: number;
   speedMultiplier?: number;
   bubbleOpacity?: number;
+  inlineTextEdit?: import("../DialogueBubble").InlineTextEditProps;
 }
 
 export function ThoughtBubble({
@@ -39,6 +41,7 @@ export function ThoughtBubble({
   textScale = 1.0,
   speedMultiplier = 1.0,
   bubbleOpacity,
+  inlineTextEdit,
 }: ThoughtBubbleProps) {
   const [isMobile, setIsMobile] = React.useState(false);
   React.useEffect(() => {
@@ -135,7 +138,9 @@ export function ThoughtBubble({
                   {p.speaker}:{" "}
                 </strong>
               )}
-              <span>{renderStyledText(p.text)}</span>
+              <span>
+                {inlineTextEdit ? <BubbleInlineEditor inlineTextEdit={inlineTextEdit} /> : renderStyledText(p.text)}
+              </span>
             </div>
           ))}
         </div>

@@ -4,6 +4,7 @@ import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
 import { PublishModal } from "./PublishModal";
+import type { EditorVersion } from "@/lib/editorVersion";
 
 const fontLabels: Record<number, string> = {
   0.85: "A- Chico",
@@ -41,6 +42,8 @@ interface ReaderTopBarProps {
   setPanOffset?: (val: { x: number; y: number }) => void;
   bubbleOpacity?: number;
   setBubbleOpacity?: (val: number) => void;
+  editorVersion?: EditorVersion;
+  setEditorVersion?: (v: EditorVersion) => void;
 }
 
 /**
@@ -72,6 +75,8 @@ export function ReaderTopBar({
   setPanOffset,
   bubbleOpacity = 0.90,
   setBubbleOpacity,
+  editorVersion = "v1",
+  setEditorVersion,
 }: ReaderTopBarProps) {
   const [showPublish, setShowPublish] = useState(false);
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
@@ -367,6 +372,29 @@ export function ReaderTopBar({
                 <span>🚀</span>
                 <span className="hidden sm:inline">Publicar</span>
               </button>
+            )}
+
+            {mode === "edit" && setEditorVersion && (
+              <div className="flex bg-zinc-100 border-2 border-[#0a0a0f] shadow-[2px_2px_0_#0a0a0f] rounded overflow-hidden">
+                <button
+                  type="button"
+                  onClick={() => setEditorVersion("v1")}
+                  className={`px-2 sm:px-3 py-1.5 text-xs font-[var(--font-bangers)] ${
+                    editorVersion === "v1" ? "bg-[#0a0a0f] text-white" : "text-[#0a0a0f] hover:bg-zinc-200"
+                  }`}
+                >
+                  1.0
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setEditorVersion("v2")}
+                  className={`px-2 sm:px-3 py-1.5 text-xs font-[var(--font-bangers)] ${
+                    editorVersion === "v2" ? "bg-[#e8185a] text-white" : "text-[#0a0a0f] hover:bg-zinc-200"
+                  }`}
+                >
+                  2.0
+                </button>
+              </div>
             )}
 
             {/* Mode toggle */}

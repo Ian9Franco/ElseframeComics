@@ -20,6 +20,8 @@ import { Dialogues, PanelStop } from "./audioPlayer";
 import { UnlockNotificationModal } from "@/components/UnlockNotificationModal";
 import { markChapterCompletionUnlock } from "@/lib/characterData/completionUnlocks";
 import { isPreviewAuthBypassedClient } from "@/lib/previewAuthClient";
+import { readEditorVersion, writeEditorVersion, type EditorVersion } from "@/lib/editorVersion";
+import { EditorV2 } from "@/components/editor-v2/EditorV2";
 
 export function CinematicReader({
   pages: rawPages,
@@ -39,6 +41,7 @@ export function CinematicReader({
   cover?: string | null;
 }) {
   const [mode, setMode] = useState<"read" | "edit">("read");
+  const [editorVersion, setEditorVersionState] = useState<EditorVersion>("v1");
 
   const pages = React.useMemo(() => {
     const hasExplicitCover = cover && cover !== rawPages[0];
@@ -120,6 +123,7 @@ export function CinematicReader({
 
   const {
     localDialogues,
+    setLocalDialogues,
     activeLayer,
     setActiveLayer,
     activePanelIdx,
@@ -292,7 +296,18 @@ export function CinematicReader({
   }, [mode, cover]);
 
   useEffect(() => {
-    if (mode !== "edit") return;
+    if (typeof window !== "undefined") {
+      setEditorVersionState(readEditorVersion());
+    }
+  }, []);
+
+  const handleSetEditorVersion = (v: EditorVersion) => {
+    setEditorVersionState(v);
+    writeEditorVersion(v);
+  };
+
+  useEffect(() => {
+    if (mode !== "edit" || editorVersion !== "v1") return;
     const handleKeyDown = (e: KeyboardEvent) => {
       if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === "z") {
         e.preventDefault();
@@ -301,7 +316,7 @@ export function CinematicReader({
     };
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [mode, handleUndo]);
+  }, [mode, editorVersion, handleUndo]);
 
   useEffect(() => {
     const originalStyle = document.body.style.overflow;
@@ -732,12 +747,32 @@ export function CinematicReader({
         setPanOffset={setPanOffset}
         bubbleOpacity={bubbleOpacity}
         setBubbleOpacity={handleSetBubbleOpacity}
+        editorVersion={editorVersion}
+        setEditorVersion={handleSetEditorVersion}
       />
 
       {/* Floating Mini Music Player (appears when a music track plays) */}
       <MiniMusicPlayer track={activeMusicTrack} />
 
       <div className={`flex-1 flex ${mode === "read" ? "flex-row" : "flex-col md:flex-row"} overflow-hidden w-full h-full relative`}>
+        {mode === "edit" && editorVersion === "v2" ? (
+          <EditorV2
+            pages={pages}
+            pageIdx={pageIdx}
+            resetPage={resetPage}
+            chapter={chapter}
+            saga={saga}
+            localDialogues={localDialogues}
+            setLocalDialogues={setLocalDialogues}
+            handleSaveChanges={handleSaveChanges}
+            isSaving={isSaving}
+            saveStatus={saveStatus}
+            hasUnsavedChanges={hasUnsavedChanges}
+            handleApplyGeneratedDialogues={handleApplyGeneratedDialogues}
+            onPreview={() => setMode("read")}
+          />
+        ) : (
+          <>
         {/* Read mode: page thumbnail sidebar (PDF-reader style) */}
         <AnimatePresence>
           {mode === "read" && (
@@ -863,6 +898,8 @@ export function CinematicReader({
           restoreLocalBackup={restoreLocalBackup}
           discardLocalBackup={discardLocalBackup}
         />
+          </>
+        )}
       </div>
 
       <ReaderAuthModal

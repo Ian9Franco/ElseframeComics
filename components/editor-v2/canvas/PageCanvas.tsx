@@ -1,0 +1,367 @@
+"use client";
+
+import React, { useEffect, useMemo, useRef, useState } from "react";
+import type { PanelStop } from "@/components/reader/audioPlayer";
+import { getComicPageUrl } from "@/components/reader/readerUtils";
+import { BubbleNode } from "./BubbleNode";
+import { SmartGuides, snapWithGuides } from "./SmartGuides";
+import { StopRegionFocusHandle } from "./StopRegion";
+import type { EditorV2Tool, Selection } from "../types";
+import type { BubbleStylePreset } from "../types";
+
+type StoreApi = {
+  selection: Selection;
+  setSelection: (s: Selection) => void;
+  activeTool: EditorV2Tool;
+  pendingBubbleStyle: BubbleStylePreset;
+  beginGesture: () => void;
+  addPanelWithMask: (rect: { x: number; y: number; w: number; h: number }) => void;
+  addBubble: (panelIdx: number, pos: { posX: number; posY: number }, style?: BubbleStylePreset) => void;
+  updateBubble: (pIdx: number, bIdx: number, fields: Partial<import("@/components/reader/DialogueBubble").DialogueLine>) => void;
+  updateBubbleLive: (pIdx: number, bIdx: number, fields: Partial<import("@/components/reader/DialogueBubble").DialogueLine>) => void;
+  updatePanel: (pIdx: number, u: Partial<PanelStop>) => void;
+  findPanelForPoint: (x: number, y: number) => number;
+};
+
+export function PageCanvas({
+  pageUrl,
+  panels,
+  activePanelIdx,
+  store,
+  scale,
+  pan,
+  spaceHeld,
+  onPanChange,
+  onWheelZoom,
+  dragBubbleStyle,
+  onDropBubbleStyle,
+  guides,
+  setGuides,
+}: {
+  pageUrl: string;
+  panels: PanelStop[];
+  activePanelIdx: number;
+  store: StoreApi;
+  scale: number;
+  pan: { x: number; y: number };
+  spaceHeld: boolean;
+  onPanChange: (p: { x: number; y: number }) => void;
+  onWheelZoom: (delta: number) => void;
+  dragBubbleStyle: BubbleStylePreset | null;
+  onDropBubbleStyle: () => void;
+  guides: { axis: "x" | "y"; value: number }[];
+  setGuides: (g: { axis: "x" | "y"; value: number }[]) => void;
+}) {
+  const containerRef = useRef<HTMLDivElement>(null);
+  const [containerSize, setContainerSize] = useState({ w: 0, h: 0 });
+  const [imgSize, setImgSize] = useState<{ w: number; h: number } | null>(null);
+  const [drawRect, setDrawRect] = useState<{ x1: number; y1: number; x2: number; y2: number } | null>(null);
+  const [marquee, setMarquee] = useState<{ x1: number; y1: number; x2: number; y2: number } | null>(null);
+  const panRef = useRef<{ sx: number; sy: number; ox: number; oy: number } | null>(null);
+  const gestureStarted = useRef(false);
+
+  useEffect(() => {
+    const img = new window.Image();
+    img.onload = () => setImgSize({ w: img.naturalWidth, h: img.naturalHeight });
+    img.src = getComicPageUrl(pageUrl);
+  }, [pageUrl]);
+
+  useEffect(() => {
+    const measure = () => {
+      if (containerRef.current) {
+        setContainerSize({ w: containerRef.current.clientWidth, h: containerRef.current.clientHeight });
+      }
+    };
+    measure();
+    window.addEventListener("resize", measure);
+    return () => window.removeEventListener("resize", measure);
+  }, []);
+
+  const layout = useMemo(() => {
+    if (!imgSize || containerSize.w <= 0) return null;
+    const fit = Math.min((containerSize.w * 0.92) / imgSize.w, (containerSize.h * 0.88) / imgSize.h);
+    const imgWidth = imgSize.w * fit;
+    const imgHeight = imgSize.h * fit;
+    const imgLeft = (containerSize.w - imgWidth) / 2;
+    const imgTop = (containerSize.h - imgHeight) / 2;
+    return { imgWidth, imgHeight, imgLeft, imgTop };
+  }, [imgSize, containerSize]);
+
+  const clientToPercent = (clientX: number, clientY: number) => {
+    if (!containerRef.current || !layout) return { posX: 50, posY: 50 };
+    const rect = containerRef.current.getBoundingClientRect();
+    const cx = rect.left + pan.x;
+    const cy = rect.top + pan.y;
+    const x = (clientX - cx - layout.imgLeft * scale) / scale;
+    const y = (clientY - cy - layout.imgTop * scale) / scale;
+    return {
+      posX: (x / layout.imgWidth) * 100,
+      posY: (y / layout.imgHeight) * 100,
+    };
+  };
+
+  const handlePointerDown = (e: React.PointerEvent) => {
+    if (e.button !== 0) return;
+    const tool = spaceHeld ? "hand" : store.activeTool;
+    if (tool === "hand") {
+      panRef.current = { sx: e.clientX, sy: e.clientY, ox: pan.x, oy: pan.y };
+      return;
+    }
+    const { posX, posY } = clientToPercent(e.clientX, e.clientY);
+    if (tool === "stop") {
+      store.beginGesture();
+      gestureStarted.current = true;
+      setDrawRect({ x1: posX, y1: posY, x2: posX, y2: posY });
+      return;
+    }
+    if (tool === "select" && e.target === e.currentTarget) {
+      store.setSelection({ kind: "none" });
+      setMarquee({ x1: posX, y1: posY, x2: posX, y2: posY });
+      return;
+    }
+    if (tool === "bubble") {
+      const pIdx = store.findPanelForPoint(posX, posY);
+      store.addBubble(pIdx >= 0 ? pIdx : 0, { posX, posY }, store.pendingBubbleStyle);
+    }
+  };
+
+  const handlePointerMove = (e: React.PointerEvent) => {
+    if (panRef.current) {
+      onPanChange({
+        x: panRef.current.ox + (e.clientX - panRef.current.sx),
+        y: panRef.current.oy + (e.clientY - panRef.current.sy),
+      });
+      return;
+    }
+    const { posX, posY } = clientToPercent(e.clientX, e.clientY);
+    if (drawRect) setDrawRect({ ...drawRect, x2: posX, y2: posY });
+    if (marquee) setMarquee({ ...marquee, x2: posX, y2: posY });
+  };
+
+  const handlePointerUp = () => {
+    panRef.current = null;
+    if (drawRect) {
+      const x = Math.min(drawRect.x1, drawRect.x2);
+      const y = Math.min(drawRect.y1, drawRect.y2);
+      const w = Math.abs(drawRect.x2 - drawRect.x1);
+      const h = Math.abs(drawRect.y2 - drawRect.y1);
+      if (w > 3 && h > 3) {
+        store.addPanelWithMask({ x, y, w, h });
+        store.setSelection({ kind: "stop", panelIdx: panels.length });
+      }
+      setDrawRect(null);
+      gestureStarted.current = false;
+    }
+    if (marquee && layout) {
+      const xMin = Math.min(marquee.x1, marquee.x2);
+      const xMax = Math.max(marquee.x1, marquee.x2);
+      const yMin = Math.min(marquee.y1, marquee.y2);
+      const yMax = Math.max(marquee.y1, marquee.y2);
+      const items: { panelIdx: number; bubbleIdx: number }[] = [];
+      panels.forEach((panel, pIdx) => {
+        (panel.dialogue || []).forEach((line, bIdx) => {
+          const px = line.posX ?? 50;
+          const py = line.posY ?? (panel.focusY ?? 0.5) * 100;
+          if (px >= xMin && px <= xMax && py >= yMin && py <= yMax) {
+            items.push({ panelIdx: pIdx, bubbleIdx: bIdx });
+          }
+        });
+      });
+      if (items.length === 1) store.setSelection({ kind: "bubble", panelIdx: items[0].panelIdx, bubbleIdx: items[0].bubbleIdx });
+      else if (items.length > 1) store.setSelection({ kind: "bubbles", items });
+      setMarquee(null);
+    }
+  };
+
+  const handleDoubleClick = (e: React.MouseEvent) => {
+    if (store.activeTool !== "select" && store.activeTool !== "bubble") return;
+    const { posX, posY } = clientToPercent(e.clientX, e.clientY);
+    const pIdx = store.findPanelForPoint(posX, posY);
+    store.addBubble(pIdx >= 0 ? pIdx : 0, { posX, posY }, store.pendingBubbleStyle);
+  };
+
+  const handleDragOver = (e: React.DragEvent) => {
+    if (dragBubbleStyle) e.preventDefault();
+  };
+
+  const handleDrop = (e: React.DragEvent) => {
+    e.preventDefault();
+    if (!dragBubbleStyle) return;
+    const { posX, posY } = clientToPercent(e.clientX, e.clientY);
+    const pIdx = store.findPanelForPoint(posX, posY);
+    store.addBubble(pIdx >= 0 ? pIdx : 0, { posX, posY }, dragBubbleStyle);
+    onDropBubbleStyle();
+  };
+
+  if (!layout) {
+    return <div ref={containerRef} className="flex-1 bg-[#0a0a0f] flex items-center justify-center text-zinc-500">Cargando página…</div>;
+  }
+
+  const { imgWidth, imgHeight, imgLeft, imgTop } = layout;
+  const scaledW = imgWidth * scale;
+  const scaledH = imgHeight * scale;
+
+  const isSelectedBubble = (pIdx: number, bIdx: number) => {
+    const s = store.selection;
+    if (s.kind === "bubble") return s.panelIdx === pIdx && s.bubbleIdx === bIdx;
+    if (s.kind === "bubbles") return s.items.some((i) => i.panelIdx === pIdx && i.bubbleIdx === bIdx);
+    return false;
+  };
+
+  const activeBubble =
+    store.selection.kind === "bubble"
+      ? { pIdx: store.selection.panelIdx, bIdx: store.selection.bubbleIdx }
+      : null;
+
+  return (
+    <div
+      ref={containerRef}
+      className="flex-1 relative overflow-hidden bg-[#0a0a0f] touch-none"
+      style={{ cursor: spaceHeld || store.activeTool === "hand" ? "grab" : store.activeTool === "stop" ? "crosshair" : "default" }}
+      onPointerDown={handlePointerDown}
+      onPointerMove={handlePointerMove}
+      onPointerUp={handlePointerUp}
+      onPointerLeave={handlePointerUp}
+      onDoubleClick={handleDoubleClick}
+      onDragOver={handleDragOver}
+      onDrop={handleDrop}
+      onWheel={(e) => {
+        e.preventDefault();
+        onWheelZoom(e.deltaY > 0 ? -0.08 : 0.08);
+      }}
+    >
+      <div
+        className="absolute origin-top-left"
+        style={{
+          transform: `translate(${pan.x}px, ${pan.y}px) scale(${scale})`,
+          left: imgLeft,
+          top: imgTop,
+          width: imgWidth,
+          height: imgHeight,
+        }}
+      >
+        <img src={getComicPageUrl(pageUrl)} alt="" className="w-full h-full object-contain pointer-events-none select-none" draggable={false} />
+      </div>
+
+      <div className="absolute inset-0 pointer-events-none" style={{ transform: `translate(${pan.x}px, ${pan.y}px)` }}>
+        {panels.map((panel, pIdx) => {
+          const rects = panel.zoomRects || (panel.zoomRect ? [panel.zoomRect] : []);
+          return rects.map((r, rIdx) => (
+            <div
+              key={`mask-${pIdx}-${rIdx}`}
+              className={`absolute border-2 pointer-events-none ${activePanelIdx === pIdx ? "border-[#e8185a]/80 bg-[#e8185a]/5" : "border-white/20 bg-white/5"}`}
+              style={{
+                left: imgLeft + (r.x / 100) * imgWidth * scale + (scale - 1) * 0,
+                top: imgTop + (r.y / 100) * imgHeight * scale,
+                width: (r.w / 100) * imgWidth * scale,
+                height: (r.h / 100) * imgHeight * scale,
+                transform: `scale(${1})`,
+              }}
+            />
+          ));
+        })}
+
+        {panels.map((panel, pIdx) => (
+          activePanelIdx === pIdx && store.activeTool === "select" ? (
+            <StopRegionFocusHandle
+              key={`focus-handle-${pIdx}`}
+              focusY={panel.focusY ?? 0.5}
+              imgLeft={imgLeft}
+              imgTop={imgTop}
+              imgWidth={imgWidth}
+              imgHeight={imgHeight}
+              scale={scale}
+              panY={pan.y}
+              onBegin={() => store.beginGesture()}
+              onChange={(fy) => store.updatePanel(pIdx, { focusY: fy })}
+            />
+          ) : (
+            <div
+              key={`focus-${pIdx}`}
+              className="absolute w-full h-px bg-cyan-400/40 pointer-events-none"
+              style={{
+                top: pan.y + imgTop + (panel.focusY ?? 0.5) * imgHeight * scale,
+                left: imgLeft,
+                width: imgWidth * scale,
+              }}
+            />
+          )
+        ))}
+
+        {drawRect && (
+          <div
+            className="absolute border-2 border-dashed border-[#e8185a] bg-[#e8185a]/10 pointer-events-none"
+            style={{
+              left: imgLeft + (Math.min(drawRect.x1, drawRect.x2) / 100) * imgWidth * scale,
+              top: imgTop + (Math.min(drawRect.y1, drawRect.y2) / 100) * imgHeight * scale,
+              width: (Math.abs(drawRect.x2 - drawRect.x1) / 100) * imgWidth * scale,
+              height: (Math.abs(drawRect.y2 - drawRect.y1) / 100) * imgHeight * scale,
+            }}
+          />
+        )}
+
+        {marquee && (
+          <div
+            className="absolute border border-sky-400 bg-sky-400/10 pointer-events-none"
+            style={{
+              left: imgLeft + (Math.min(marquee.x1, marquee.x2) / 100) * imgWidth * scale,
+              top: imgTop + (Math.min(marquee.y1, marquee.y2) / 100) * imgHeight * scale,
+              width: (Math.abs(marquee.x2 - marquee.x1) / 100) * imgWidth * scale,
+              height: (Math.abs(marquee.y2 - marquee.y1) / 100) * imgHeight * scale,
+            }}
+          />
+        )}
+
+        <SmartGuides guides={guides} imgLeft={imgLeft} imgTop={imgTop} imgWidth={imgWidth * scale} imgHeight={imgHeight * scale} />
+      </div>
+
+      <div
+        className="absolute inset-0"
+        style={{ transform: `translate(${pan.x}px, ${pan.y}px) scale(${scale})`, transformOrigin: `${imgLeft}px ${imgTop}px` }}
+      >
+        {panels.flatMap((panel, pIdx) =>
+          (panel.dialogue || []).map((line, bIdx) => {
+            const others = (panel.dialogue || [])
+              .filter((_, i) => i !== bIdx)
+              .map((l) => ({ posX: l.posX ?? 50, posY: l.posY ?? 50 }));
+            return (
+              <BubbleNode
+                key={`${pIdx}-${bIdx}`}
+                line={line}
+                panel={panel}
+                pIdx={pIdx}
+                bIdx={bIdx}
+                isActive={activePanelIdx === pIdx}
+                isSelected={isSelectedBubble(pIdx, bIdx)}
+                imgLeft={imgLeft}
+                imgTop={imgTop}
+                imgWidth={imgWidth}
+                imgHeight={imgHeight}
+                editingText={activeBubble?.pIdx === pIdx && activeBubble?.bIdx === bIdx}
+                onSelect={() => store.setSelection({ kind: "bubble", panelIdx: pIdx, bubbleIdx: bIdx })}
+                onMove={(px, py) => {
+                  if (!gestureStarted.current) {
+                    store.beginGesture();
+                    gestureStarted.current = true;
+                  }
+                  const snapped = snapWithGuides(px, py, others);
+                  setGuides(snapped.guides);
+                  store.updateBubbleLive(pIdx, bIdx, { posX: snapped.posX, posY: snapped.posY });
+                }}
+                onTailMove={(tx, ty, linkTo) => {
+                  store.updateBubble(pIdx, bIdx, {
+                    tailX: tx,
+                    tailY: ty,
+                    linkedTo: linkTo,
+                  });
+                }}
+                onTextChange={(text) => store.updateBubbleLive(pIdx, bIdx, { text })}
+                onResizeWidth={(width) => store.updateBubble(pIdx, bIdx, { width })}
+              />
+            );
+          })
+        )}
+      </div>
+    </div>
+  );
+}

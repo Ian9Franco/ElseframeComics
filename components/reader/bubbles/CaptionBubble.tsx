@@ -15,6 +15,7 @@ import {
   resolveBgColor,
   renderStyledText,
 } from "./bubbleHelpers";
+import { BubbleInlineEditor } from "./BubbleInlineEditor";
 
 interface CaptionBubbleProps {
   line: DialogueLine;
@@ -26,6 +27,7 @@ interface CaptionBubbleProps {
   textScale?: number;
   speedMultiplier?: number;
   bubbleOpacity?: number;
+  inlineTextEdit?: import("../DialogueBubble").InlineTextEditProps;
 }
 
 export function CaptionBubble({
@@ -38,6 +40,7 @@ export function CaptionBubble({
   textScale = 1.0,
   speedMultiplier = 1.0,
   bubbleOpacity,
+  inlineTextEdit,
 }: CaptionBubbleProps) {
   const [isMobile, setIsMobile] = React.useState(false);
   React.useEffect(() => {
@@ -142,7 +145,11 @@ export function CaptionBubble({
                 {p.speaker}:{" "}
               </strong>
             )}
-            {renderStyledText(p.text)}
+            {inlineTextEdit ? (
+              <BubbleInlineEditor inlineTextEdit={inlineTextEdit} />
+            ) : (
+              renderStyledText(p.text)
+            )}
           </div>
         ))}
       </div>

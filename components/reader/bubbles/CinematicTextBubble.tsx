@@ -13,6 +13,7 @@ import {
   resolveFontClass,
   resolveFontFamily,
 } from "./bubbleHelpers";
+import { BubbleInlineEditor } from "./BubbleInlineEditor";
 
 interface CinematicTextBubbleProps {
   line: DialogueLine;
@@ -23,6 +24,7 @@ interface CinematicTextBubbleProps {
   depth?: number;
   textScale?: number;
   speedMultiplier?: number;
+  inlineTextEdit?: import("../DialogueBubble").InlineTextEditProps;
 }
 
 function colorWithAlpha(color: string, alpha: number): string {
@@ -63,6 +65,7 @@ export function CinematicTextBubble({
   depth,
   textScale = 1.0,
   speedMultiplier = 1.0,
+  inlineTextEdit,
 }: CinematicTextBubbleProps) {
   const paragraphs = parseParagraphs(line.text);
   const variant = line.cinematicVariant ?? "translucent";
@@ -177,12 +180,16 @@ export function CinematicTextBubble({
       )}
 
       <div className={`${fontClass} relative z-10`} style={contentStyle}>
-        {paragraphs.map((paragraph, idx) => (
-          <React.Fragment key={idx}>
-            {idx > 0 && "\n"}
-            {renderStyledText(paragraph.text)}
-          </React.Fragment>
-        ))}
+        {inlineTextEdit ? (
+          <BubbleInlineEditor inlineTextEdit={inlineTextEdit} className={fontClass} style={contentStyle} />
+        ) : (
+          paragraphs.map((paragraph, idx) => (
+            <React.Fragment key={idx}>
+              {idx > 0 && "\n"}
+              {renderStyledText(paragraph.text)}
+            </React.Fragment>
+          ))
+        )}
       </div>
     </motion.div>
   );

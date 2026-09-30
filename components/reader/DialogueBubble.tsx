@@ -33,6 +33,12 @@ export type DialogueLine = {
   linkedTo?: number;     // Index of sibling bubble to connect with an organic bridge
 };
 
+export type InlineTextEditProps = {
+  value: string;
+  onChange: (text: string) => void;
+  autoFocus?: boolean;
+};
+
 export function getBubbleStyles(line: DialogueLine, bubbleOpacity?: number) {
   const style = line.style ?? "normal";
   let bgColor      = resolveBgColor(line.customBg, "#ffffff", bubbleOpacity);
@@ -78,6 +84,7 @@ export function DialogueBubble({
   textScale = 1.0,
   speedMultiplier = 1.0,
   bubbleOpacity,
+  inlineTextEdit,
 }: {
   line: DialogueLine;
   index: number;
@@ -89,6 +96,7 @@ export function DialogueBubble({
   textScale?: number;
   speedMultiplier?: number;
   bubbleOpacity?: number;
+  inlineTextEdit?: InlineTextEditProps;
 }) {
   const style = line.style ?? "normal";
 
@@ -104,6 +112,7 @@ export function DialogueBubble({
         textScale={textScale}
         speedMultiplier={speedMultiplier}
         bubbleOpacity={bubbleOpacity}
+        inlineTextEdit={inlineTextEdit}
       />
     );
   }
@@ -121,6 +130,7 @@ export function DialogueBubble({
         textScale={textScale}
         speedMultiplier={speedMultiplier}
         bubbleOpacity={bubbleOpacity}
+        inlineTextEdit={inlineTextEdit}
       />
     );
   }
@@ -136,6 +146,7 @@ export function DialogueBubble({
         depth={depth}
         textScale={textScale}
         speedMultiplier={speedMultiplier}
+        inlineTextEdit={inlineTextEdit}
       />
     );
   }
@@ -152,6 +163,7 @@ export function DialogueBubble({
       textScale={textScale}
       speedMultiplier={speedMultiplier}
       bubbleOpacity={bubbleOpacity}
+      inlineTextEdit={inlineTextEdit}
     />
   );
 }

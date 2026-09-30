@@ -16,6 +16,8 @@ import {
   getSfxGradient,
   renderStyledText,
 } from "./bubbleHelpers";
+import { BubbleInlineEditor } from "./BubbleInlineEditor";
+import type { InlineTextEditProps } from "../DialogueBubble";
 
 interface StandardBubbleProps {
   line: DialogueLine;
@@ -173,7 +175,8 @@ export function StandardBubble({
   textScale = 1.0,
   speedMultiplier = 1.0,
   bubbleOpacity,
-}: StandardBubbleProps) {
+  inlineTextEdit,
+}: StandardBubbleProps & { inlineTextEdit?: InlineTextEditProps }) {
   const style   = line.style ?? "normal";
   const tailDir = line.tail  ?? "bottom-left";
   const paragraphs = parseParagraphs(line.text);
@@ -481,6 +484,8 @@ export function StandardBubble({
               );
             })}
           </div>
+        ) : inlineTextEdit ? (
+          <BubbleInlineEditor inlineTextEdit={inlineTextEdit} className={bubbleClass} style={{ color: line.textColor }} />
         ) : (
           <div className="flex flex-col gap-1.5">
             {paragraphs.map((p, i) => (

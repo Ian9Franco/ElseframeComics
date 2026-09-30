@@ -1,0 +1,5668 @@
+{
+  "pages": {
+    "10": {
+      "panels": [
+        {
+          "focusY": 0.18,
+          "dialogue": [
+            {
+              "text": "3:07 AM.",
+              "size": "small",
+              "posX": 38,
+              "posY": 8,
+              "tailX": 40,
+              "tailY": 24,
+              "tailWidth": 6,
+              "tailCurvature": -22,
+              "width": 90,
+              "fontSize": 8,
+              "borderRadius": 18,
+              "speaker": "Narración",
+              "style": "caption",
+              "tail": "none"
+            },
+            {
+              "text": "Buenísimo...",
+              "size": "small",
+              "posX": 25,
+              "posY": 14,
+              "tailX": 40,
+              "tailY": 24,
+              "tailWidth": 6,
+              "tailCurvature": -22,
+              "width": 120,
+              "fontSize": 8,
+              "borderRadius": 18,
+              "speaker": "Uandi",
+              "style": "thought",
+              "tail": "none"
+            }
+          ],
+          "zoomRects": [
+            {
+              "x": 0,
+              "y": 0,
+              "w": 100,
+              "h": 24
+            }
+          ]
+        },
+        {
+          "focusY": 0.48,
+          "dialogue": [
+            {
+              "text": "Peter duerme con el control remoto en la mano.",
+              "size": "small",
+              "posX": 10,
+              "posY": 42,
+              "tailX": 40,
+              "tailY": 24,
+              "tailWidth": 6,
+              "tailCurvature": -22,
+              "width": 230,
+              "fontSize": 8,
+              "borderRadius": 18,
+              "speaker": "Narración",
+              "style": "caption",
+              "tail": "none"
+            },
+            {
+              "text": "...",
+              "size": "small",
+              "posX": 40,
+              "posY": 50,
+              "tailX": 40,
+              "tailY": 24,
+              "tailWidth": 6,
+              "tailCurvature": -22,
+              "width": 60,
+              "fontSize": 8,
+              "borderRadius": 18,
+              "speaker": "Uandi",
+              "style": "thought",
+              "tail": "none"
+            }
+          ],
+          "zoomRects": [
+            {
+              "x": 0,
+              "y": 34,
+              "w": 100,
+              "h": 24
+            }
+          ]
+        },
+        {
+          "focusY": 0.75,
+          "dialogue": [
+            {
+              "text": "Dormí, boludo.",
+              "size": "small",
+              "posX": 20,
+              "posY": 70,
+              "tailX": 40,
+              "tailY": 24,
+              "tailWidth": 6,
+              "tailCurvature": -22,
+              "width": 130,
+              "fontSize": 8,
+              "borderRadius": 18,
+              "speaker": "Uandi",
+              "style": "thought",
+              "tail": "none"
+            },
+            {
+              "text": "Sale hacia la Berlingo.",
+              "size": "small",
+              "posX": 12,
+              "posY": 76,
+              "tailX": 40,
+              "tailY": 24,
+              "tailWidth": 6,
+              "tailCurvature": -22,
+              "width": 160,
+              "fontSize": 8,
+              "borderRadius": 18,
+              "speaker": "Narración",
+              "style": "caption",
+              "tail": "none"
+            }
+          ],
+          "zoomRects": [
+            {
+              "x": 0,
+              "y": 62,
+              "w": 100,
+              "h": 24
+            }
+          ]
+        }
+      ]
+    },
+    "11": {
+      "panels": [
+        {
+          "focusY": 0.15,
+          "dialogue": [
+            {
+              "text": "Horas después.",
+              "size": "small",
+              "posX": 38,
+              "posY": 8,
+              "tailX": 40,
+              "tailY": 24,
+              "tailWidth": 6,
+              "tailCurvature": -22,
+              "width": 120,
+              "fontSize": 8,
+              "borderRadius": 18,
+              "speaker": "Narración",
+              "style": "caption",
+              "tail": "none"
+            },
+            {
+              "text": "La YPF está casi vacía. Asfalto húmedo.",
+              "size": "small",
+              "posX": 10,
+              "posY": 16,
+              "tailX": 40,
+              "tailY": 24,
+              "tailWidth": 6,
+              "tailCurvature": -22,
+              "width": 220,
+              "fontSize": 8,
+              "borderRadius": 18,
+              "speaker": "Narración",
+              "style": "caption",
+              "tail": "none"
+            }
+          ],
+          "zoomRects": [
+            {
+              "x": 0,
+              "y": 0,
+              "w": 100,
+              "h": 24
+            }
+          ]
+        },
+        {
+          "focusY": 0.38,
+          "dialogue": [
+            {
+              "text": "Uandi maneja hacia la estación.",
+              "size": "small",
+              "posX": 12,
+              "posY": 32,
+              "tailX": 40,
+              "tailY": 24,
+              "tailWidth": 6,
+              "tailCurvature": -22,
+              "width": 190,
+              "fontSize": 8,
+              "borderRadius": 18,
+              "speaker": "Narración",
+              "style": "caption",
+              "tail": "none"
+            },
+            {
+              "text": "...",
+              "size": "small",
+              "posX": 45,
+              "posY": 36,
+              "tailX": 40,
+              "tailY": 24,
+              "tailWidth": 6,
+              "tailCurvature": -22,
+              "width": 60,
+              "fontSize": 8,
+              "borderRadius": 18,
+              "speaker": "Uandi",
+              "style": "thought",
+              "tail": "none"
+            }
+          ],
+          "zoomRects": [
+            {
+              "x": 0,
+              "y": 24,
+              "w": 100,
+              "h": 24
+            }
+          ]
+        },
+        {
+          "focusY": 0.62,
+          "dialogue": [
+            {
+              "text": "Todavía me falta la yerba...",
+              "size": "small",
+              "posX": 15,
+              "posY": 55,
+              "tailX": 40,
+              "tailY": 24,
+              "tailWidth": 6,
+              "tailCurvature": -22,
+              "width": 175,
+              "fontSize": 8,
+              "borderRadius": 18,
+              "speaker": "Uandi",
+              "style": "thought",
+              "tail": "none"
+            }
+          ],
+          "zoomRects": [
+            {
+              "x": 0,
+              "y": 47,
+              "w": 100,
+              "h": 24
+            }
+          ]
+        },
+        {
+          "focusY": 0.85,
+          "dialogue": [
+            {
+              "text": "Buenas.",
+              "size": "small",
+              "posX": 20,
+              "posY": 78,
+              "tailX": 40,
+              "tailY": 24,
+              "tailWidth": 6,
+              "tailCurvature": -22,
+              "width": 80,
+              "fontSize": 8,
+              "borderRadius": 18,
+              "speaker": "Uandi"
+            }
+          ],
+          "zoomRects": [
+            {
+              "x": 0,
+              "y": 70,
+              "w": 100,
+              "h": 24
+            }
+          ]
+        }
+      ]
+    },
+    "12": {
+      "panels": [
+        {
+          "focusY": 0.18,
+          "dialogue": [
+            {
+              "text": "Buenas.",
+              "size": "small",
+              "posX": 18,
+              "posY": 8,
+              "tailX": 40,
+              "tailY": 24,
+              "tailWidth": 6,
+              "tailCurvature": -22,
+              "width": 80,
+              "fontSize": 8,
+              "borderRadius": 18,
+              "speaker": "Uandi"
+            },
+            {
+              "text": "Buenas...",
+              "size": "small",
+              "posX": 62,
+              "posY": 12,
+              "tailX": 40,
+              "tailY": 24,
+              "tailWidth": 6,
+              "tailCurvature": -22,
+              "width": 100,
+              "fontSize": 8,
+              "borderRadius": 18,
+              "speaker": "Empleado YPF"
+            }
+          ],
+          "zoomRects": [
+            {
+              "x": 0,
+              "y": 0,
+              "w": 100,
+              "h": 24
+            }
+          ]
+        },
+        {
+          "dialogue": [
+            {
+              "text": "Decime que tenés yerba.",
+              "size": "small",
+              "posX": 12,
+              "posY": 36,
+              "tailX": 40,
+              "tailY": 24,
+              "tailWidth": 6,
+              "tailCurvature": -22,
+              "width": 165,
+              "fontSize": 8,
+              "borderRadius": 18,
+              "speaker": "Uandi"
+            },
+            {
+              "text": "Segundo pasillo.",
+              "size": "small",
+              "posX": 58,
+              "posY": 40,
+              "tailX": 40,
+              "tailY": 24,
+              "tailWidth": 6,
+              "tailCurvature": -22,
+              "width": 130,
+              "fontSize": 8,
+              "borderRadius": 18,
+              "speaker": "Empleado YPF"
+            },
+            {
+              "text": "Sos un héroe.",
+              "size": "small",
+              "posX": 12,
+              "posY": 48,
+              "tailX": 40,
+              "tailY": 24,
+              "tailWidth": 6,
+              "tailCurvature": -22,
+              "width": 110,
+              "fontSize": 8,
+              "borderRadius": 18,
+              "speaker": "Uandi"
+            }
+          ],
+          "zoomRects": [
+            {
+              "x": 0,
+              "y": 28,
+              "w": 100,
+              "h": 24
+            }
+          ]
+        },
+        {
+          "focusY": 0.62,
+          "dialogue": [
+            {
+              "text": "Son las tres de la mañana.",
+              "size": "small",
+              "posX": 48,
+              "posY": 58,
+              "tailX": 40,
+              "tailY": 24,
+              "tailWidth": 6,
+              "tailCurvature": -22,
+              "width": 165,
+              "fontSize": 8,
+              "borderRadius": 18,
+              "speaker": "Empleado YPF"
+            },
+            {
+              "text": "Principalmente.",
+              "size": "small",
+              "posX": 18,
+              "posY": 62,
+              "tailX": 40,
+              "tailY": 24,
+              "tailWidth": 6,
+              "tailCurvature": -22,
+              "width": 120,
+              "fontSize": 8,
+              "borderRadius": 18,
+              "speaker": "Uandi"
+            }
+          ],
+          "zoomRects": [
+            {
+              "x": 0,
+              "y": 50,
+              "w": 100,
+              "h": 24
+            }
+          ]
+        },
+        {
+          "focusY": 0.84,
+          "dialogue": [
+            {
+              "text": "Paga. Sale con el paquete bajo el brazo.",
+              "size": "small",
+              "posX": 10,
+              "posY": 72,
+              "tailX": 40,
+              "tailY": 24,
+              "tailWidth": 6,
+              "tailCurvature": -22,
+              "width": 220,
+              "fontSize": 8,
+              "borderRadius": 18,
+              "speaker": "Narración",
+              "style": "caption",
+              "tail": "none"
+            },
+            {
+              "text": "Gracias.",
+              "size": "small",
+              "posX": 22,
+              "posY": 80,
+              "tailX": 40,
+              "tailY": 24,
+              "tailWidth": 6,
+              "tailCurvature": -22,
+              "width": 80,
+              "fontSize": 8,
+              "borderRadius": 18,
+              "speaker": "Uandi"
+            }
+          ],
+          "zoomRects": [
+            {
+              "x": 0,
+              "y": 64,
+              "w": 100,
+              "h": 24
+            }
+          ]
+        }
+      ]
+    },
+    "13": {
+      "panels": [
+        {
+          "focusY": 0.18,
+          "dialogue": [
+            {
+              "text": "Ninguno de los dos presta demasiada atención.",
+              "size": "small",
+              "posX": 10,
+              "posY": 8,
+              "tailX": 40,
+              "tailY": 24,
+              "tailWidth": 6,
+              "tailCurvature": -22,
+              "width": 220,
+              "fontSize": 8,
+              "borderRadius": 18,
+              "speaker": "Narración",
+              "style": "caption",
+              "tail": "none"
+            },
+            {
+              "text": "Capucha. Mano en el bolsillo.",
+              "size": "small",
+              "posX": 12,
+              "posY": 16,
+              "tailX": 40,
+              "tailY": 24,
+              "tailWidth": 6,
+              "tailCurvature": -22,
+              "width": 180,
+              "fontSize": 8,
+              "borderRadius": 18,
+              "speaker": "Narración",
+              "style": "caption",
+              "tail": "none"
+            }
+          ],
+          "zoomRects": [
+            {
+              "x": 0,
+              "y": 0,
+              "w": 100,
+              "h": 24
+            }
+          ]
+        },
+        {
+          "focusY": 0.42,
+          "dialogue": [
+            {
+              "text": "...",
+              "size": "small",
+              "posX": 40,
+              "posY": 38,
+              "tailX": 40,
+              "tailY": 24,
+              "tailWidth": 6,
+              "tailCurvature": -22,
+              "width": 60,
+              "fontSize": 8,
+              "borderRadius": 18,
+              "speaker": "Uandi",
+              "style": "thought",
+              "tail": "none"
+            },
+            {
+              "text": "Camina al surtidor con la yerba.",
+              "size": "small",
+              "posX": 12,
+              "posY": 36,
+              "tailX": 40,
+              "tailY": 24,
+              "tailWidth": 6,
+              "tailCurvature": -22,
+              "width": 200,
+              "fontSize": 8,
+              "borderRadius": 18,
+              "speaker": "Narración",
+              "style": "caption",
+              "tail": "none"
+            }
+          ],
+          "zoomRects": [
+            {
+              "x": 0,
+              "y": 30,
+              "w": 100,
+              "h": 24
+            }
+          ]
+        },
+        {
+          "focusY": 0.65,
+          "dialogue": [
+            {
+              "text": "Alguien lo observa desde las sombras.",
+              "size": "small",
+              "posX": 10,
+              "posY": 58,
+              "tailX": 40,
+              "tailY": 24,
+              "tailWidth": 6,
+              "tailCurvature": -22,
+              "width": 210,
+              "fontSize": 8,
+              "borderRadius": 18,
+              "speaker": "Narración",
+              "style": "caption",
+              "tail": "none"
+            }
+          ],
+          "zoomRects": [
+            {
+              "x": 0,
+              "y": 50,
+              "w": 100,
+              "h": 24
+            }
+          ]
+        },
+        {
+          "focusY": 0.88,
+          "dialogue": [
+            {
+              "text": "¡No te muevas!",
+              "size": "small",
+              "posX": 55,
+              "posY": 76,
+              "tailX": 40,
+              "tailY": 24,
+              "tailWidth": 6,
+              "tailCurvature": -22,
+              "width": 120,
+              "fontSize": 8,
+              "borderRadius": 18,
+              "speaker": "Ladrón"
+            },
+            {
+              "text": "La billetera.",
+              "size": "small",
+              "posX": 18,
+              "posY": 82,
+              "tailX": 40,
+              "tailY": 24,
+              "tailWidth": 6,
+              "tailCurvature": -22,
+              "width": 110,
+              "fontSize": 8,
+              "borderRadius": 18,
+              "speaker": "Ladrón"
+            }
+          ],
+          "zoomRects": [
+            {
+              "x": 0,
+              "y": 68,
+              "w": 100,
+              "h": 24
+            }
+          ]
+        }
+      ]
+    },
+    "14": {
+      "panels": [
+        {
+          "focusY": 0.15,
+          "dialogue": [
+            {
+              "text": "Manos arriba.",
+              "size": "small",
+              "posX": 18,
+              "posY": 6,
+              "tailX": 40,
+              "tailY": 24,
+              "tailWidth": 6,
+              "tailCurvature": -22,
+              "width": 115,
+              "fontSize": 8,
+              "borderRadius": 18,
+              "speaker": "Ladrón"
+            },
+            {
+              "text": "Todo.",
+              "size": "small",
+              "posX": 65,
+              "posY": 10,
+              "tailX": 40,
+              "tailY": 24,
+              "tailWidth": 6,
+              "tailCurvature": -22,
+              "width": 70,
+              "fontSize": 8,
+              "borderRadius": 18,
+              "speaker": "Ladrón"
+            }
+          ],
+          "zoomRects": [
+            {
+              "x": 0,
+              "y": 0,
+              "w": 100,
+              "h": 24
+            }
+          ]
+        },
+        {
+          "focusY": 0.32,
+          "dialogue": [
+            {
+              "text": "Está bien.",
+              "size": "small",
+              "posX": 15,
+              "posY": 26,
+              "tailX": 40,
+              "tailY": 24,
+              "tailWidth": 6,
+              "tailCurvature": -22,
+              "width": 95,
+              "fontSize": 8,
+              "borderRadius": 18,
+              "speaker": "Uandi"
+            },
+            {
+              "text": "Te lo voy a dar.",
+              "size": "small",
+              "posX": 58,
+              "posY": 30,
+              "tailX": 40,
+              "tailY": 24,
+              "tailWidth": 6,
+              "tailCurvature": -22,
+              "width": 130,
+              "fontSize": 8,
+              "borderRadius": 18,
+              "speaker": "Uandi"
+            }
+          ],
+          "zoomRects": [
+            {
+              "x": 0,
+              "y": 18,
+              "w": 100,
+              "h": 24
+            }
+          ]
+        },
+        {
+          "focusY": 0.5,
+          "dialogue": [
+            {
+              "text": "Despacio.",
+              "size": "small",
+              "posX": 20,
+              "posY": 48,
+              "tailX": 40,
+              "tailY": 24,
+              "tailWidth": 6,
+              "tailCurvature": -22,
+              "width": 95,
+              "fontSize": 8,
+              "borderRadius": 18,
+              "speaker": "Ladrón"
+            },
+            {
+              "text": "Es joven. Más asustado que ellos. Eso es peor.",
+              "size": "small",
+              "posX": 10,
+              "posY": 46,
+              "tailX": 40,
+              "tailY": 24,
+              "tailWidth": 6,
+              "tailCurvature": -22,
+              "width": 230,
+              "fontSize": 8,
+              "borderRadius": 18,
+              "speaker": "Narración",
+              "style": "caption",
+              "tail": "none"
+            }
+          ],
+          "zoomRects": [
+            {
+              "x": 0,
+              "y": 40,
+              "w": 100,
+              "h": 24
+            }
+          ]
+        },
+        {
+          "focusY": 0.68,
+          "dialogue": [
+            {
+              "text": "Che.",
+              "size": "small",
+              "posX": 18,
+              "posY": 62,
+              "tailX": 40,
+              "tailY": 24,
+              "tailWidth": 6,
+              "tailCurvature": -22,
+              "width": 60,
+              "fontSize": 8,
+              "borderRadius": 18,
+              "speaker": "Uandi"
+            },
+            {
+              "text": "Nadie está haciendo nada.",
+              "size": "small",
+              "posX": 42,
+              "posY": 66,
+              "tailX": 40,
+              "tailY": 24,
+              "tailWidth": 6,
+              "tailCurvature": -22,
+              "width": 175,
+              "fontSize": 8,
+              "borderRadius": 18,
+              "speaker": "Uandi"
+            },
+            {
+              "text": "¡Callate!",
+              "size": "small",
+              "posX": 62,
+              "posY": 70,
+              "tailX": 40,
+              "tailY": 24,
+              "tailWidth": 6,
+              "tailCurvature": -22,
+              "width": 100,
+              "fontSize": 8,
+              "borderRadius": 18,
+              "speaker": "Ladrón"
+            }
+          ],
+          "zoomRects": [
+            {
+              "x": 0,
+              "y": 54,
+              "w": 100,
+              "h": 24
+            }
+          ]
+        },
+        {
+          "focusY": 0.88,
+          "dialogue": [
+            {
+              "text": "Pará—",
+              "size": "small",
+              "posX": 38,
+              "posY": 82,
+              "tailX": 40,
+              "tailY": 24,
+              "tailWidth": 6,
+              "tailCurvature": -22,
+              "width": 70,
+              "fontSize": 8,
+              "borderRadius": 18,
+              "speaker": "Uandi"
+            },
+            {
+              "text": "BANG.",
+              "size": "small",
+              "posX": 42,
+              "posY": 78,
+              "tailX": 40,
+              "tailY": 24,
+              "tailWidth": 6,
+              "tailCurvature": -22,
+              "width": 80,
+              "fontSize": 8,
+              "borderRadius": 18,
+              "speaker": "Narración",
+              "style": "caption",
+              "tail": "none"
+            }
+          ],
+          "zoomRects": [
+            {
+              "x": 0,
+              "y": 74,
+              "w": 100,
+              "h": 24
+            }
+          ]
+        }
+      ]
+    },
+    "15": {
+      "panels": [
+        {
+          "focusY": 0.2,
+          "dialogue": [
+            {
+              "text": "Uandi mira hacia abajo. Una mancha en la remera.",
+              "size": "small",
+              "posX": 10,
+              "posY": 10,
+              "tailX": 40,
+              "tailY": 24,
+              "tailWidth": 6,
+              "tailCurvature": -22,
+              "width": 230,
+              "fontSize": 8,
+              "borderRadius": 18,
+              "speaker": "Narración",
+              "style": "caption",
+              "tail": "none"
+            },
+            {
+              "text": "...",
+              "size": "small",
+              "posX": 40,
+              "posY": 18,
+              "tailX": 40,
+              "tailY": 24,
+              "tailWidth": 6,
+              "tailCurvature": -22,
+              "width": 60,
+              "fontSize": 8,
+              "borderRadius": 18,
+              "speaker": "Uandi"
+            }
+          ],
+          "zoomRects": [
+            {
+              "x": 0,
+              "y": 2,
+              "w": 100,
+              "h": 24
+            }
+          ]
+        },
+        {
+          "focusY": 0.48,
+          "dialogue": [
+            {
+              "text": "Intenta respirar. No puede.",
+              "size": "small",
+              "posX": 12,
+              "posY": 42,
+              "tailX": 40,
+              "tailY": 24,
+              "tailWidth": 6,
+              "tailCurvature": -22,
+              "width": 180,
+              "fontSize": 8,
+              "borderRadius": 18,
+              "speaker": "Narración",
+              "style": "caption",
+              "tail": "none"
+            },
+            {
+              "text": "El ladrón corre con la billetera.",
+              "size": "small",
+              "posX": 12,
+              "posY": 50,
+              "tailX": 40,
+              "tailY": 24,
+              "tailWidth": 6,
+              "tailCurvature": -22,
+              "width": 200,
+              "fontSize": 8,
+              "borderRadius": 18,
+              "speaker": "Narración",
+              "style": "caption",
+              "tail": "none"
+            }
+          ],
+          "zoomRects": [
+            {
+              "x": 0,
+              "y": 34,
+              "w": 100,
+              "h": 24
+            }
+          ]
+        },
+        {
+          "focusY": 0.72,
+          "dialogue": [
+            {
+              "text": "No hay transformación. No hay Aegis.",
+              "size": "small",
+              "posX": 10,
+              "posY": 66,
+              "tailX": 40,
+              "tailY": 24,
+              "tailWidth": 6,
+              "tailCurvature": -22,
+              "width": 220,
+              "fontSize": 8,
+              "borderRadius": 18,
+              "speaker": "Narración",
+              "style": "caption",
+              "tail": "none"
+            },
+            {
+              "text": "Solo un hombre intentando respirar.",
+              "size": "small",
+              "posX": 10,
+              "posY": 74,
+              "tailX": 40,
+              "tailY": 24,
+              "tailWidth": 6,
+              "tailCurvature": -22,
+              "width": 210,
+              "fontSize": 8,
+              "borderRadius": 18,
+              "speaker": "Narración",
+              "style": "caption",
+              "tail": "none"
+            }
+          ],
+          "zoomRects": [
+            {
+              "x": 0,
+              "y": 58,
+              "w": 100,
+              "h": 24
+            }
+          ]
+        },
+        {
+          "focusY": 0.9,
+          "dialogue": [
+            {
+              "text": "Después... nada.",
+              "size": "small",
+              "posX": 38,
+              "posY": 84,
+              "tailX": 40,
+              "tailY": 24,
+              "tailWidth": 6,
+              "tailCurvature": -22,
+              "width": 120,
+              "fontSize": 8,
+              "borderRadius": 18,
+              "speaker": "Narración",
+              "style": "caption",
+              "tail": "none"
+            }
+          ],
+          "zoomRects": [
+            {
+              "x": 0,
+              "y": 76,
+              "w": 100,
+              "h": 24
+            }
+          ]
+        }
+      ]
+    },
+    "16": {
+      "panels": [
+        {
+          "focusY": 0.1,
+          "dialogue": [
+            {
+              "text": "El teléfono de la casa suena.",
+              "size": "small",
+              "posX": 15,
+              "posY": 6,
+              "tailX": 40,
+              "tailY": 24,
+              "tailWidth": 6,
+              "tailCurvature": -22,
+              "width": 190,
+              "fontSize": 8,
+              "borderRadius": 18,
+              "speaker": "Narración",
+              "style": "caption",
+              "tail": "none"
+            }
+          ],
+          "zoomRects": [
+            {
+              "x": 0,
+              "y": 0,
+              "w": 100,
+              "h": 24
+            }
+          ]
+        },
+        {
+          "focusY": 0.28,
+          "dialogue": [
+            {
+              "text": "¿Sí?",
+              "size": "small",
+              "posX": 22,
+              "posY": 22,
+              "tailX": 40,
+              "tailY": 24,
+              "tailWidth": 6,
+              "tailCurvature": -22,
+              "width": 70,
+              "fontSize": 8,
+              "borderRadius": 18,
+              "speaker": "Peter"
+            },
+            {
+              "text": "¿Peter?",
+              "size": "small",
+              "posX": 58,
+              "posY": 26,
+              "tailX": 40,
+              "tailY": 24,
+              "tailWidth": 6,
+              "tailCurvature": -22,
+              "width": 90,
+              "fontSize": 8,
+              "borderRadius": 18,
+              "speaker": "Desconocido",
+              "offscreen": true,
+              "showSpeakerName": true
+            }
+          ],
+          "zoomRects": [
+            {
+              "x": 0,
+              "y": 14,
+              "w": 100,
+              "h": 24
+            }
+          ]
+        },
+        {
+          "focusY": 0.45,
+          "dialogue": [
+            {
+              "text": "Habla la policía.",
+              "size": "small",
+              "posX": 55,
+              "posY": 40,
+              "tailX": 40,
+              "tailY": 24,
+              "tailWidth": 6,
+              "tailCurvature": -22,
+              "width": 130,
+              "fontSize": 8,
+              "borderRadius": 18,
+              "speaker": "Policía",
+              "offscreen": true,
+              "showSpeakerName": true
+            },
+            {
+              "text": "¿Qué pasó?",
+              "size": "small",
+              "posX": 18,
+              "posY": 44,
+              "tailX": 40,
+              "tailY": 24,
+              "tailWidth": 6,
+              "tailCurvature": -22,
+              "width": 95,
+              "fontSize": 8,
+              "borderRadius": 18,
+              "speaker": "Peter"
+            }
+          ],
+          "zoomRects": [
+            {
+              "x": 0,
+              "y": 32,
+              "w": 100,
+              "h": 24
+            }
+          ]
+        },
+        {
+          "focusY": 0.62,
+          "dialogue": [
+            {
+              "text": "Necesitamos que venga a la comisaría.",
+              "size": "small",
+              "posX": 12,
+              "posY": 56,
+              "tailX": 40,
+              "tailY": 24,
+              "tailWidth": 6,
+              "tailCurvature": -22,
+              "width": 210,
+              "fontSize": 8,
+              "borderRadius": 18,
+              "speaker": "Policía",
+              "offscreen": true,
+              "showSpeakerName": true
+            },
+            {
+              "text": "Se trata de Uandi.",
+              "size": "small",
+              "posX": 52,
+              "posY": 62,
+              "tailX": 40,
+              "tailY": 24,
+              "tailWidth": 6,
+              "tailCurvature": -22,
+              "width": 145,
+              "fontSize": 8,
+              "borderRadius": 18,
+              "speaker": "Policía",
+              "offscreen": true,
+              "showSpeakerName": true
+            }
+          ],
+          "zoomRects": [
+            {
+              "x": 0,
+              "y": 48,
+              "w": 100,
+              "h": 24
+            }
+          ]
+        },
+        {
+          "focusY": 0.82,
+          "dialogue": [
+            {
+              "text": "¿Dónde está Uandi?",
+              "size": "small",
+              "posX": 20,
+              "posY": 74,
+              "tailX": 40,
+              "tailY": 24,
+              "tailWidth": 6,
+              "tailCurvature": -22,
+              "width": 140,
+              "fontSize": 8,
+              "borderRadius": 18,
+              "speaker": "Peter"
+            },
+            {
+              "text": "Hubo un incidente en una estación de servicio.",
+              "size": "small",
+              "posX": 12,
+              "posY": 80,
+              "tailX": 40,
+              "tailY": 24,
+              "tailWidth": 6,
+              "tailCurvature": -22,
+              "width": 225,
+              "fontSize": 8,
+              "borderRadius": 18,
+              "speaker": "Policía",
+              "offscreen": true,
+              "showSpeakerName": true
+            }
+          ],
+          "zoomRects": [
+            {
+              "x": 0,
+              "y": 66,
+              "w": 100,
+              "h": 24
+            }
+          ]
+        },
+        {
+          "focusY": 0.94,
+          "dialogue": [
+            {
+              "text": "¿Está vivo?",
+              "size": "small",
+              "posX": 28,
+              "posY": 86,
+              "tailX": 40,
+              "tailY": 24,
+              "tailWidth": 6,
+              "tailCurvature": -22,
+              "width": 110,
+              "fontSize": 8,
+              "borderRadius": 18,
+              "speaker": "Peter"
+            },
+            {
+              "text": "Silencio. Los mates se hacen pedazos en el piso.",
+              "size": "small",
+              "posX": 12,
+              "posY": 90,
+              "tailX": 40,
+              "tailY": 24,
+              "tailWidth": 6,
+              "tailCurvature": -22,
+              "width": 220,
+              "fontSize": 8,
+              "borderRadius": 18,
+              "speaker": "Narración",
+              "style": "caption",
+              "tail": "none"
+            }
+          ],
+          "zoomRects": [
+            {
+              "x": 0,
+              "y": 78,
+              "w": 100,
+              "h": 24
+            }
+          ]
+        }
+      ]
+    },
+    "17": {
+      "panels": [
+        {
+          "focusY": 0.18,
+          "dialogue": [
+            {
+              "text": "A la mañana siguiente.",
+              "size": "small",
+              "posX": 28,
+              "posY": 8,
+              "tailX": 40,
+              "tailY": 24,
+              "tailWidth": 6,
+              "tailCurvature": -22,
+              "width": 150,
+              "fontSize": 8,
+              "borderRadius": 18,
+              "speaker": "Narración",
+              "style": "caption",
+              "tail": "none"
+            },
+            {
+              "text": "Cinta amarilla en la YPF.",
+              "size": "small",
+              "posX": 12,
+              "posY": 18,
+              "tailX": 40,
+              "tailY": 24,
+              "tailWidth": 6,
+              "tailCurvature": -22,
+              "width": 180,
+              "fontSize": 8,
+              "borderRadius": 18,
+              "speaker": "Narración",
+              "style": "caption",
+              "tail": "none"
+            }
+          ],
+          "zoomRects": [
+            {
+              "x": 0,
+              "y": 0,
+              "w": 100,
+              "h": 24
+            }
+          ]
+        },
+        {
+          "focusY": 0.48,
+          "dialogue": [
+            {
+              "text": "Forenses. Oficiales. Un cuerpo bajo lona.",
+              "size": "small",
+              "posX": 10,
+              "posY": 40,
+              "tailX": 40,
+              "tailY": 24,
+              "tailWidth": 6,
+              "tailCurvature": -22,
+              "width": 220,
+              "fontSize": 8,
+              "borderRadius": 18,
+              "speaker": "Narración",
+              "style": "caption",
+              "tail": "none"
+            }
+          ],
+          "zoomRects": [
+            {
+              "x": 0,
+              "y": 32,
+              "w": 100,
+              "h": 24
+            }
+          ]
+        },
+        {
+          "focusY": 0.72,
+          "dialogue": [
+            {
+              "text": "...",
+              "size": "small",
+              "posX": 35,
+              "posY": 66,
+              "tailX": 40,
+              "tailY": 24,
+              "tailWidth": 6,
+              "tailCurvature": -22,
+              "width": 60,
+              "fontSize": 8,
+              "borderRadius": 18,
+              "speaker": "Peter",
+              "style": "thought",
+              "tail": "none"
+            }
+          ],
+          "zoomRects": [
+            {
+              "x": 0,
+              "y": 58,
+              "w": 100,
+              "h": 24
+            }
+          ]
+        },
+        {
+          "focusY": 0.9,
+          "dialogue": [
+            {
+              "text": "Llegaste.",
+              "size": "small",
+              "posX": 55,
+              "posY": 82,
+              "tailX": 40,
+              "tailY": 24,
+              "tailWidth": 6,
+              "tailCurvature": -22,
+              "width": 95,
+              "fontSize": 8,
+              "borderRadius": 18,
+              "speaker": "Jaz"
+            },
+            {
+              "text": "Lo sé.",
+              "size": "small",
+              "posX": 18,
+              "posY": 86,
+              "tailX": 40,
+              "tailY": 24,
+              "tailWidth": 6,
+              "tailCurvature": -22,
+              "width": 70,
+              "fontSize": 8,
+              "borderRadius": 18,
+              "speaker": "Peter"
+            }
+          ],
+          "zoomRects": [
+            {
+              "x": 0,
+              "y": 74,
+              "w": 100,
+              "h": 24
+            }
+          ]
+        }
+      ]
+    },
+    "18": {
+      "panels": [
+        {
+          "focusY": 0.2,
+          "dialogue": [
+            {
+              "text": "Peter y Jaz miran la escena.",
+              "size": "small",
+              "posX": 12,
+              "posY": 8,
+              "tailX": 40,
+              "tailY": 24,
+              "tailWidth": 6,
+              "tailCurvature": -22,
+              "width": 180,
+              "fontSize": 8,
+              "borderRadius": 18,
+              "speaker": "Narración",
+              "style": "caption",
+              "tail": "none"
+            },
+            {
+              "text": "¿Uandi?",
+              "size": "small",
+              "posX": 62,
+              "posY": 12,
+              "tailX": 40,
+              "tailY": 24,
+              "tailWidth": 6,
+              "tailCurvature": -22,
+              "width": 80,
+              "fontSize": 8,
+              "borderRadius": 18,
+              "speaker": "Jaz"
+            }
+          ],
+          "zoomRects": [
+            {
+              "x": 0,
+              "y": 0,
+              "w": 100,
+              "h": 24
+            }
+          ]
+        },
+        {
+          "focusY": 0.42,
+          "dialogue": [
+            {
+              "text": "...",
+              "size": "small",
+              "posX": 38,
+              "posY": 36,
+              "tailX": 40,
+              "tailY": 24,
+              "tailWidth": 6,
+              "tailCurvature": -22,
+              "width": 60,
+              "fontSize": 8,
+              "borderRadius": 18,
+              "speaker": "Peter"
+            },
+            {
+              "text": "Peter.",
+              "size": "small",
+              "posX": 58,
+              "posY": 40,
+              "tailX": 40,
+              "tailY": 24,
+              "tailWidth": 6,
+              "tailCurvature": -22,
+              "width": 70,
+              "fontSize": 8,
+              "borderRadius": 18,
+              "speaker": "Jaz"
+            }
+          ],
+          "zoomRects": [
+            {
+              "x": 0,
+              "y": 28,
+              "w": 100,
+              "h": 24
+            }
+          ]
+        },
+        {
+          "focusY": 0.62,
+          "dialogue": [
+            {
+              "text": "Voy a hacerte algunas preguntas.",
+              "size": "small",
+              "posX": 12,
+              "posY": 56,
+              "tailX": 40,
+              "tailY": 24,
+              "tailWidth": 6,
+              "tailCurvature": -22,
+              "width": 195,
+              "fontSize": 8,
+              "borderRadius": 18,
+              "speaker": "Sheriff"
+            },
+            {
+              "text": "Ya sé cómo funciona.",
+              "size": "small",
+              "posX": 52,
+              "posY": 60,
+              "tailX": 40,
+              "tailY": 24,
+              "tailWidth": 6,
+              "tailCurvature": -22,
+              "width": 155,
+              "fontSize": 8,
+              "borderRadius": 18,
+              "speaker": "Peter"
+            }
+          ],
+          "zoomRects": [
+            {
+              "x": 0,
+              "y": 48,
+              "w": 100,
+              "h": 24
+            }
+          ]
+        },
+        {
+          "focusY": 0.85,
+          "dialogue": [
+            {
+              "text": "Bien.",
+              "size": "small",
+              "posX": 20,
+              "posY": 76,
+              "tailX": 40,
+              "tailY": 24,
+              "tailWidth": 6,
+              "tailCurvature": -22,
+              "width": 60,
+              "fontSize": 8,
+              "borderRadius": 18,
+              "speaker": "Sheriff"
+            },
+            {
+              "text": "Empecemos acá.",
+              "size": "small",
+              "posX": 55,
+              "posY": 80,
+              "tailX": 40,
+              "tailY": 24,
+              "tailWidth": 6,
+              "tailCurvature": -22,
+              "width": 130,
+              "fontSize": 8,
+              "borderRadius": 18,
+              "speaker": "Sheriff"
+            }
+          ],
+          "zoomRects": [
+            {
+              "x": 0,
+              "y": 68,
+              "w": 100,
+              "h": 24
+            }
+          ]
+        }
+      ]
+    },
+    "19": {
+      "panels": [
+        {
+          "focusY": 0.15,
+          "dialogue": [
+            {
+              "text": "¿Cuándo fue la última vez que viste a Uandi?",
+              "size": "small",
+              "posX": 10,
+              "posY": 6,
+              "tailX": 40,
+              "tailY": 24,
+              "tailWidth": 6,
+              "tailCurvature": -22,
+              "width": 220,
+              "fontSize": 8,
+              "borderRadius": 18,
+              "speaker": "Sheriff"
+            },
+            {
+              "text": "En casa.",
+              "size": "small",
+              "posX": 58,
+              "posY": 10,
+              "tailX": 40,
+              "tailY": 24,
+              "tailWidth": 6,
+              "tailCurvature": -22,
+              "width": 85,
+              "fontSize": 8,
+              "borderRadius": 18,
+              "speaker": "Peter"
+            }
+          ],
+          "zoomRects": [
+            {
+              "x": 0,
+              "y": 0,
+              "w": 100,
+              "h": 24
+            }
+          ]
+        },
+        {
+          "focusY": 0.32,
+          "dialogue": [
+            {
+              "text": "¿Hora?",
+              "size": "small",
+              "posX": 18,
+              "posY": 26,
+              "tailX": 40,
+              "tailY": 24,
+              "tailWidth": 6,
+              "tailCurvature": -22,
+              "width": 70,
+              "fontSize": 8,
+              "borderRadius": 18,
+              "speaker": "Sheriff"
+            },
+            {
+              "text": "Una... una y pico.",
+              "size": "small",
+              "posX": 55,
+              "posY": 30,
+              "tailX": 40,
+              "tailY": 24,
+              "tailWidth": 6,
+              "tailCurvature": -22,
+              "width": 130,
+              "fontSize": 8,
+              "borderRadius": 18,
+              "speaker": "Peter"
+            },
+            {
+              "text": "¿Discutieron?",
+              "size": "small",
+              "posX": 12,
+              "posY": 36,
+              "tailX": 40,
+              "tailY": 24,
+              "tailWidth": 6,
+              "tailCurvature": -22,
+              "width": 110,
+              "fontSize": 8,
+              "borderRadius": 18,
+              "speaker": "Sheriff"
+            },
+            {
+              "text": "No.",
+              "size": "small",
+              "posX": 68,
+              "posY": 40,
+              "tailX": 40,
+              "tailY": 24,
+              "tailWidth": 6,
+              "tailCurvature": -22,
+              "width": 50,
+              "fontSize": 8,
+              "borderRadius": 18,
+              "speaker": "Peter"
+            }
+          ],
+          "zoomRects": [
+            {
+              "x": 0,
+              "y": 18,
+              "w": 100,
+              "h": 24
+            }
+          ]
+        },
+        {
+          "focusY": 0.5,
+          "dialogue": [
+            {
+              "text": "¿Algo fuera de lo normal?",
+              "size": "small",
+              "posX": 12,
+              "posY": 44,
+              "tailX": 40,
+              "tailY": 24,
+              "tailWidth": 6,
+              "tailCurvature": -22,
+              "width": 175,
+              "fontSize": 8,
+              "borderRadius": 18,
+              "speaker": "Sheriff"
+            },
+            {
+              "text": "Nos atacó un vampiro.",
+              "size": "small",
+              "posX": 52,
+              "posY": 48,
+              "tailX": 40,
+              "tailY": 24,
+              "tailWidth": 6,
+              "tailCurvature": -22,
+              "width": 155,
+              "fontSize": 8,
+              "borderRadius": 18,
+              "speaker": "Peter"
+            }
+          ],
+          "zoomRects": [
+            {
+              "x": 0,
+              "y": 36,
+              "w": 100,
+              "h": 24
+            }
+          ]
+        },
+        {
+          "focusY": 0.66,
+          "dialogue": [
+            {
+              "text": "¿Me creés?",
+              "size": "small",
+              "posX": 22,
+              "posY": 60,
+              "tailX": 40,
+              "tailY": 24,
+              "tailWidth": 6,
+              "tailCurvature": -22,
+              "width": 100,
+              "fontSize": 8,
+              "borderRadius": 18,
+              "speaker": "Peter"
+            },
+            {
+              "text": "Todavía no decidí nada. Contame.",
+              "size": "small",
+              "posX": 48,
+              "posY": 64,
+              "tailX": 40,
+              "tailY": 24,
+              "tailWidth": 6,
+              "tailCurvature": -22,
+              "width": 195,
+              "fontSize": 8,
+              "borderRadius": 18,
+              "speaker": "Sheriff"
+            }
+          ],
+          "zoomRects": [
+            {
+              "x": 0,
+              "y": 52,
+              "w": 100,
+              "h": 24
+            }
+          ]
+        },
+        {
+          "focusY": 0.82,
+          "dialogue": [
+            {
+              "text": "Balanar. El callejón. La pelea.",
+              "size": "small",
+              "posX": 12,
+              "posY": 74,
+              "tailX": 40,
+              "tailY": 24,
+              "tailWidth": 6,
+              "tailCurvature": -22,
+              "width": 200,
+              "fontSize": 8,
+              "borderRadius": 18,
+              "speaker": "Peter"
+            },
+            {
+              "text": "Yo me dormí.",
+              "size": "small",
+              "posX": 55,
+              "posY": 78,
+              "tailX": 40,
+              "tailY": 24,
+              "tailWidth": 6,
+              "tailCurvature": -22,
+              "width": 110,
+              "fontSize": 8,
+              "borderRadius": 18,
+              "speaker": "Peter"
+            },
+            {
+              "text": "Por eso no me despertó.",
+              "size": "small",
+              "posX": 12,
+              "posY": 86,
+              "tailX": 40,
+              "tailY": 24,
+              "tailWidth": 6,
+              "tailCurvature": -22,
+              "width": 165,
+              "fontSize": 8,
+              "borderRadius": 18,
+              "speaker": "Peter"
+            }
+          ],
+          "zoomRects": [
+            {
+              "x": 0,
+              "y": 66,
+              "w": 100,
+              "h": 24
+            }
+          ]
+        },
+        {
+          "focusY": 0.94,
+          "dialogue": [
+            {
+              "text": "¿Uandi tenía enemigos?",
+              "size": "small",
+              "posX": 12,
+              "posY": 88,
+              "tailX": 40,
+              "tailY": 24,
+              "tailWidth": 6,
+              "tailCurvature": -22,
+              "width": 175,
+              "fontSize": 8,
+              "borderRadius": 18,
+              "speaker": "Sheriff"
+            },
+            {
+              "text": "Nadie que le pegara un tiro comprando yerba.",
+              "size": "small",
+              "posX": 12,
+              "posY": 92,
+              "tailX": 40,
+              "tailY": 24,
+              "tailWidth": 6,
+              "tailCurvature": -22,
+              "width": 230,
+              "fontSize": 8,
+              "borderRadius": 18,
+              "speaker": "Peter"
+            },
+            {
+              "text": "Tendría que haber estado ahí.",
+              "size": "small",
+              "posX": 42,
+              "posY": 96,
+              "tailX": 40,
+              "tailY": 24,
+              "tailWidth": 6,
+              "tailCurvature": -22,
+              "width": 195,
+              "fontSize": 8,
+              "borderRadius": 18,
+              "speaker": "Peter"
+            }
+          ],
+          "zoomRects": [
+            {
+              "x": 0,
+              "y": 80,
+              "w": 100,
+              "h": 24
+            }
+          ]
+        }
+      ]
+    },
+    "20": {
+      "panels": [
+        {
+          "focusY": 0.2,
+          "dialogue": [
+            {
+              "text": "¿Peter?",
+              "size": "small",
+              "posX": 55,
+              "posY": 10,
+              "tailX": 40,
+              "tailY": 24,
+              "tailWidth": 6,
+              "tailCurvature": -22,
+              "width": 80,
+              "fontSize": 8,
+              "borderRadius": 18,
+              "speaker": "Ian",
+              "offscreen": true,
+              "showSpeakerName": true
+            },
+            {
+              "text": "Ian...",
+              "size": "small",
+              "posX": 18,
+              "posY": 14,
+              "tailX": 40,
+              "tailY": 24,
+              "tailWidth": 6,
+              "tailCurvature": -22,
+              "width": 70,
+              "fontSize": 8,
+              "borderRadius": 18,
+              "speaker": "Peter"
+            }
+          ],
+          "zoomRects": [
+            {
+              "x": 0,
+              "y": 2,
+              "w": 100,
+              "h": 24
+            }
+          ]
+        },
+        {
+          "focusY": 0.42,
+          "dialogue": [
+            {
+              "text": "¿Qué pasó?",
+              "size": "small",
+              "posX": 58,
+              "posY": 34,
+              "tailX": 40,
+              "tailY": 24,
+              "tailWidth": 6,
+              "tailCurvature": -22,
+              "width": 95,
+              "fontSize": 8,
+              "borderRadius": 18,
+              "speaker": "Ian",
+              "offscreen": true,
+              "showSpeakerName": true
+            },
+            {
+              "text": "Uandi está muerto.",
+              "size": "small",
+              "posX": 15,
+              "posY": 38,
+              "tailX": 40,
+              "tailY": 24,
+              "tailWidth": 6,
+              "tailCurvature": -22,
+              "width": 145,
+              "fontSize": 8,
+              "borderRadius": 18,
+              "speaker": "Peter"
+            }
+          ],
+          "zoomRects": [
+            {
+              "x": 0,
+              "y": 26,
+              "w": 100,
+              "h": 24
+            }
+          ]
+        },
+        {
+          "focusY": 0.58,
+          "dialogue": [
+            {
+              "text": "¿Dónde estás?",
+              "size": "small",
+              "posX": 52,
+              "posY": 52,
+              "tailX": 40,
+              "tailY": 24,
+              "tailWidth": 6,
+              "tailCurvature": -22,
+              "width": 115,
+              "fontSize": 8,
+              "borderRadius": 18,
+              "speaker": "Ian",
+              "offscreen": true,
+              "showSpeakerName": true
+            },
+            {
+              "text": "Con la policía.",
+              "size": "small",
+              "posX": 18,
+              "posY": 56,
+              "tailX": 40,
+              "tailY": 24,
+              "tailWidth": 6,
+              "tailCurvature": -22,
+              "width": 120,
+              "fontSize": 8,
+              "borderRadius": 18,
+              "speaker": "Peter"
+            },
+            {
+              "text": "Voy para allá.",
+              "size": "small",
+              "posX": 55,
+              "posY": 62,
+              "tailX": 40,
+              "tailY": 24,
+              "tailWidth": 6,
+              "tailCurvature": -22,
+              "width": 115,
+              "fontSize": 8,
+              "borderRadius": 18,
+              "speaker": "Ian",
+              "offscreen": true,
+              "showSpeakerName": true
+            }
+          ],
+          "zoomRects": [
+            {
+              "x": 0,
+              "y": 44,
+              "w": 100,
+              "h": 24
+            }
+          ]
+        },
+        {
+          "focusY": 0.75,
+          "dialogue": [
+            {
+              "text": "Traé a Jaz.",
+              "size": "small",
+              "posX": 20,
+              "posY": 70,
+              "tailX": 40,
+              "tailY": 24,
+              "tailWidth": 6,
+              "tailCurvature": -22,
+              "width": 100,
+              "fontSize": 8,
+              "borderRadius": 18,
+              "speaker": "Peter"
+            },
+            {
+              "text": "No sé cómo llamar a Mati.",
+              "size": "small",
+              "posX": 12,
+              "posY": 76,
+              "tailX": 40,
+              "tailY": 24,
+              "tailWidth": 6,
+              "tailCurvature": -22,
+              "width": 185,
+              "fontSize": 8,
+              "borderRadius": 18,
+              "speaker": "Peter"
+            },
+            {
+              "text": "Primero ocupémonos de Uandi.",
+              "size": "small",
+              "posX": 48,
+              "posY": 82,
+              "tailX": 40,
+              "tailY": 24,
+              "tailWidth": 6,
+              "tailCurvature": -22,
+              "width": 195,
+              "fontSize": 8,
+              "borderRadius": 18,
+              "speaker": "Ian",
+              "offscreen": true,
+              "showSpeakerName": true
+            }
+          ],
+          "zoomRects": [
+            {
+              "x": 0,
+              "y": 62,
+              "w": 100,
+              "h": 24
+            }
+          ]
+        },
+        {
+          "focusY": 0.9,
+          "dialogue": [
+            {
+              "text": "Ian cuelga. El laboratorio queda en silencio.",
+              "size": "small",
+              "posX": 12,
+              "posY": 84,
+              "tailX": 40,
+              "tailY": 24,
+              "tailWidth": 6,
+              "tailCurvature": -22,
+              "width": 220,
+              "fontSize": 8,
+              "borderRadius": 18,
+              "speaker": "Narración",
+              "style": "caption",
+              "tail": "none"
+            },
+            {
+              "text": "Tenemos que ir.",
+              "size": "small",
+              "posX": 22,
+              "posY": 88,
+              "tailX": 40,
+              "tailY": 24,
+              "tailWidth": 6,
+              "tailCurvature": -22,
+              "width": 120,
+              "fontSize": 8,
+              "borderRadius": 18,
+              "speaker": "Ian"
+            }
+          ],
+          "zoomRects": [
+            {
+              "x": 0,
+              "y": 76,
+              "w": 100,
+              "h": 24
+            }
+          ]
+        }
+      ]
+    },
+    "21": {
+      "panels": [
+        {
+          "focusY": 0.18,
+          "dialogue": [
+            {
+              "text": "Ian, Jaz y Valery llegan al playón.",
+              "size": "small",
+              "posX": 10,
+              "posY": 6,
+              "tailX": 40,
+              "tailY": 24,
+              "tailWidth": 6,
+              "tailCurvature": -22,
+              "width": 210,
+              "fontSize": 8,
+              "borderRadius": 18,
+              "speaker": "Narración",
+              "style": "caption",
+              "tail": "none"
+            },
+            {
+              "text": "Ahí está.",
+              "size": "small",
+              "posX": 58,
+              "posY": 12,
+              "tailX": 40,
+              "tailY": 24,
+              "tailWidth": 6,
+              "tailCurvature": -22,
+              "width": 90,
+              "fontSize": 8,
+              "borderRadius": 18,
+              "speaker": "Jaz"
+            }
+          ],
+          "zoomRects": [
+            {
+              "x": 0,
+              "y": 0,
+              "w": 100,
+              "h": 24
+            }
+          ]
+        },
+        {
+          "focusY": 0.38,
+          "dialogue": [
+            {
+              "text": "Jaz lo abraza. Peter tarda en responder.",
+              "size": "small",
+              "posX": 10,
+              "posY": 28,
+              "tailX": 40,
+              "tailY": 24,
+              "tailWidth": 6,
+              "tailCurvature": -22,
+              "width": 220,
+              "fontSize": 8,
+              "borderRadius": 18,
+              "speaker": "Narración",
+              "style": "caption",
+              "tail": "none"
+            },
+            {
+              "text": "...",
+              "size": "small",
+              "posX": 40,
+              "posY": 36,
+              "tailX": 40,
+              "tailY": 24,
+              "tailWidth": 6,
+              "tailCurvature": -22,
+              "width": 60,
+              "fontSize": 8,
+              "borderRadius": 18,
+              "speaker": "Peter"
+            }
+          ],
+          "zoomRects": [
+            {
+              "x": 0,
+              "y": 20,
+              "w": 100,
+              "h": 24
+            }
+          ]
+        },
+        {
+          "focusY": 0.55,
+          "dialogue": [
+            {
+              "text": "Yo estaba durmiendo.",
+              "size": "small",
+              "posX": 15,
+              "posY": 50,
+              "tailX": 40,
+              "tailY": 24,
+              "tailWidth": 6,
+              "tailCurvature": -22,
+              "width": 155,
+              "fontSize": 8,
+              "borderRadius": 18,
+              "speaker": "Peter"
+            },
+            {
+              "text": "Lo sé.",
+              "size": "small",
+              "posX": 62,
+              "posY": 54,
+              "tailX": 40,
+              "tailY": 24,
+              "tailWidth": 6,
+              "tailCurvature": -22,
+              "width": 70,
+              "fontSize": 8,
+              "borderRadius": 18,
+              "speaker": "Ian"
+            },
+            {
+              "text": "Salió solo.",
+              "size": "small",
+              "posX": 15,
+              "posY": 60,
+              "tailX": 40,
+              "tailY": 24,
+              "tailWidth": 6,
+              "tailCurvature": -22,
+              "width": 100,
+              "fontSize": 8,
+              "borderRadius": 18,
+              "speaker": "Peter"
+            }
+          ],
+          "zoomRects": [
+            {
+              "x": 0,
+              "y": 42,
+              "w": 100,
+              "h": 24
+            }
+          ]
+        },
+        {
+          "focusY": 0.72,
+          "dialogue": [
+            {
+              "text": "No estabas ahí.",
+              "size": "small",
+              "posX": 18,
+              "posY": 66,
+              "tailX": 40,
+              "tailY": 24,
+              "tailWidth": 6,
+              "tailCurvature": -22,
+              "width": 130,
+              "fontSize": 8,
+              "borderRadius": 18,
+              "speaker": "Ian"
+            },
+            {
+              "text": "Exacto.",
+              "size": "small",
+              "posX": 62,
+              "posY": 70,
+              "tailX": 40,
+              "tailY": 24,
+              "tailWidth": 6,
+              "tailCurvature": -22,
+              "width": 80,
+              "fontSize": 8,
+              "borderRadius": 18,
+              "speaker": "Peter"
+            }
+          ],
+          "zoomRects": [
+            {
+              "x": 0,
+              "y": 58,
+              "w": 100,
+              "h": 24
+            }
+          ]
+        },
+        {
+          "focusY": 0.88,
+          "dialogue": [
+            {
+              "text": "¿Quién lo hizo?",
+              "size": "small",
+              "posX": 20,
+              "posY": 80,
+              "tailX": 40,
+              "tailY": 24,
+              "tailWidth": 6,
+              "tailCurvature": -22,
+              "width": 115,
+              "fontSize": 8,
+              "borderRadius": 18,
+              "speaker": "Ian"
+            },
+            {
+              "text": "Todavía no saben.",
+              "size": "small",
+              "posX": 55,
+              "posY": 84,
+              "tailX": 40,
+              "tailY": 24,
+              "tailWidth": 6,
+              "tailCurvature": -22,
+              "width": 140,
+              "fontSize": 8,
+              "borderRadius": 18,
+              "speaker": "Peter"
+            }
+          ],
+          "zoomRects": [
+            {
+              "x": 0,
+              "y": 72,
+              "w": 100,
+              "h": 24
+            }
+          ]
+        }
+      ]
+    },
+    "22": {
+      "panels": [
+        {
+          "focusY": 0.15,
+          "dialogue": [
+            {
+              "text": "Contame otra vez.",
+              "size": "small",
+              "posX": 12,
+              "posY": 6,
+              "tailX": 40,
+              "tailY": 24,
+              "tailWidth": 6,
+              "tailCurvature": -22,
+              "width": 140,
+              "fontSize": 8,
+              "borderRadius": 18,
+              "speaker": "Sheriff"
+            },
+            {
+              "text": "Desde el principio.",
+              "size": "small",
+              "posX": 55,
+              "posY": 10,
+              "tailX": 40,
+              "tailY": 24,
+              "tailWidth": 6,
+              "tailCurvature": -22,
+              "width": 145,
+              "fontSize": 8,
+              "borderRadius": 18,
+              "speaker": "Sheriff"
+            }
+          ],
+          "zoomRects": [
+            {
+              "x": 0,
+              "y": 0,
+              "w": 100,
+              "h": 24
+            }
+          ]
+        },
+        {
+          "focusY": 0.35,
+          "dialogue": [
+            {
+              "text": "Volvimos. Pizza. Dormimos.",
+              "size": "small",
+              "posX": 12,
+              "posY": 28,
+              "tailX": 40,
+              "tailY": 24,
+              "tailWidth": 6,
+              "tailCurvature": -22,
+              "width": 175,
+              "fontSize": 8,
+              "borderRadius": 18,
+              "speaker": "Peter"
+            },
+            {
+              "text": "Él salió sin despertarme.",
+              "size": "small",
+              "posX": 52,
+              "posY": 32,
+              "tailX": 40,
+              "tailY": 24,
+              "tailWidth": 6,
+              "tailCurvature": -22,
+              "width": 165,
+              "fontSize": 8,
+              "borderRadius": 18,
+              "speaker": "Peter"
+            }
+          ],
+          "zoomRects": [
+            {
+              "x": 0,
+              "y": 20,
+              "w": 100,
+              "h": 24
+            }
+          ]
+        },
+        {
+          "focusY": 0.52,
+          "dialogue": [
+            {
+              "text": "¿Vampiro?",
+              "size": "small",
+              "posX": 18,
+              "posY": 46,
+              "tailX": 40,
+              "tailY": 24,
+              "tailWidth": 6,
+              "tailCurvature": -22,
+              "width": 90,
+              "fontSize": 8,
+              "borderRadius": 18,
+              "speaker": "Deputy"
+            },
+            {
+              "text": "Con alas.",
+              "size": "small",
+              "posX": 58,
+              "posY": 50,
+              "tailX": 40,
+              "tailY": 24,
+              "tailWidth": 6,
+              "tailCurvature": -22,
+              "width": 100,
+              "fontSize": 8,
+              "borderRadius": 18,
+              "speaker": "Peter"
+            },
+            {
+              "text": "Anoche. En la calle.",
+              "size": "small",
+              "posX": 12,
+              "posY": 56,
+              "tailX": 40,
+              "tailY": 24,
+              "tailWidth": 6,
+              "tailCurvature": -22,
+              "width": 145,
+              "fontSize": 8,
+              "borderRadius": 18,
+              "speaker": "Peter"
+            }
+          ],
+          "zoomRects": [
+            {
+              "x": 0,
+              "y": 38,
+              "w": 100,
+              "h": 24
+            }
+          ]
+        },
+        {
+          "focusY": 0.7,
+          "dialogue": [
+            {
+              "text": "Eso no explica un tiro en la YPF.",
+              "size": "small",
+              "posX": 10,
+              "posY": 64,
+              "tailX": 40,
+              "tailY": 24,
+              "tailWidth": 6,
+              "tailCurvature": -22,
+              "width": 210,
+              "fontSize": 8,
+              "borderRadius": 18,
+              "speaker": "Sheriff"
+            },
+            {
+              "text": "Lo sé.",
+              "size": "small",
+              "posX": 62,
+              "posY": 68,
+              "tailX": 40,
+              "tailY": 24,
+              "tailWidth": 6,
+              "tailCurvature": -22,
+              "width": 70,
+              "fontSize": 8,
+              "borderRadius": 18,
+              "speaker": "Peter"
+            }
+          ],
+          "zoomRects": [
+            {
+              "x": 0,
+              "y": 56,
+              "w": 100,
+              "h": 24
+            }
+          ]
+        },
+        {
+          "focusY": 0.88,
+          "dialogue": [
+            {
+              "text": "Lo que necesito es quién sí estuvo.",
+              "size": "small",
+              "posX": 12,
+              "posY": 80,
+              "tailX": 40,
+              "tailY": 24,
+              "tailWidth": 6,
+              "tailCurvature": -22,
+              "width": 215,
+              "fontSize": 8,
+              "borderRadius": 18,
+              "speaker": "Sheriff"
+            },
+            {
+              "text": "El empleado vio más que yo.",
+              "size": "small",
+              "posX": 12,
+              "posY": 88,
+              "tailX": 40,
+              "tailY": 24,
+              "tailWidth": 6,
+              "tailCurvature": -22,
+              "width": 195,
+              "fontSize": 8,
+              "borderRadius": 18,
+              "speaker": "Peter"
+            }
+          ],
+          "zoomRects": [
+            {
+              "x": 0,
+              "y": 72,
+              "w": 100,
+              "h": 24
+            }
+          ]
+        }
+      ]
+    },
+    "23": {
+      "panels": [
+        {
+          "focusY": 0.15,
+          "dialogue": [
+            {
+              "text": "Entró normal.",
+              "size": "small",
+              "posX": 12,
+              "posY": 6,
+              "tailX": 40,
+              "tailY": 24,
+              "tailWidth": 6,
+              "tailCurvature": -22,
+              "width": 120,
+              "fontSize": 8,
+              "borderRadius": 18,
+              "speaker": "Empleado YPF"
+            },
+            {
+              "text": "¿Uandi?",
+              "size": "small",
+              "posX": 55,
+              "posY": 10,
+              "tailX": 40,
+              "tailY": 24,
+              "tailWidth": 6,
+              "tailCurvature": -22,
+              "width": 80,
+              "fontSize": 8,
+              "borderRadius": 18,
+              "speaker": "Sheriff"
+            },
+            {
+              "text": "Sí. Venía seguido de noche.",
+              "size": "small",
+              "posX": 12,
+              "posY": 16,
+              "tailX": 40,
+              "tailY": 24,
+              "tailWidth": 6,
+              "tailCurvature": -22,
+              "width": 195,
+              "fontSize": 8,
+              "borderRadius": 18,
+              "speaker": "Empleado YPF"
+            }
+          ],
+          "zoomRects": [
+            {
+              "x": 0,
+              "y": 0,
+              "w": 100,
+              "h": 24
+            }
+          ]
+        },
+        {
+          "focusY": 0.32,
+          "dialogue": [
+            {
+              "text": "Compró. Pagó. Salió al playón.",
+              "size": "small",
+              "posX": 10,
+              "posY": 26,
+              "tailX": 40,
+              "tailY": 24,
+              "tailWidth": 6,
+              "tailCurvature": -22,
+              "width": 210,
+              "fontSize": 8,
+              "borderRadius": 18,
+              "speaker": "Empleado YPF"
+            },
+            {
+              "text": "¿El hombre armado lo esperaba?",
+              "size": "small",
+              "posX": 12,
+              "posY": 34,
+              "tailX": 40,
+              "tailY": 24,
+              "tailWidth": 6,
+              "tailCurvature": -22,
+              "width": 200,
+              "fontSize": 8,
+              "borderRadius": 18,
+              "speaker": "Sheriff"
+            }
+          ],
+          "zoomRects": [
+            {
+              "x": 0,
+              "y": 18,
+              "w": 100,
+              "h": 24
+            }
+          ]
+        },
+        {
+          "focusY": 0.5,
+          "dialogue": [
+            {
+              "text": "No creo. Cuando entró ni lo miró.",
+              "size": "small",
+              "posX": 12,
+              "posY": 44,
+              "tailX": 40,
+              "tailY": 24,
+              "tailWidth": 6,
+              "tailCurvature": -22,
+              "width": 210,
+              "fontSize": 8,
+              "borderRadius": 18,
+              "speaker": "Empleado YPF"
+            },
+            {
+              "text": "Fue al surtidor.",
+              "size": "small",
+              "posX": 55,
+              "posY": 50,
+              "tailX": 40,
+              "tailY": 24,
+              "tailWidth": 6,
+              "tailCurvature": -22,
+              "width": 130,
+              "fontSize": 8,
+              "borderRadius": 18,
+              "speaker": "Empleado YPF"
+            }
+          ],
+          "zoomRects": [
+            {
+              "x": 0,
+              "y": 36,
+              "w": 100,
+              "h": 24
+            }
+          ]
+        },
+        {
+          "focusY": 0.68,
+          "dialogue": [
+            {
+              "text": "¿Uandi intentó atacarlo?",
+              "size": "small",
+              "posX": 12,
+              "posY": 62,
+              "tailX": 40,
+              "tailY": 24,
+              "tailWidth": 6,
+              "tailCurvature": -22,
+              "width": 185,
+              "fontSize": 8,
+              "borderRadius": 18,
+              "speaker": "Sheriff"
+            },
+            {
+              "text": "No.",
+              "size": "small",
+              "posX": 62,
+              "posY": 66,
+              "tailX": 40,
+              "tailY": 24,
+              "tailWidth": 6,
+              "tailCurvature": -22,
+              "width": 50,
+              "fontSize": 8,
+              "borderRadius": 18,
+              "speaker": "Empleado YPF"
+            },
+            {
+              "text": "Hablaba.",
+              "size": "small",
+              "posX": 12,
+              "posY": 72,
+              "tailX": 40,
+              "tailY": 24,
+              "tailWidth": 6,
+              "tailCurvature": -22,
+              "width": 90,
+              "fontSize": 8,
+              "borderRadius": 18,
+              "speaker": "Empleado YPF"
+            }
+          ],
+          "zoomRects": [
+            {
+              "x": 0,
+              "y": 54,
+              "w": 100,
+              "h": 24
+            }
+          ]
+        },
+        {
+          "focusY": 0.85,
+          "dialogue": [
+            {
+              "text": "Le decía que se llevara la plata.",
+              "size": "small",
+              "posX": 10,
+              "posY": 78,
+              "tailX": 40,
+              "tailY": 24,
+              "tailWidth": 6,
+              "tailCurvature": -22,
+              "width": 210,
+              "fontSize": 8,
+              "borderRadius": 18,
+              "speaker": "Empleado YPF"
+            },
+            {
+              "text": "Se puso en el medio.",
+              "size": "small",
+              "posX": 12,
+              "posY": 86,
+              "tailX": 40,
+              "tailY": 24,
+              "tailWidth": 6,
+              "tailCurvature": -22,
+              "width": 155,
+              "fontSize": 8,
+              "borderRadius": 18,
+              "speaker": "Empleado YPF"
+            },
+            {
+              "text": "Y le disparó.",
+              "size": "small",
+              "posX": 58,
+              "posY": 90,
+              "tailX": 40,
+              "tailY": 24,
+              "tailWidth": 6,
+              "tailCurvature": -22,
+              "width": 115,
+              "fontSize": 8,
+              "borderRadius": 18,
+              "speaker": "Empleado YPF"
+            }
+          ],
+          "zoomRects": [
+            {
+              "x": 0,
+              "y": 70,
+              "w": 100,
+              "h": 24
+            }
+          ]
+        }
+      ]
+    },
+    "24": {
+      "panels": [
+        {
+          "focusY": 0.18,
+          "dialogue": [
+            {
+              "text": "¿Viste al sospechoso salir?",
+              "size": "small",
+              "posX": 12,
+              "posY": 8,
+              "tailX": 40,
+              "tailY": 24,
+              "tailWidth": 6,
+              "tailCurvature": -22,
+              "width": 195,
+              "fontSize": 8,
+              "borderRadius": 18,
+              "speaker": "Sheriff"
+            },
+            {
+              "text": "Corriendo. Con una billetera.",
+              "size": "small",
+              "posX": 12,
+              "posY": 16,
+              "tailX": 40,
+              "tailY": 24,
+              "tailWidth": 6,
+              "tailCurvature": -22,
+              "width": 200,
+              "fontSize": 8,
+              "borderRadius": 18,
+              "speaker": "Empleado YPF"
+            }
+          ],
+          "zoomRects": [
+            {
+              "x": 0,
+              "y": 0,
+              "w": 100,
+              "h": 24
+            }
+          ]
+        },
+        {
+          "focusY": 0.38,
+          "dialogue": [
+            {
+              "text": "Peter pasa con abrigo y anteojos.",
+              "size": "small",
+              "posX": 10,
+              "posY": 32,
+              "tailX": 40,
+              "tailY": 24,
+              "tailWidth": 6,
+              "tailCurvature": -22,
+              "width": 200,
+              "fontSize": 8,
+              "borderRadius": 18,
+              "speaker": "Narración",
+              "style": "caption",
+              "tail": "none"
+            },
+            {
+              "text": "...",
+              "size": "small",
+              "posX": 55,
+              "posY": 36,
+              "tailX": 40,
+              "tailY": 24,
+              "tailWidth": 6,
+              "tailCurvature": -22,
+              "width": 60,
+              "fontSize": 8,
+              "borderRadius": 18,
+              "speaker": "Deputy",
+              "style": "thought",
+              "tail": "none"
+            }
+          ],
+          "zoomRects": [
+            {
+              "x": 0,
+              "y": 24,
+              "w": 100,
+              "h": 24
+            }
+          ]
+        },
+        {
+          "focusY": 0.58,
+          "dialogue": [
+            {
+              "text": "Ian, Jaz y Valery llegan al cordón.",
+              "size": "small",
+              "posX": 10,
+              "posY": 52,
+              "tailX": 40,
+              "tailY": 24,
+              "tailWidth": 6,
+              "tailCurvature": -22,
+              "width": 210,
+              "fontSize": 8,
+              "borderRadius": 18,
+              "speaker": "Narración",
+              "style": "caption",
+              "tail": "none"
+            },
+            {
+              "text": "Ahí.",
+              "size": "small",
+              "posX": 20,
+              "posY": 56,
+              "tailX": 40,
+              "tailY": 24,
+              "tailWidth": 6,
+              "tailCurvature": -22,
+              "width": 60,
+              "fontSize": 8,
+              "borderRadius": 18,
+              "speaker": "Ian"
+            }
+          ],
+          "zoomRects": [
+            {
+              "x": 0,
+              "y": 44,
+              "w": 100,
+              "h": 24
+            }
+          ]
+        },
+        {
+          "focusY": 0.82,
+          "dialogue": [
+            {
+              "text": "Ustedes tres. Afuera.",
+              "size": "small",
+              "posX": 12,
+              "posY": 74,
+              "tailX": 40,
+              "tailY": 24,
+              "tailWidth": 6,
+              "tailCurvature": -22,
+              "width": 155,
+              "fontSize": 8,
+              "borderRadius": 18,
+              "speaker": "Sheriff"
+            },
+            {
+              "text": "Sheriff.",
+              "size": "small",
+              "posX": 55,
+              "posY": 78,
+              "tailX": 40,
+              "tailY": 24,
+              "tailWidth": 6,
+              "tailCurvature": -22,
+              "width": 80,
+              "fontSize": 8,
+              "borderRadius": 18,
+              "speaker": "Valery"
+            },
+            {
+              "text": "Ahora.",
+              "size": "small",
+              "posX": 20,
+              "posY": 86,
+              "tailX": 40,
+              "tailY": 24,
+              "tailWidth": 6,
+              "tailCurvature": -22,
+              "width": 70,
+              "fontSize": 8,
+              "borderRadius": 18,
+              "speaker": "Sheriff"
+            }
+          ],
+          "zoomRects": [
+            {
+              "x": 0,
+              "y": 66,
+              "w": 100,
+              "h": 24
+            }
+          ]
+        }
+      ]
+    },
+    "25": {
+      "panels": [
+        {
+          "focusY": 0.2,
+          "dialogue": [
+            {
+              "text": "Adentro.",
+              "size": "small",
+              "posX": 55,
+              "posY": 10,
+              "tailX": 40,
+              "tailY": 24,
+              "tailWidth": 6,
+              "tailCurvature": -22,
+              "width": 85,
+              "fontSize": 8,
+              "borderRadius": 18,
+              "speaker": "Sheriff"
+            },
+            {
+              "text": "Los tres. Conmigo.",
+              "size": "small",
+              "posX": 12,
+              "posY": 14,
+              "tailX": 40,
+              "tailY": 24,
+              "tailWidth": 6,
+              "tailCurvature": -22,
+              "width": 145,
+              "fontSize": 8,
+              "borderRadius": 18,
+              "speaker": "Sheriff"
+            }
+          ],
+          "zoomRects": [
+            {
+              "x": 0,
+              "y": 2,
+              "w": 100,
+              "h": 24
+            }
+          ]
+        },
+        {
+          "focusY": 0.42,
+          "dialogue": [
+            {
+              "text": "¿Podemos ayudar?",
+              "size": "small",
+              "posX": 18,
+              "posY": 36,
+              "tailX": 40,
+              "tailY": 24,
+              "tailWidth": 6,
+              "tailCurvature": -22,
+              "width": 125,
+              "fontSize": 8,
+              "borderRadius": 18,
+              "speaker": "Ian"
+            },
+            {
+              "text": "Pueden responder.",
+              "size": "small",
+              "posX": 52,
+              "posY": 40,
+              "tailX": 40,
+              "tailY": 24,
+              "tailWidth": 6,
+              "tailCurvature": -22,
+              "width": 140,
+              "fontSize": 8,
+              "borderRadius": 18,
+              "speaker": "Sheriff"
+            }
+          ],
+          "zoomRects": [
+            {
+              "x": 0,
+              "y": 28,
+              "w": 100,
+              "h": 24
+            }
+          ]
+        },
+        {
+          "focusY": 0.62,
+          "dialogue": [
+            {
+              "text": "La comisaría huele a café recalentado.",
+              "size": "small",
+              "posX": 10,
+              "posY": 56,
+              "tailX": 40,
+              "tailY": 24,
+              "tailWidth": 6,
+              "tailCurvature": -22,
+              "width": 220,
+              "fontSize": 8,
+              "borderRadius": 18,
+              "speaker": "Narración",
+              "style": "caption",
+              "tail": "none"
+            },
+            {
+              "text": "Volvé a tu puesto.",
+              "size": "small",
+              "posX": 55,
+              "posY": 60,
+              "tailX": 40,
+              "tailY": 24,
+              "tailWidth": 6,
+              "tailCurvature": -22,
+              "width": 155,
+              "fontSize": 8,
+              "borderRadius": 18,
+              "speaker": "Sheriff"
+            }
+          ],
+          "zoomRects": [
+            {
+              "x": 0,
+              "y": 48,
+              "w": 100,
+              "h": 24
+            }
+          ]
+        },
+        {
+          "focusY": 0.85,
+          "dialogue": [
+            {
+              "text": "Sí, señor.",
+              "size": "small",
+              "posX": 58,
+              "posY": 78,
+              "tailX": 40,
+              "tailY": 24,
+              "tailWidth": 6,
+              "tailCurvature": -22,
+              "width": 95,
+              "fontSize": 8,
+              "borderRadius": 18,
+              "speaker": "Deputy"
+            },
+            {
+              "text": "Oficina del Sheriff.",
+              "size": "small",
+              "posX": 28,
+              "posY": 84,
+              "tailX": 40,
+              "tailY": 24,
+              "tailWidth": 6,
+              "tailCurvature": -22,
+              "width": 140,
+              "fontSize": 8,
+              "borderRadius": 18,
+              "speaker": "Narración",
+              "style": "caption",
+              "tail": "none"
+            }
+          ],
+          "zoomRects": [
+            {
+              "x": 0,
+              "y": 70,
+              "w": 100,
+              "h": 24
+            }
+          ]
+        }
+      ]
+    },
+    "26": {
+      "panels": [
+        {
+          "focusY": 0.18,
+          "dialogue": [
+            {
+              "text": "Voy a preguntar cosas que les parezcan irrelevantes.",
+              "size": "small",
+              "posX": 10,
+              "posY": 6,
+              "tailX": 40,
+              "tailY": 24,
+              "tailWidth": 6,
+              "tailCurvature": -22,
+              "width": 230,
+              "fontSize": 8,
+              "borderRadius": 18,
+              "speaker": "Sheriff"
+            },
+            {
+              "text": "Las irrelevantes suelen importar.",
+              "size": "small",
+              "posX": 12,
+              "posY": 14,
+              "tailX": 40,
+              "tailY": 24,
+              "tailWidth": 6,
+              "tailCurvature": -22,
+              "width": 210,
+              "fontSize": 8,
+              "borderRadius": 18,
+              "speaker": "Ian"
+            }
+          ],
+          "zoomRects": [
+            {
+              "x": 0,
+              "y": 0,
+              "w": 100,
+              "h": 24
+            }
+          ]
+        },
+        {
+          "focusY": 0.38,
+          "dialogue": [
+            {
+              "text": "¿Uandi tenía problemas económicos?",
+              "size": "small",
+              "posX": 12,
+              "posY": 32,
+              "tailX": 40,
+              "tailY": 24,
+              "tailWidth": 6,
+              "tailCurvature": -22,
+              "width": 210,
+              "fontSize": 8,
+              "borderRadius": 18,
+              "speaker": "Sheriff"
+            },
+            {
+              "text": "No especialmente.",
+              "size": "small",
+              "posX": 55,
+              "posY": 36,
+              "tailX": 40,
+              "tailY": 24,
+              "tailWidth": 6,
+              "tailCurvature": -22,
+              "width": 140,
+              "fontSize": 8,
+              "borderRadius": 18,
+              "speaker": "Ian"
+            },
+            {
+              "text": "¿Deudas?",
+              "size": "small",
+              "posX": 12,
+              "posY": 42,
+              "tailX": 40,
+              "tailY": 24,
+              "tailWidth": 6,
+              "tailCurvature": -22,
+              "width": 80,
+              "fontSize": 8,
+              "borderRadius": 18,
+              "speaker": "Sheriff"
+            },
+            {
+              "text": "No que sepamos.",
+              "size": "small",
+              "posX": 55,
+              "posY": 46,
+              "tailX": 40,
+              "tailY": 24,
+              "tailWidth": 6,
+              "tailCurvature": -22,
+              "width": 140,
+              "fontSize": 8,
+              "borderRadius": 18,
+              "speaker": "Jaz"
+            }
+          ],
+          "zoomRects": [
+            {
+              "x": 0,
+              "y": 24,
+              "w": 100,
+              "h": 24
+            }
+          ]
+        },
+        {
+          "focusY": 0.55,
+          "dialogue": [
+            {
+              "text": "¿Alguien quería verlo muerto?",
+              "size": "small",
+              "posX": 12,
+              "posY": 50,
+              "tailX": 40,
+              "tailY": 24,
+              "tailWidth": 6,
+              "tailCurvature": -22,
+              "width": 195,
+              "fontSize": 8,
+              "borderRadius": 18,
+              "speaker": "Sheriff"
+            },
+            {
+              "text": "No conozco a nadie.",
+              "size": "small",
+              "posX": 12,
+              "posY": 58,
+              "tailX": 40,
+              "tailY": 24,
+              "tailWidth": 6,
+              "tailCurvature": -22,
+              "width": 155,
+              "fontSize": 8,
+              "borderRadius": 18,
+              "speaker": "Ian"
+            },
+            {
+              "text": "Uandi se mete donde no lo llaman.",
+              "size": "small",
+              "posX": 48,
+              "posY": 62,
+              "tailX": 40,
+              "tailY": 24,
+              "tailWidth": 6,
+              "tailCurvature": -22,
+              "width": 195,
+              "fontSize": 8,
+              "borderRadius": 18,
+              "speaker": "Jaz"
+            }
+          ],
+          "zoomRects": [
+            {
+              "x": 0,
+              "y": 42,
+              "w": 100,
+              "h": 24
+            }
+          ]
+        },
+        {
+          "focusY": 0.72,
+          "dialogue": [
+            {
+              "text": "El empleado dijo algo parecido.",
+              "size": "small",
+              "posX": 10,
+              "posY": 66,
+              "tailX": 40,
+              "tailY": 24,
+              "tailWidth": 6,
+              "tailCurvature": -22,
+              "width": 210,
+              "fontSize": 8,
+              "borderRadius": 18,
+              "speaker": "Sheriff"
+            },
+            {
+              "text": "Demasiado.",
+              "size": "small",
+              "posX": 58,
+              "posY": 70,
+              "tailX": 40,
+              "tailY": 24,
+              "tailWidth": 6,
+              "tailCurvature": -22,
+              "width": 95,
+              "fontSize": 8,
+              "borderRadius": 18,
+              "speaker": "Ian"
+            }
+          ],
+          "zoomRects": [
+            {
+              "x": 0,
+              "y": 58,
+              "w": 100,
+              "h": 24
+            }
+          ]
+        },
+        {
+          "focusY": 0.88,
+          "dialogue": [
+            {
+              "text": "Entonces veamos lo que sí sabemos.",
+              "size": "small",
+              "posX": 12,
+              "posY": 80,
+              "tailX": 40,
+              "tailY": 24,
+              "tailWidth": 6,
+              "tailCurvature": -22,
+              "width": 215,
+              "fontSize": 8,
+              "borderRadius": 18,
+              "speaker": "Sheriff"
+            },
+            {
+              "text": "Fotos del playón sobre el escritorio.",
+              "size": "small",
+              "posX": 12,
+              "posY": 88,
+              "tailX": 40,
+              "tailY": 24,
+              "tailWidth": 6,
+              "tailCurvature": -22,
+              "width": 210,
+              "fontSize": 8,
+              "borderRadius": 18,
+              "speaker": "Narración",
+              "style": "caption",
+              "tail": "none"
+            }
+          ],
+          "zoomRects": [
+            {
+              "x": 0,
+              "y": 72,
+              "w": 100,
+              "h": 24
+            }
+          ]
+        }
+      ]
+    },
+    "27": {
+      "panels": [
+        {
+          "focusY": 0.15,
+          "dialogue": [
+            {
+              "text": "La imagen de seguridad de la YPF.",
+              "size": "small",
+              "posX": 12,
+              "posY": 6,
+              "tailX": 40,
+              "tailY": 24,
+              "tailWidth": 6,
+              "tailCurvature": -22,
+              "width": 200,
+              "fontSize": 8,
+              "borderRadius": 18,
+              "speaker": "Narración",
+              "style": "caption",
+              "tail": "none"
+            },
+            {
+              "text": "Sin sonido. Baja calidad.",
+              "size": "small",
+              "posX": 52,
+              "posY": 10,
+              "tailX": 40,
+              "tailY": 24,
+              "tailWidth": 6,
+              "tailCurvature": -22,
+              "width": 155,
+              "fontSize": 8,
+              "borderRadius": 18,
+              "speaker": "Sheriff"
+            }
+          ],
+          "zoomRects": [
+            {
+              "x": 0,
+              "y": 0,
+              "w": 100,
+              "h": 24
+            }
+          ]
+        },
+        {
+          "focusY": 0.32,
+          "dialogue": [
+            {
+              "text": "¿Lo reconocen?",
+              "size": "small",
+              "posX": 12,
+              "posY": 26,
+              "tailX": 40,
+              "tailY": 24,
+              "tailWidth": 6,
+              "tailCurvature": -22,
+              "width": 125,
+              "fontSize": 8,
+              "borderRadius": 18,
+              "speaker": "Sheriff"
+            },
+            {
+              "text": "No.",
+              "size": "small",
+              "posX": 62,
+              "posY": 30,
+              "tailX": 40,
+              "tailY": 24,
+              "tailWidth": 6,
+              "tailCurvature": -22,
+              "width": 50,
+              "fontSize": 8,
+              "borderRadius": 18,
+              "speaker": "Jaz"
+            },
+            {
+              "text": "Nunca le vi la cara.",
+              "size": "small",
+              "posX": 12,
+              "posY": 36,
+              "tailX": 40,
+              "tailY": 24,
+              "tailWidth": 6,
+              "tailCurvature": -22,
+              "width": 155,
+              "fontSize": 8,
+              "borderRadius": 18,
+              "speaker": "Ian"
+            }
+          ],
+          "zoomRects": [
+            {
+              "x": 0,
+              "y": 18,
+              "w": 100,
+              "h": 24
+            }
+          ]
+        },
+        {
+          "focusY": 0.5,
+          "dialogue": [
+            {
+              "text": "Sale del local. Va al surtidor.",
+              "size": "small",
+              "posX": 10,
+              "posY": 44,
+              "tailX": 40,
+              "tailY": 24,
+              "tailWidth": 6,
+              "tailCurvature": -22,
+              "width": 200,
+              "fontSize": 8,
+              "borderRadius": 18,
+              "speaker": "Sheriff"
+            },
+            {
+              "text": "Entra después de Uandi.",
+              "size": "small",
+              "posX": 48,
+              "posY": 50,
+              "tailX": 40,
+              "tailY": 24,
+              "tailWidth": 6,
+              "tailCurvature": -22,
+              "width": 175,
+              "fontSize": 8,
+              "borderRadius": 18,
+              "speaker": "Sheriff"
+            },
+            {
+              "text": "Eso reduce que lo esperara adentro.",
+              "size": "small",
+              "posX": 10,
+              "posY": 56,
+              "tailX": 40,
+              "tailY": 24,
+              "tailWidth": 6,
+              "tailCurvature": -22,
+              "width": 220,
+              "fontSize": 8,
+              "borderRadius": 18,
+              "speaker": "Ian"
+            }
+          ],
+          "zoomRects": [
+            {
+              "x": 0,
+              "y": 36,
+              "w": 100,
+              "h": 24
+            }
+          ]
+        },
+        {
+          "focusY": 0.68,
+          "dialogue": [
+            {
+              "text": "Arma. Manos arriba. Disparo.",
+              "size": "small",
+              "posX": 28,
+              "posY": 62,
+              "tailX": 40,
+              "tailY": 24,
+              "tailWidth": 6,
+              "tailCurvature": -22,
+              "width": 160,
+              "fontSize": 8,
+              "borderRadius": 18,
+              "speaker": "Narración",
+              "style": "caption",
+              "tail": "none"
+            },
+            {
+              "text": "Ya está.",
+              "size": "small",
+              "posX": 18,
+              "posY": 68,
+              "tailX": 40,
+              "tailY": 24,
+              "tailWidth": 6,
+              "tailCurvature": -22,
+              "width": 80,
+              "fontSize": 8,
+              "borderRadius": 18,
+              "speaker": "Jaz"
+            },
+            {
+              "text": "¿Fue un robo?",
+              "size": "small",
+              "posX": 52,
+              "posY": 72,
+              "tailX": 40,
+              "tailY": 24,
+              "tailWidth": 6,
+              "tailCurvature": -22,
+              "width": 115,
+              "fontSize": 8,
+              "borderRadius": 18,
+              "speaker": "Jaz"
+            },
+            {
+              "text": "Eso parece.",
+              "size": "small",
+              "posX": 12,
+              "posY": 78,
+              "tailX": 40,
+              "tailY": 24,
+              "tailWidth": 6,
+              "tailCurvature": -22,
+              "width": 100,
+              "fontSize": 8,
+              "borderRadius": 18,
+              "speaker": "Sheriff"
+            },
+            {
+              "text": "Parece.",
+              "size": "small",
+              "posX": 55,
+              "posY": 82,
+              "tailX": 40,
+              "tailY": 24,
+              "tailWidth": 6,
+              "tailCurvature": -22,
+              "width": 75,
+              "fontSize": 8,
+              "borderRadius": 18,
+              "speaker": "Ian"
+            },
+            {
+              "text": "¿Tenés otra teoría?",
+              "size": "small",
+              "posX": 12,
+              "posY": 88,
+              "tailX": 40,
+              "tailY": 24,
+              "tailWidth": 6,
+              "tailCurvature": -22,
+              "width": 155,
+              "fontSize": 8,
+              "borderRadius": 18,
+              "speaker": "Sheriff"
+            },
+            {
+              "text": "Todavía no.",
+              "size": "small",
+              "posX": 58,
+              "posY": 92,
+              "tailX": 40,
+              "tailY": 24,
+              "tailWidth": 6,
+              "tailCurvature": -22,
+              "width": 100,
+              "fontSize": 8,
+              "borderRadius": 18,
+              "speaker": "Ian"
+            }
+          ],
+          "zoomRects": [
+            {
+              "x": 0,
+              "y": 54,
+              "w": 100,
+              "h": 24
+            }
+          ]
+        },
+        {
+          "focusY": 0.88,
+          "dialogue": [
+            {
+              "text": "Si encontramos algo, los llamo.",
+              "size": "small",
+              "posX": 10,
+              "posY": 80,
+              "tailX": 40,
+              "tailY": 24,
+              "tailWidth": 6,
+              "tailCurvature": -22,
+              "width": 210,
+              "fontSize": 8,
+              "borderRadius": 18,
+              "speaker": "Sheriff"
+            },
+            {
+              "text": "Gracias.",
+              "size": "small",
+              "posX": 55,
+              "posY": 84,
+              "tailX": 40,
+              "tailY": 24,
+              "tailWidth": 6,
+              "tailCurvature": -22,
+              "width": 80,
+              "fontSize": 8,
+              "borderRadius": 18,
+              "speaker": "Jaz"
+            },
+            {
+              "text": "No hagas mi trabajo por tu cuenta.",
+              "size": "small",
+              "posX": 10,
+              "posY": 90,
+              "tailX": 40,
+              "tailY": 24,
+              "tailWidth": 6,
+              "tailCurvature": -22,
+              "width": 215,
+              "fontSize": 8,
+              "borderRadius": 18,
+              "speaker": "Sheriff"
+            },
+            {
+              "text": "No estaba planeando hacerlo.",
+              "size": "small",
+              "posX": 48,
+              "posY": 94,
+              "tailX": 40,
+              "tailY": 24,
+              "tailWidth": 6,
+              "tailCurvature": -22,
+              "width": 195,
+              "fontSize": 8,
+              "borderRadius": 18,
+              "speaker": "Ian"
+            }
+          ],
+          "zoomRects": [
+            {
+              "x": 0,
+              "y": 72,
+              "w": 100,
+              "h": 24
+            }
+          ]
+        }
+      ]
+    },
+    "28": {
+      "panels": [
+        {
+          "focusY": 0.12,
+          "dialogue": [
+            {
+              "text": "El Sheriff queda solo.",
+              "size": "small",
+              "posX": 28,
+              "posY": 8,
+              "tailX": 40,
+              "tailY": 24,
+              "tailWidth": 6,
+              "tailCurvature": -22,
+              "width": 150,
+              "fontSize": 8,
+              "borderRadius": 18,
+              "speaker": "Narración",
+              "style": "caption",
+              "tail": "none"
+            },
+            {
+              "text": "La imagen del homicida congelada en pantalla.",
+              "size": "small",
+              "posX": 10,
+              "posY": 16,
+              "tailX": 40,
+              "tailY": 24,
+              "tailWidth": 6,
+              "tailCurvature": -22,
+              "width": 230,
+              "fontSize": 8,
+              "borderRadius": 18,
+              "speaker": "Narración",
+              "style": "caption",
+              "tail": "none"
+            }
+          ],
+          "zoomRects": [
+            {
+              "x": 0,
+              "y": 0,
+              "w": 100,
+              "h": 24
+            }
+          ]
+        },
+        {
+          "focusY": 0.3,
+          "dialogue": [
+            {
+              "text": "Algo le resulta familiar. No el hombre. La sensación.",
+              "size": "small",
+              "posX": 10,
+              "posY": 26,
+              "tailX": 40,
+              "tailY": 24,
+              "tailWidth": 6,
+              "tailCurvature": -22,
+              "width": 230,
+              "fontSize": 8,
+              "borderRadius": 18,
+              "speaker": "Narración",
+              "style": "caption",
+              "tail": "none"
+            },
+            {
+              "text": "Una explicación demasiado simple.",
+              "size": "small",
+              "posX": 12,
+              "posY": 36,
+              "tailX": 40,
+              "tailY": 24,
+              "tailWidth": 6,
+              "tailCurvature": -22,
+              "width": 200,
+              "fontSize": 8,
+              "borderRadius": 18,
+              "speaker": "Narración",
+              "style": "caption",
+              "tail": "none"
+            }
+          ],
+          "zoomRects": [
+            {
+              "x": 0,
+              "y": 18,
+              "w": 100,
+              "h": 24
+            }
+          ]
+        },
+        {
+          "focusY": 0.48,
+          "dialogue": [
+            {
+              "text": "Abre el cajón. Carpeta sin clasificación oficial.",
+              "size": "small",
+              "posX": 10,
+              "posY": 44,
+              "tailX": 40,
+              "tailY": 24,
+              "tailWidth": 6,
+              "tailCurvature": -22,
+              "width": 230,
+              "fontSize": 8,
+              "borderRadius": 18,
+              "speaker": "Narración",
+              "style": "caption",
+              "tail": "none"
+            },
+            {
+              "text": "Fotografías. Demasiado borrosas para probar nada.",
+              "size": "small",
+              "posX": 10,
+              "posY": 54,
+              "tailX": 40,
+              "tailY": 24,
+              "tailWidth": 6,
+              "tailCurvature": -22,
+              "width": 230,
+              "fontSize": 8,
+              "borderRadius": 18,
+              "speaker": "Narración",
+              "style": "caption",
+              "tail": "none"
+            }
+          ],
+          "zoomRects": [
+            {
+              "x": 0,
+              "y": 36,
+              "w": 100,
+              "h": 24
+            }
+          ]
+        },
+        {
+          "focusY": 0.66,
+          "dialogue": [
+            {
+              "text": "Central Park. Una figura roja entre el grano.",
+              "size": "small",
+              "posX": 10,
+              "posY": 62,
+              "tailX": 40,
+              "tailY": 24,
+              "tailWidth": 6,
+              "tailCurvature": -22,
+              "width": 220,
+              "fontSize": 8,
+              "borderRadius": 18,
+              "speaker": "Narración",
+              "style": "caption",
+              "tail": "none"
+            },
+            {
+              "text": "VOPS. Naves. Criaturas. Informes sin respuesta.",
+              "size": "small",
+              "posX": 10,
+              "posY": 72,
+              "tailX": 40,
+              "tailY": 24,
+              "tailWidth": 6,
+              "tailCurvature": -22,
+              "width": 230,
+              "fontSize": 8,
+              "borderRadius": 18,
+              "speaker": "Narración",
+              "style": "caption",
+              "tail": "none"
+            }
+          ],
+          "zoomRects": [
+            {
+              "x": 0,
+              "y": 54,
+              "w": 100,
+              "h": 24
+            }
+          ]
+        },
+        {
+          "focusY": 0.88,
+          "dialogue": [
+            {
+              "text": "El Sheriff no dice nada.",
+              "size": "small",
+              "posX": 22,
+              "posY": 80,
+              "tailX": 40,
+              "tailY": 24,
+              "tailWidth": 6,
+              "tailCurvature": -22,
+              "width": 170,
+              "fontSize": 8,
+              "borderRadius": 18,
+              "speaker": "Narración",
+              "style": "caption",
+              "tail": "none"
+            },
+            {
+              "text": "Otra vez.",
+              "size": "small",
+              "posX": 38,
+              "posY": 86,
+              "tailX": 40,
+              "tailY": 24,
+              "tailWidth": 6,
+              "tailCurvature": -22,
+              "width": 90,
+              "fontSize": 8,
+              "borderRadius": 18,
+              "speaker": "Narración",
+              "style": "caption",
+              "tail": "none"
+            },
+            {
+              "text": "Dos investigaciones separadas por años.",
+              "size": "small",
+              "posX": 10,
+              "posY": 90,
+              "tailX": 40,
+              "tailY": 24,
+              "tailWidth": 6,
+              "tailCurvature": -22,
+              "width": 230,
+              "fontSize": 8,
+              "borderRadius": 18,
+              "speaker": "Narración",
+              "style": "caption",
+              "tail": "none"
+            },
+            {
+              "text": "Todavía.",
+              "size": "small",
+              "posX": 42,
+              "posY": 94,
+              "tailX": 40,
+              "tailY": 24,
+              "tailWidth": 6,
+              "tailCurvature": -22,
+              "width": 80,
+              "fontSize": 8,
+              "borderRadius": 18,
+              "speaker": "Narración",
+              "style": "caption",
+              "tail": "none"
+            }
+          ],
+          "zoomRects": [
+            {
+              "x": 0,
+              "y": 72,
+              "w": 100,
+              "h": 24
+            }
+          ]
+        }
+      ]
+    },
+    "01": {
+      "panels": [
+        {
+          "focusY": 0.12,
+          "dialogue": [
+            {
+              "text": "La lluvia lleva horas cayendo sobre la ciudad.",
+              "size": "small",
+              "posX": 10,
+              "posY": 6,
+              "tailX": 40,
+              "tailY": 24,
+              "tailWidth": 6,
+              "tailCurvature": -22,
+              "width": 230,
+              "fontSize": 8,
+              "borderRadius": 18,
+              "speaker": "Narración",
+              "style": "caption",
+              "tail": "none"
+            },
+            {
+              "text": "Te estoy diciendo que era más barato el paquete grande.",
+              "size": "small",
+              "posX": 12,
+              "posY": 14,
+              "tailX": 40,
+              "tailY": 24,
+              "tailWidth": 6,
+              "tailCurvature": -22,
+              "width": 220,
+              "fontSize": 8,
+              "borderRadius": 18,
+              "speaker": "Peter"
+            },
+            {
+              "text": "Vivimos dos personas.",
+              "size": "small",
+              "posX": 55,
+              "posY": 18,
+              "tailX": 40,
+              "tailY": 24,
+              "tailWidth": 6,
+              "tailCurvature": -22,
+              "width": 140,
+              "fontSize": 8,
+              "borderRadius": 18,
+              "speaker": "Uandi"
+            }
+          ],
+          "zoomRects": [
+            {
+              "x": 0,
+              "y": 0,
+              "w": 100,
+              "h": 24
+            }
+          ]
+        },
+        {
+          "focusY": 0.35,
+          "dialogue": [
+            {
+              "text": "Yo como por tres.",
+              "size": "small",
+              "posX": 18,
+              "posY": 30,
+              "tailX": 40,
+              "tailY": 24,
+              "tailWidth": 6,
+              "tailCurvature": -22,
+              "width": 120,
+              "fontSize": 8,
+              "borderRadius": 18,
+              "speaker": "Peter"
+            },
+            {
+              "text": "Ese no es el argumento que pensás que es.",
+              "size": "small",
+              "posX": 48,
+              "posY": 34,
+              "tailX": 40,
+              "tailY": 24,
+              "tailWidth": 6,
+              "tailCurvature": -22,
+              "width": 195,
+              "fontSize": 8,
+              "borderRadius": 18,
+              "speaker": "Uandi"
+            }
+          ],
+          "zoomRects": [
+            {
+              "x": 0,
+              "y": 22,
+              "w": 100,
+              "h": 24
+            }
+          ]
+        },
+        {
+          "focusY": 0.58,
+          "dialogue": [
+            {
+              "text": "¿Me estás haciendo body shaming?",
+              "size": "small",
+              "posX": 15,
+              "posY": 52,
+              "tailX": 40,
+              "tailY": 24,
+              "tailWidth": 6,
+              "tailCurvature": -22,
+              "width": 175,
+              "fontSize": 8,
+              "borderRadius": 18,
+              "speaker": "Peter"
+            },
+            {
+              "text": "Sí.",
+              "size": "small",
+              "posX": 68,
+              "posY": 56,
+              "tailX": 40,
+              "tailY": 24,
+              "tailWidth": 6,
+              "tailCurvature": -22,
+              "width": 50,
+              "fontSize": 8,
+              "borderRadius": 18,
+              "speaker": "Uandi"
+            },
+            {
+              "text": "Forro.",
+              "size": "small",
+              "posX": 22,
+              "posY": 62,
+              "tailX": 40,
+              "tailY": 24,
+              "tailWidth": 6,
+              "tailCurvature": -22,
+              "width": 70,
+              "fontSize": 8,
+              "borderRadius": 18,
+              "speaker": "Peter"
+            }
+          ],
+          "zoomRects": [
+            {
+              "x": 0,
+              "y": 44,
+              "w": 100,
+              "h": 24
+            }
+          ]
+        },
+        {
+          "focusY": 0.82,
+          "dialogue": [
+            {
+              "text": "Por unos segundos son solo dos amigos volviendo a casa.",
+              "size": "small",
+              "posX": 10,
+              "posY": 72,
+              "tailX": 40,
+              "tailY": 24,
+              "tailWidth": 6,
+              "tailCurvature": -22,
+              "width": 230,
+              "fontSize": 8,
+              "borderRadius": 18,
+              "speaker": "Narración",
+              "style": "caption",
+              "tail": "none"
+            },
+            {
+              "text": "...",
+              "size": "small",
+              "posX": 72,
+              "posY": 82,
+              "tailX": 40,
+              "tailY": 24,
+              "tailWidth": 6,
+              "tailCurvature": -22,
+              "width": 80,
+              "fontSize": 8,
+              "borderRadius": 18,
+              "speaker": "Balanar",
+              "style": "thought",
+              "tail": "none"
+            }
+          ],
+          "zoomRects": [
+            {
+              "x": 0,
+              "y": 64,
+              "w": 100,
+              "h": 24
+            }
+          ]
+        }
+      ]
+    },
+    "02": {
+      "panels": [
+        {
+          "focusY": 0.2,
+          "dialogue": [
+            {
+              "text": "Peter.",
+              "size": "small",
+              "posX": 18,
+              "posY": 10,
+              "tailX": 40,
+              "tailY": 24,
+              "tailWidth": 6,
+              "tailCurvature": -22,
+              "width": 70,
+              "fontSize": 8,
+              "borderRadius": 18,
+              "speaker": "Uandi"
+            },
+            {
+              "text": "Atrás mío.",
+              "size": "small",
+              "posX": 55,
+              "posY": 14,
+              "tailX": 40,
+              "tailY": 24,
+              "tailWidth": 6,
+              "tailCurvature": -22,
+              "width": 110,
+              "fontSize": 8,
+              "borderRadius": 18,
+              "speaker": "Peter"
+            },
+            {
+              "text": "¿Qué viste?",
+              "size": "small",
+              "posX": 18,
+              "posY": 22,
+              "tailX": 40,
+              "tailY": 24,
+              "tailWidth": 6,
+              "tailCurvature": -22,
+              "width": 100,
+              "fontSize": 8,
+              "borderRadius": 18,
+              "speaker": "Uandi"
+            },
+            {
+              "text": "No sé.",
+              "size": "small",
+              "posX": 58,
+              "posY": 26,
+              "tailX": 40,
+              "tailY": 24,
+              "tailWidth": 6,
+              "tailCurvature": -22,
+              "width": 80,
+              "fontSize": 8,
+              "borderRadius": 18,
+              "speaker": "Peter"
+            }
+          ],
+          "zoomRects": [
+            {
+              "x": 0,
+              "y": 2,
+              "w": 100,
+              "h": 24
+            }
+          ]
+        },
+        {
+          "focusY": 0.45,
+          "dialogue": [
+            {
+              "text": "Después, alas.",
+              "size": "small",
+              "posX": 28,
+              "posY": 38,
+              "tailX": 40,
+              "tailY": 24,
+              "tailWidth": 6,
+              "tailCurvature": -22,
+              "width": 100,
+              "fontSize": 8,
+              "borderRadius": 18,
+              "speaker": "Narración",
+              "style": "caption",
+              "tail": "none"
+            },
+            {
+              "text": "¡UANDI!",
+              "size": "small",
+              "posX": 38,
+              "posY": 42,
+              "tailX": 40,
+              "tailY": 24,
+              "tailWidth": 6,
+              "tailCurvature": -22,
+              "width": 100,
+              "fontSize": 8,
+              "borderRadius": 18,
+              "speaker": "Peter"
+            }
+          ],
+          "zoomRects": [
+            {
+              "x": 0,
+              "y": 30,
+              "w": 100,
+              "h": 24
+            }
+          ]
+        },
+        {
+          "focusY": 0.72,
+          "dialogue": [
+            {
+              "text": "El vaso sale volando.",
+              "size": "small",
+              "posX": 20,
+              "posY": 66,
+              "tailX": 40,
+              "tailY": 24,
+              "tailWidth": 6,
+              "tailCurvature": -22,
+              "width": 160,
+              "fontSize": 8,
+              "borderRadius": 18,
+              "speaker": "Narración",
+              "style": "caption",
+              "tail": "none"
+            },
+            {
+              "text": "Uandi golpea el pavimento.",
+              "size": "small",
+              "posX": 12,
+              "posY": 72,
+              "tailX": 40,
+              "tailY": 24,
+              "tailWidth": 6,
+              "tailCurvature": -22,
+              "width": 170,
+              "fontSize": 8,
+              "borderRadius": 18,
+              "speaker": "Narración",
+              "style": "caption",
+              "tail": "none"
+            }
+          ],
+          "zoomRects": [
+            {
+              "x": 0,
+              "y": 58,
+              "w": 100,
+              "h": 24
+            }
+          ]
+        },
+        {
+          "focusY": 0.9,
+          "dialogue": [
+            {
+              "text": "¡Quedate ahí!",
+              "size": "small",
+              "posX": 55,
+              "posY": 84,
+              "tailX": 40,
+              "tailY": 24,
+              "tailWidth": 6,
+              "tailCurvature": -22,
+              "width": 120,
+              "fontSize": 8,
+              "borderRadius": 18,
+              "speaker": "Peter"
+            },
+            {
+              "text": "Peter...",
+              "size": "small",
+              "posX": 15,
+              "posY": 88,
+              "tailX": 40,
+              "tailY": 24,
+              "tailWidth": 6,
+              "tailCurvature": -22,
+              "width": 80,
+              "fontSize": 8,
+              "borderRadius": 18,
+              "speaker": "Uandi"
+            }
+          ],
+          "zoomRects": [
+            {
+              "x": 0,
+              "y": 76,
+              "w": 100,
+              "h": 24
+            }
+          ]
+        }
+      ]
+    },
+    "04": {
+      "panels": [
+        {
+          "focusY": 0.2,
+          "dialogue": [
+            {
+              "text": "¿Terminaste?",
+              "size": "small",
+              "posX": 18,
+              "posY": 10,
+              "tailX": 40,
+              "tailY": 24,
+              "tailWidth": 6,
+              "tailCurvature": -22,
+              "width": 115,
+              "fontSize": 8,
+              "borderRadius": 18,
+              "speaker": "Uandi"
+            },
+            {
+              "text": "No sé.",
+              "size": "small",
+              "posX": 62,
+              "posY": 14,
+              "tailX": 40,
+              "tailY": 24,
+              "tailWidth": 6,
+              "tailCurvature": -22,
+              "width": 75,
+              "fontSize": 8,
+              "borderRadius": 18,
+              "speaker": "Peter"
+            }
+          ],
+          "zoomRects": [
+            {
+              "x": 0,
+              "y": 2,
+              "w": 100,
+              "h": 24
+            }
+          ]
+        },
+        {
+          "focusY": 0.45,
+          "dialogue": [
+            {
+              "text": "Bueno. Cuando sepas, avisame.",
+              "size": "small",
+              "posX": 12,
+              "posY": 38,
+              "tailX": 40,
+              "tailY": 24,
+              "tailWidth": 6,
+              "tailCurvature": -22,
+              "width": 195,
+              "fontSize": 8,
+              "borderRadius": 18,
+              "speaker": "Uandi"
+            },
+            {
+              "text": "Balanar despega entre los edificios.",
+              "size": "small",
+              "posX": 12,
+              "posY": 44,
+              "tailX": 40,
+              "tailY": 24,
+              "tailWidth": 6,
+              "tailCurvature": -22,
+              "width": 200,
+              "fontSize": 8,
+              "borderRadius": 18,
+              "speaker": "Narración",
+              "style": "caption",
+              "tail": "none"
+            }
+          ],
+          "zoomRects": [
+            {
+              "x": 0,
+              "y": 30,
+              "w": 100,
+              "h": 24
+            }
+          ]
+        },
+        {
+          "focusY": 0.68,
+          "dialogue": [
+            {
+              "text": "¿Estás bien?",
+              "size": "small",
+              "posX": 18,
+              "posY": 62,
+              "tailX": 40,
+              "tailY": 24,
+              "tailWidth": 6,
+              "tailCurvature": -22,
+              "width": 100,
+              "fontSize": 8,
+              "borderRadius": 18,
+              "speaker": "Peter"
+            },
+            {
+              "text": "Sí.",
+              "size": "small",
+              "posX": 62,
+              "posY": 66,
+              "tailX": 40,
+              "tailY": 24,
+              "tailWidth": 6,
+              "tailCurvature": -22,
+              "width": 50,
+              "fontSize": 8,
+              "borderRadius": 18,
+              "speaker": "Uandi"
+            },
+            {
+              "text": "¿Seguro?",
+              "size": "small",
+              "posX": 18,
+              "posY": 72,
+              "tailX": 40,
+              "tailY": 24,
+              "tailWidth": 6,
+              "tailCurvature": -22,
+              "width": 80,
+              "fontSize": 8,
+              "borderRadius": 18,
+              "speaker": "Peter"
+            }
+          ],
+          "zoomRects": [
+            {
+              "x": 0,
+              "y": 54,
+              "w": 100,
+              "h": 24
+            }
+          ]
+        },
+        {
+          "focusY": 0.88,
+          "dialogue": [
+            {
+              "text": "Peter.",
+              "size": "small",
+              "posX": 22,
+              "posY": 84,
+              "tailX": 40,
+              "tailY": 24,
+              "tailWidth": 6,
+              "tailCurvature": -22,
+              "width": 70,
+              "fontSize": 8,
+              "borderRadius": 18,
+              "speaker": "Uandi"
+            },
+            {
+              "text": "¿Te pegó?",
+              "size": "small",
+              "posX": 55,
+              "posY": 88,
+              "tailX": 40,
+              "tailY": 24,
+              "tailWidth": 6,
+              "tailCurvature": -22,
+              "width": 95,
+              "fontSize": 8,
+              "borderRadius": 18,
+              "speaker": "Peter"
+            }
+          ],
+          "zoomRects": [
+            {
+              "x": 0,
+              "y": 76,
+              "w": 100,
+              "h": 24
+            }
+          ]
+        }
+      ]
+    },
+    "05": {
+      "panels": [
+        {
+          "focusY": 0.2,
+          "dialogue": [
+            {
+              "text": "¿Te cortó?",
+              "size": "small",
+              "posX": 18,
+              "posY": 10,
+              "tailX": 40,
+              "tailY": 24,
+              "tailWidth": 6,
+              "tailCurvature": -22,
+              "width": 95,
+              "fontSize": 8,
+              "borderRadius": 18,
+              "speaker": "Peter"
+            },
+            {
+              "text": "¿Te mordió?",
+              "size": "small",
+              "posX": 58,
+              "posY": 14,
+              "tailX": 40,
+              "tailY": 24,
+              "tailWidth": 6,
+              "tailCurvature": -22,
+              "width": 105,
+              "fontSize": 8,
+              "borderRadius": 18,
+              "speaker": "Peter"
+            },
+            {
+              "text": "Pará.",
+              "size": "small",
+              "posX": 18,
+              "posY": 20,
+              "tailX": 40,
+              "tailY": 24,
+              "tailWidth": 6,
+              "tailCurvature": -22,
+              "width": 60,
+              "fontSize": 8,
+              "borderRadius": 18,
+              "speaker": "Uandi"
+            }
+          ],
+          "zoomRects": [
+            {
+              "x": 0,
+              "y": 2,
+              "w": 100,
+              "h": 24
+            }
+          ]
+        },
+        {
+          "focusY": 0.45,
+          "dialogue": [
+            {
+              "text": "Tengo treinta años, no cinco.",
+              "size": "small",
+              "posX": 12,
+              "posY": 38,
+              "tailX": 40,
+              "tailY": 24,
+              "tailWidth": 6,
+              "tailCurvature": -22,
+              "width": 195,
+              "fontSize": 8,
+              "borderRadius": 18,
+              "speaker": "Uandi"
+            },
+            {
+              "text": "Hace treinta segundos un vampiro con alas intentó comerme.",
+              "size": "small",
+              "posX": 12,
+              "posY": 46,
+              "tailX": 40,
+              "tailY": 24,
+              "tailWidth": 6,
+              "tailCurvature": -22,
+              "width": 230,
+              "fontSize": 8,
+              "borderRadius": 18,
+              "speaker": "Peter"
+            }
+          ],
+          "zoomRects": [
+            {
+              "x": 0,
+              "y": 30,
+              "w": 100,
+              "h": 24
+            }
+          ]
+        },
+        {
+          "focusY": 0.68,
+          "dialogue": [
+            {
+              "text": "Capaz quería pedirte el Instagram.",
+              "size": "small",
+              "posX": 12,
+              "posY": 62,
+              "tailX": 40,
+              "tailY": 24,
+              "tailWidth": 6,
+              "tailCurvature": -22,
+              "width": 210,
+              "fontSize": 8,
+              "borderRadius": 18,
+              "speaker": "Peter"
+            },
+            {
+              "text": "Eso sí murió.",
+              "size": "small",
+              "posX": 55,
+              "posY": 68,
+              "tailX": 40,
+              "tailY": 24,
+              "tailWidth": 6,
+              "tailCurvature": -22,
+              "width": 115,
+              "fontSize": 8,
+              "borderRadius": 18,
+              "speaker": "Peter"
+            },
+            {
+              "text": "Era nuevo.",
+              "size": "small",
+              "posX": 12,
+              "posY": 74,
+              "tailX": 40,
+              "tailY": 24,
+              "tailWidth": 6,
+              "tailCurvature": -22,
+              "width": 100,
+              "fontSize": 8,
+              "borderRadius": 18,
+              "speaker": "Uandi"
+            }
+          ],
+          "zoomRects": [
+            {
+              "x": 0,
+              "y": 54,
+              "w": 100,
+              "h": 24
+            }
+          ]
+        },
+        {
+          "focusY": 0.88,
+          "dialogue": [
+            {
+              "text": "Uandi pisa una bolsa. Desaparece en la basura.",
+              "size": "small",
+              "posX": 10,
+              "posY": 80,
+              "tailX": 40,
+              "tailY": 24,
+              "tailWidth": 6,
+              "tailCurvature": -22,
+              "width": 220,
+              "fontSize": 8,
+              "borderRadius": 18,
+              "speaker": "Narración",
+              "style": "caption",
+              "tail": "none"
+            },
+            {
+              "text": "Ni una palabra.",
+              "size": "small",
+              "posX": 42,
+              "posY": 88,
+              "tailX": 40,
+              "tailY": 24,
+              "tailWidth": 6,
+              "tailCurvature": -22,
+              "width": 130,
+              "fontSize": 8,
+              "borderRadius": 18,
+              "speaker": "Uandi"
+            }
+          ],
+          "zoomRects": [
+            {
+              "x": 0,
+              "y": 72,
+              "w": 100,
+              "h": 24
+            }
+          ]
+        }
+      ]
+    },
+    "06": {
+      "panels": [
+        {
+          "focusY": 0.22,
+          "dialogue": [
+            {
+              "text": "Peter.",
+              "size": "small",
+              "posX": 22,
+              "posY": 12,
+              "tailX": 40,
+              "tailY": 24,
+              "tailWidth": 6,
+              "tailCurvature": -22,
+              "width": 70,
+              "fontSize": 8,
+              "borderRadius": 18,
+              "speaker": "Uandi"
+            },
+            {
+              "text": "No dije nada.",
+              "size": "small",
+              "posX": 58,
+              "posY": 16,
+              "tailX": 40,
+              "tailY": 24,
+              "tailWidth": 6,
+              "tailCurvature": -22,
+              "width": 120,
+              "fontSize": 8,
+              "borderRadius": 18,
+              "speaker": "Peter"
+            },
+            {
+              "text": "Te conozco.",
+              "size": "small",
+              "posX": 18,
+              "posY": 22,
+              "tailX": 40,
+              "tailY": 24,
+              "tailWidth": 6,
+              "tailCurvature": -22,
+              "width": 100,
+              "fontSize": 8,
+              "borderRadius": 18,
+              "speaker": "Uandi"
+            }
+          ],
+          "zoomRects": [
+            {
+              "x": 0,
+              "y": 4,
+              "w": 100,
+              "h": 24
+            }
+          ]
+        },
+        {
+          "focusY": 0.48,
+          "dialogue": [
+            {
+              "text": "¡No te rías, hijo de puta!",
+              "size": "small",
+              "posX": 12,
+              "posY": 42,
+              "tailX": 40,
+              "tailY": 24,
+              "tailWidth": 6,
+              "tailCurvature": -22,
+              "width": 185,
+              "fontSize": 8,
+              "borderRadius": 18,
+              "speaker": "Uandi"
+            },
+            {
+              "text": "Por primera vez desde el ataque, Uandi también se ríe.",
+              "size": "small",
+              "posX": 10,
+              "posY": 48,
+              "tailX": 40,
+              "tailY": 24,
+              "tailWidth": 6,
+              "tailCurvature": -22,
+              "width": 230,
+              "fontSize": 8,
+              "borderRadius": 18,
+              "speaker": "Narración",
+              "style": "caption",
+              "tail": "none"
+            }
+          ],
+          "zoomRects": [
+            {
+              "x": 0,
+              "y": 34,
+              "w": 100,
+              "h": 24
+            }
+          ]
+        },
+        {
+          "focusY": 0.75,
+          "dialogue": [
+            {
+              "text": "Siguen caminando. La tensión empieza a desaparecer.",
+              "size": "small",
+              "posX": 10,
+              "posY": 68,
+              "tailX": 40,
+              "tailY": 24,
+              "tailWidth": 6,
+              "tailCurvature": -22,
+              "width": 230,
+              "fontSize": 8,
+              "borderRadius": 18,
+              "speaker": "Narración",
+              "style": "caption",
+              "tail": "none"
+            },
+            {
+              "text": "Más tarde, el departamento está en silencio.",
+              "size": "small",
+              "posX": 10,
+              "posY": 76,
+              "tailX": 40,
+              "tailY": 24,
+              "tailWidth": 6,
+              "tailCurvature": -22,
+              "width": 220,
+              "fontSize": 8,
+              "borderRadius": 18,
+              "speaker": "Narración",
+              "style": "caption",
+              "tail": "none"
+            }
+          ],
+          "zoomRects": [
+            {
+              "x": 0,
+              "y": 60,
+              "w": 100,
+              "h": 24
+            }
+          ]
+        }
+      ]
+    },
+    "07": {
+      "panels": [
+        {
+          "focusY": 0.2,
+          "dialogue": [
+            {
+              "text": "Dejame dos.",
+              "size": "small",
+              "posX": 18,
+              "posY": 10,
+              "tailX": 40,
+              "tailY": 24,
+              "tailWidth": 6,
+              "tailCurvature": -22,
+              "width": 100,
+              "fontSize": 8,
+              "borderRadius": 18,
+              "speaker": "Uandi"
+            },
+            {
+              "text": "No especificaste cuáles.",
+              "size": "small",
+              "posX": 55,
+              "posY": 14,
+              "tailX": 40,
+              "tailY": 24,
+              "tailWidth": 6,
+              "tailCurvature": -22,
+              "width": 165,
+              "fontSize": 8,
+              "borderRadius": 18,
+              "speaker": "Peter"
+            }
+          ],
+          "zoomRects": [
+            {
+              "x": 0,
+              "y": 2,
+              "w": 100,
+              "h": 24
+            }
+          ]
+        },
+        {
+          "focusY": 0.45,
+          "dialogue": [
+            {
+              "text": "Las que tengan comida arriba.",
+              "size": "small",
+              "posX": 12,
+              "posY": 38,
+              "tailX": 40,
+              "tailY": 24,
+              "tailWidth": 6,
+              "tailCurvature": -22,
+              "width": 175,
+              "fontSize": 8,
+              "borderRadius": 18,
+              "speaker": "Uandi"
+            },
+            {
+              "text": "Complicado.",
+              "size": "small",
+              "posX": 58,
+              "posY": 42,
+              "tailX": 40,
+              "tailY": 24,
+              "tailWidth": 6,
+              "tailCurvature": -22,
+              "width": 100,
+              "fontSize": 8,
+              "borderRadius": 18,
+              "speaker": "Peter"
+            }
+          ],
+          "zoomRects": [
+            {
+              "x": 0,
+              "y": 30,
+              "w": 100,
+              "h": 24
+            }
+          ]
+        },
+        {
+          "focusY": 0.68,
+          "dialogue": [
+            {
+              "text": "Podría haberte acompañado antes.",
+              "size": "small",
+              "posX": 12,
+              "posY": 60,
+              "tailX": 40,
+              "tailY": 24,
+              "tailWidth": 6,
+              "tailCurvature": -22,
+              "width": 195,
+              "fontSize": 8,
+              "borderRadius": 18,
+              "speaker": "Peter"
+            },
+            {
+              "text": "No vamos a empezar con esto.",
+              "size": "small",
+              "posX": 48,
+              "posY": 64,
+              "tailX": 40,
+              "tailY": 24,
+              "tailWidth": 6,
+              "tailCurvature": -22,
+              "width": 195,
+              "fontSize": 8,
+              "borderRadius": 18,
+              "speaker": "Uandi"
+            }
+          ],
+          "zoomRects": [
+            {
+              "x": 0,
+              "y": 52,
+              "w": 100,
+              "h": 24
+            }
+          ]
+        },
+        {
+          "focusY": 0.88,
+          "dialogue": [
+            {
+              "text": "Ese tipo vino por vos.",
+              "size": "small",
+              "posX": 12,
+              "posY": 80,
+              "tailX": 40,
+              "tailY": 24,
+              "tailWidth": 6,
+              "tailCurvature": -22,
+              "width": 155,
+              "fontSize": 8,
+              "borderRadius": 18,
+              "speaker": "Peter"
+            },
+            {
+              "text": "Estoy bien.",
+              "size": "small",
+              "posX": 55,
+              "posY": 84,
+              "tailX": 40,
+              "tailY": 24,
+              "tailWidth": 6,
+              "tailCurvature": -22,
+              "width": 95,
+              "fontSize": 8,
+              "borderRadius": 18,
+              "speaker": "Uandi"
+            },
+            {
+              "text": "Dormí.",
+              "size": "small",
+              "posX": 12,
+              "posY": 90,
+              "tailX": 40,
+              "tailY": 24,
+              "tailWidth": 6,
+              "tailCurvature": -22,
+              "width": 70,
+              "fontSize": 8,
+              "borderRadius": 18,
+              "speaker": "Uandi"
+            }
+          ],
+          "zoomRects": [
+            {
+              "x": 0,
+              "y": 72,
+              "w": 100,
+              "h": 24
+            }
+          ]
+        }
+      ]
+    },
+    "08": {
+      "panels": [
+        {
+          "focusY": 0.25,
+          "dialogue": [
+            {
+              "text": "Puedo intentarlo.",
+              "size": "small",
+              "posX": 18,
+              "posY": 18,
+              "tailX": 40,
+              "tailY": 24,
+              "tailWidth": 6,
+              "tailCurvature": -22,
+              "width": 130,
+              "fontSize": 8,
+              "borderRadius": 18,
+              "speaker": "Peter"
+            },
+            {
+              "text": "Tenés seis manos. Comé más rápido.",
+              "size": "small",
+              "posX": 48,
+              "posY": 22,
+              "tailX": 40,
+              "tailY": 24,
+              "tailWidth": 6,
+              "tailCurvature": -22,
+              "width": 195,
+              "fontSize": 8,
+              "borderRadius": 18,
+              "speaker": "Uandi"
+            }
+          ],
+          "zoomRects": [
+            {
+              "x": 0,
+              "y": 10,
+              "w": 100,
+              "h": 24
+            }
+          ]
+        },
+        {
+          "focusY": 0.55,
+          "dialogue": [
+            {
+              "text": "La lluvia golpea suavemente las ventanas.",
+              "size": "small",
+              "posX": 12,
+              "posY": 48,
+              "tailX": 40,
+              "tailY": 24,
+              "tailWidth": 6,
+              "tailCurvature": -22,
+              "width": 210,
+              "fontSize": 8,
+              "borderRadius": 18,
+              "speaker": "Narración",
+              "style": "caption",
+              "tail": "none"
+            },
+            {
+              "text": "Comen pizza. Silencio cómodo.",
+              "size": "small",
+              "posX": 12,
+              "posY": 56,
+              "tailX": 40,
+              "tailY": 24,
+              "tailWidth": 6,
+              "tailCurvature": -22,
+              "width": 180,
+              "fontSize": 8,
+              "borderRadius": 18,
+              "speaker": "Narración",
+              "style": "caption",
+              "tail": "none"
+            }
+          ],
+          "zoomRects": [
+            {
+              "x": 0,
+              "y": 40,
+              "w": 100,
+              "h": 24
+            }
+          ]
+        },
+        {
+          "focusY": 0.82,
+          "dialogue": [
+            {
+              "text": "Peter sale de la ducha con toalla en la cabeza.",
+              "size": "small",
+              "posX": 10,
+              "posY": 74,
+              "tailX": 40,
+              "tailY": 24,
+              "tailWidth": 6,
+              "tailCurvature": -22,
+              "width": 230,
+              "fontSize": 8,
+              "borderRadius": 18,
+              "speaker": "Narración",
+              "style": "caption",
+              "tail": "none"
+            },
+            {
+              "text": "La casa junto al puerto, de noche.",
+              "size": "small",
+              "posX": 22,
+              "posY": 82,
+              "tailX": 40,
+              "tailY": 24,
+              "tailWidth": 6,
+              "tailCurvature": -22,
+              "width": 180,
+              "fontSize": 8,
+              "borderRadius": 18,
+              "speaker": "Narración",
+              "style": "caption",
+              "tail": "none"
+            }
+          ],
+          "zoomRects": [
+            {
+              "x": 0,
+              "y": 66,
+              "w": 100,
+              "h": 24
+            }
+          ]
+        }
+      ]
+    },
+    "09": {
+      "panels": [
+        {
+          "focusY": 0.2,
+          "dialogue": [
+            {
+              "text": "Tengo hambre.",
+              "size": "small",
+              "posX": 55,
+              "posY": 10,
+              "tailX": 40,
+              "tailY": 24,
+              "tailWidth": 6,
+              "tailCurvature": -22,
+              "width": 110,
+              "fontSize": 8,
+              "borderRadius": 18,
+              "speaker": "Peter"
+            },
+            {
+              "text": "Horas después. Todo oscuro.",
+              "size": "small",
+              "posX": 12,
+              "posY": 6,
+              "tailX": 40,
+              "tailY": 24,
+              "tailWidth": 6,
+              "tailCurvature": -22,
+              "width": 170,
+              "fontSize": 8,
+              "borderRadius": 18,
+              "speaker": "Narración",
+              "style": "caption",
+              "tail": "none"
+            }
+          ],
+          "zoomRects": [
+            {
+              "x": 0,
+              "y": 2,
+              "w": 100,
+              "h": 24
+            }
+          ]
+        },
+        {
+          "focusY": 0.45,
+          "dialogue": [
+            {
+              "text": "La luz de la heladera ilumina a Uandi.",
+              "size": "small",
+              "posX": 10,
+              "posY": 38,
+              "tailX": 40,
+              "tailY": 24,
+              "tailWidth": 6,
+              "tailCurvature": -22,
+              "width": 220,
+              "fontSize": 8,
+              "borderRadius": 18,
+              "speaker": "Narración",
+              "style": "caption",
+              "tail": "none"
+            },
+            {
+              "text": "Buenísimo...",
+              "size": "small",
+              "posX": 22,
+              "posY": 44,
+              "tailX": 40,
+              "tailY": 24,
+              "tailWidth": 6,
+              "tailCurvature": -22,
+              "width": 120,
+              "fontSize": 8,
+              "borderRadius": 18,
+              "speaker": "Uandi",
+              "style": "thought",
+              "tail": "none"
+            }
+          ],
+          "zoomRects": [
+            {
+              "x": 0,
+              "y": 30,
+              "w": 100,
+              "h": 24
+            }
+          ]
+        },
+        {
+          "focusY": 0.68,
+          "dialogue": [
+            {
+              "text": "Peter duerme en el sillón. Tres brazos colgando.",
+              "size": "small",
+              "posX": 10,
+              "posY": 62,
+              "tailX": 40,
+              "tailY": 24,
+              "tailWidth": 6,
+              "tailCurvature": -22,
+              "width": 230,
+              "fontSize": 8,
+              "borderRadius": 18,
+              "speaker": "Narración",
+              "style": "caption",
+              "tail": "none"
+            },
+            {
+              "text": "Dormí, boludo.",
+              "size": "small",
+              "posX": 20,
+              "posY": 68,
+              "tailX": 40,
+              "tailY": 24,
+              "tailWidth": 6,
+              "tailCurvature": -22,
+              "width": 120,
+              "fontSize": 8,
+              "borderRadius": 18,
+              "speaker": "Uandi"
+            }
+          ],
+          "zoomRects": [
+            {
+              "x": 0,
+              "y": 54,
+              "w": 100,
+              "h": 24
+            }
+          ]
+        },
+        {
+          "focusY": 0.88,
+          "dialogue": [
+            {
+              "text": "Toma las llaves. Cierra sin hacer ruido.",
+              "size": "small",
+              "posX": 10,
+              "posY": 82,
+              "tailX": 40,
+              "tailY": 24,
+              "tailWidth": 6,
+              "tailCurvature": -22,
+              "width": 220,
+              "fontSize": 8,
+              "borderRadius": 18,
+              "speaker": "Narración",
+              "style": "caption",
+              "tail": "none"
+            }
+          ],
+          "zoomRects": [
+            {
+              "x": 0,
+              "y": 74,
+              "w": 100,
+              "h": 24
+            }
+          ]
+        }
+      ]
+    },
+    "03": {
+      "panels": [
+        {
+          "focusY": 0.18,
+          "dialogue": [
+            {
+              "text": "¡No!",
+              "size": "small",
+              "posX": 22,
+              "posY": 8,
+              "tailX": 40,
+              "tailY": 24,
+              "tailWidth": 6,
+              "tailCurvature": -22,
+              "width": 60,
+              "fontSize": 8,
+              "borderRadius": 18,
+              "speaker": "Peter"
+            },
+            {
+              "text": "¡Te dije que no!",
+              "size": "small",
+              "posX": 55,
+              "posY": 12,
+              "tailX": 40,
+              "tailY": 24,
+              "tailWidth": 6,
+              "tailCurvature": -22,
+              "width": 130,
+              "fontSize": 8,
+              "borderRadius": 18,
+              "speaker": "Peter"
+            }
+          ],
+          "zoomRects": [
+            {
+              "x": 0,
+              "y": 0,
+              "w": 100,
+              "h": 24
+            }
+          ]
+        },
+        {
+          "focusY": 0.42,
+          "dialogue": [
+            {
+              "text": "Peter...",
+              "size": "small",
+              "posX": 18,
+              "posY": 36,
+              "tailX": 40,
+              "tailY": 24,
+              "tailWidth": 6,
+              "tailCurvature": -22,
+              "width": 80,
+              "fontSize": 8,
+              "borderRadius": 18,
+              "speaker": "Uandi"
+            },
+            {
+              "text": "¡Quedate ahí!",
+              "size": "small",
+              "posX": 55,
+              "posY": 40,
+              "tailX": 40,
+              "tailY": 24,
+              "tailWidth": 6,
+              "tailCurvature": -22,
+              "width": 120,
+              "fontSize": 8,
+              "borderRadius": 18,
+              "speaker": "Peter"
+            },
+            {
+              "text": "No te estoy ayudando mucho desde acá.",
+              "size": "small",
+              "posX": 12,
+              "posY": 48,
+              "tailX": 40,
+              "tailY": 24,
+              "tailWidth": 6,
+              "tailCurvature": -22,
+              "width": 210,
+              "fontSize": 8,
+              "borderRadius": 18,
+              "speaker": "Uandi"
+            }
+          ],
+          "zoomRects": [
+            {
+              "x": 0,
+              "y": 28,
+              "w": 100,
+              "h": 24
+            }
+          ]
+        },
+        {
+          "focusY": 0.65,
+          "dialogue": [
+            {
+              "text": "Esa es exactamente la idea.",
+              "size": "small",
+              "posX": 12,
+              "posY": 58,
+              "tailX": 40,
+              "tailY": 24,
+              "tailWidth": 6,
+              "tailCurvature": -22,
+              "width": 175,
+              "fontSize": 8,
+              "borderRadius": 18,
+              "speaker": "Peter"
+            },
+            {
+              "text": "Ni se te ocurra.",
+              "size": "small",
+              "posX": 55,
+              "posY": 62,
+              "tailX": 40,
+              "tailY": 24,
+              "tailWidth": 6,
+              "tailCurvature": -22,
+              "width": 130,
+              "fontSize": 8,
+              "borderRadius": 18,
+              "speaker": "Peter"
+            }
+          ],
+          "zoomRects": [
+            {
+              "x": 0,
+              "y": 50,
+              "w": 100,
+              "h": 24
+            }
+          ]
+        },
+        {
+          "focusY": 0.88,
+          "dialogue": [
+            {
+              "text": "Probá.",
+              "size": "small",
+              "posX": 42,
+              "posY": 82,
+              "tailX": 40,
+              "tailY": 24,
+              "tailWidth": 6,
+              "tailCurvature": -22,
+              "width": 80,
+              "fontSize": 8,
+              "borderRadius": 18,
+              "speaker": "Peter"
+            },
+            {
+              "text": "Balanar sisea. Extiende las alas.",
+              "size": "small",
+              "posX": 12,
+              "posY": 86,
+              "tailX": 40,
+              "tailY": 24,
+              "tailWidth": 6,
+              "tailCurvature": -22,
+              "width": 200,
+              "fontSize": 8,
+              "borderRadius": 18,
+              "speaker": "Narración",
+              "style": "caption",
+              "tail": "none"
+            }
+          ],
+          "zoomRects": [
+            {
+              "x": 0,
+              "y": 74,
+              "w": 100,
+              "h": 24
+            }
+          ]
+        }
+      ]
+    }
+  }
+}
