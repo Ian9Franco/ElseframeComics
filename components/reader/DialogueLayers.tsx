@@ -7,62 +7,104 @@ import {
   estimateBubbleSize,
   findTargetBubble,
   getEffectiveIndexes,
+  buildSpeechFusionGroups,
+  type FusionBubbleRef,
 } from "./readerUtils";
-import type { DialogueLine } from "./DialogueBubble";
+import {
+  buildSpeechFusionPath,
+  comicBalloonSeed,
+  type SpeechFusionNode,
+} from "./bubbles/bubbleHelpers";
 
-function isSpeechBalloon(line: DialogueLine) {
-  const style = line.style ?? "normal";
-  return style === "normal" || style === "whisper";
-}
+/** Inactive lines stay readable; the old 0.18 fade hid the new balloon fill. */
+const INACTIVE_BUBBLE_OPACITY = 0.82;
 
-function SpeechJoins({
-  bubbles,
-}: {
-  bubbles: { key: string; x: number; y: number; line: DialogueLine; active: boolean }[];
-}) {
-  const nodes: React.ReactNode[] = [];
-  for (let i = 0; i < bubbles.length; i++) {
-    for (let j = i + 1; j < bubbles.length; j++) {
-      const a = bubbles[i];
-      const b = bubbles[j];
-      if (!isSpeechBalloon(a.line) || !isSpeechBalloon(b.line)) continue;
-      const sa = estimateBubbleSize(a.line);
-      const sb = estimateBubbleSize(b.line);
-      const dx = b.x - a.x;
-      const dy = b.y - a.y;
-      const len = Math.hypot(dx, dy);
-      if (len < 16) continue;
-      const gapX = Math.abs(dx) - sa.halfW - sb.halfW;
-      const gapY = Math.abs(dy) - sa.halfH - sb.halfH;
-      const stacked = gapY < 28 && -gapX > Math.min(sa.halfW, sb.halfW) * 0.5;
-      const sideBySide = gapX < 28 && -gapY > Math.min(sa.halfH, sb.halfH) * 0.35;
-      if (!stacked && !sideBySide) continue;
-      const { bgColor, borderColor } = getBubbleStyles(a.line);
-      const neck = stacked
-        ? Math.min(sa.halfW, sb.halfW) * 1.2
-        : Math.min(sa.halfH, sb.halfH) * 1.15;
-      const angle = (Math.atan2(dy, dx) * 180) / Math.PI;
-      nodes.push(
-        <div
-          key={`join-${a.key}-${b.key}`}
-          className="absolute pointer-events-none"
-          style={{
-            left: (a.x + b.x) / 2,
-            top: (a.y + b.y) / 2,
-            width: len,
-            height: neck,
-            transform: `translate(-50%, -50%) rotate(${angle}deg)`,
-            background: bgColor,
-            border: `1.85px solid ${borderColor}`,
-            borderRadius: neck / 2,
-            zIndex: 28,
-            opacity: a.active && b.active ? 1 : 0.18,
-          }}
-        />
-      );
+function renderSpeechFusion(
+  bubbles: FusionBubbleRef[],
+  bubbleOpacity: number | undefined,
+  bodySizes: Record<string, { w: number; h: number }>
+): { element: React.ReactNode; keys: Set<string> } {
+  const { groups } = buildSpeechFusionGroups(bubbles);
+  const mobile =
+    typeof window !== "undefined" && window.innerWidth < 768;
+  const bleed = mobile ? 10 : 16;
+  const rendered = new Set<string>();
+
+  const nodes = groups.map((group) => {
+    if (group.some((b) => !bodySizes[b.key] || bodySizes[b.key].w < 8)) return null;
+    const localNodes: SpeechFusionNode[] = group.map((b) => {
+      const box = bodySizes[b.key];
+      return {
+        cx: b.x,
+        cy: b.y,
+        rx: box.w / 2 + bleed,
+        ry: box.h / 2 + bleed,
+        seed: comicBalloonSeed(b.index, b.line.text || ""),
+        neckPx: b.line.tailWidth,
+      };
+    });
+    let minX = Infinity;
+    let minY = Infinity;
+    let maxX = -Infinity;
+    let maxY = -Infinity;
+    for (const n of localNodes) {
+      minX = Math.min(minX, n.cx - n.rx);
+      minY = Math.min(minY, n.cy - n.ry);
+      maxX = Math.max(maxX, n.cx + n.rx);
+      maxY = Math.max(maxY, n.cy + n.ry);
     }
-  }
-  return <>{nodes}</>;
+    const local = localNodes.map((n) => ({
+      ...n,
+      cx: n.cx - minX,
+      cy: n.cy - minY,
+    }));
+    const allWhisper = group.every((b) => (b.line.style ?? "normal") === "whisper");
+    let path: string | null = null;
+    try {
+      path = buildSpeechFusionPath(local, {
+        kind: allWhisper ? "scallop" : "smooth",
+      });
+    } catch {
+      path = null;
+    }
+    if (!path) return null;
+    for (const b of group) rendered.add(b.key);
+    const { bgColor, borderColor } = getBubbleStyles(group[0].line, bubbleOpacity);
+    const fill = bgColor.replace(
+      /rgba\(\s*([\d.]+)\s*,\s*([\d.]+)\s*,\s*([\d.]+)\s*,\s*[\d.]+\s*\)/,
+      "rgb($1, $2, $3)"
+    );
+    const w = Math.max(1, maxX - minX);
+    const h = Math.max(1, maxY - minY);
+    const anyActive = group.some((b) => b.active);
+    return (
+      <svg
+        key={`fusion-${group.map((g) => g.key).join("-")}`}
+        className="absolute pointer-events-none overflow-visible"
+        viewBox={`0 0 ${w} ${h}`}
+        width={w}
+        height={h}
+        style={{
+          left: minX,
+          top: minY,
+          zIndex: 27,
+          opacity: anyActive ? 1 : INACTIVE_BUBBLE_OPACITY,
+          transition: "opacity 520ms cubic-bezier(0.22, 1, 0.36, 1)",
+        }}
+      >
+        <path
+          d={path}
+          fill={fill}
+          stroke={borderColor}
+          strokeWidth={allWhisper ? 2.75 : 2.15}
+          strokeLinejoin="round"
+          strokeLinecap="round"
+        />
+      </svg>
+    );
+  });
+
+  return { element: <>{nodes}</>, keys: rendered };
 }
 
 interface DialogueLayersProps {
@@ -83,6 +125,7 @@ interface DialogueLayersProps {
   bubbleOffsets: Record<string, { x: number; y: number }>;
   draggedBubbleKey: string | null;
   textScale: number;
+  bubbleLayoutScale?: number;
   autoplay?: boolean;
   speedMultiplier?: number;
   isPageChanging: boolean;
@@ -118,6 +161,7 @@ export function DialogueLayers({
   bubbleOffsets,
   draggedBubbleKey,
   textScale,
+  bubbleLayoutScale = 1,
   autoplay = false,
   speedMultiplier = 1.0,
   isPageChanging,
@@ -134,6 +178,14 @@ export function DialogueLayers({
   bubbleOpacity = 0.88,
   staggerDelay = false,
 }: DialogueLayersProps) {
+  const [bodySizes, setBodySizes] = React.useState<Record<string, { w: number; h: number }>>({});
+  const handleBodyMeasure = React.useCallback((key: string, size: { w: number; h: number }) => {
+    setBodySizes((prev) => {
+      const cur = prev[key];
+      if (cur && Math.abs(cur.w - size.w) < 1 && Math.abs(cur.h - size.h) < 1) return prev;
+      return { ...prev, [key]: size };
+    });
+  }, []);
   const settings = localDialogues.settings || {};
   const clearReadDialogues = settings.clearReadDialogues ?? true;
   const appearanceAnimation = settings.appearanceAnimation ?? "spring";
@@ -157,12 +209,14 @@ export function DialogueLayers({
         ? currentPanels.slice(0, panelIdx + 1)
         : [activePanel];
 
+    const fusionEnabled = false;
+
     return (
       <>
         {panelsToRender.flatMap((panel: PanelStop, pIndex: number) => {
           const dialogueList = panel.dialogue || [];
           const effectiveIndexes = getEffectiveIndexes(dialogueList, imgWidth, imgHeight, imgLeft, imgTop);
-          const joinBubbles = dialogueList.map((line, i) => {
+          const joinBubbles: FusionBubbleRef[] = dialogueList.map((line, i) => {
             const posX = line.posX ?? 50;
             const posY = line.posY ?? panel.focusY * 100;
             const offset = bubbleOffsets[`${pIndex}-${i}`] || { x: 0, y: 0 };
@@ -175,15 +229,19 @@ export function DialogueLayers({
               (isCurrentPanel && (autoplay ? i <= activeReadingBubbleIdx : i === activeReadingBubbleIdx));
             return {
               key: `${pIndex}-${i}`,
+              index: i,
               x: imgLeft + (posX / 100) * imgWidth + parallaxX + offset.x,
               y: imgTop + (posY / 100) * imgHeight + parallaxY + offset.y,
               line,
               active,
             };
           });
+          const fusion = fusionEnabled
+            ? renderSpeechFusion(joinBubbles, bubbleOpacity, bodySizes)
+            : { element: null, keys: new Set<string>() };
 
           return [
-            <SpeechJoins key={`joins-${pIndex}`} bubbles={joinBubbles} />,
+            <React.Fragment key={`fusion-${pIndex}`}>{fusion.element}</React.Fragment>,
             ...dialogueList.map((line, i) => {
             const posX = line.posX ?? 50;
             const posY = line.posY ?? panel.focusY * 100;
@@ -275,7 +333,7 @@ export function DialogueLayers({
                       left: "50%",
                       top: "50%",
                       zIndex: 0,
-                      opacity: isBubbleActive ? 1.0 : 0.18,
+                      opacity: 1,
                       transition: "opacity 520ms cubic-bezier(0.22, 1, 0.36, 1)",
                     }}
                   >
@@ -288,10 +346,12 @@ export function DialogueLayers({
             return (
               <div
                 key={`read-bub-${pIndex}-${i}`}
+                data-dialogue-bubble
                 onPointerDown={(e) => handleBubblePointerDown(e, bubbleKey)}
                 onPointerMove={(e) => handleBubblePointerMove(e, bubbleKey)}
                 onPointerUp={(e) => handleBubblePointerUp(e, bubbleKey)}
                 onPointerCancel={(e) => handleBubblePointerUp(e, bubbleKey)}
+                onClick={(e) => e.stopPropagation()}
                 className={`absolute select-none ${
                   draggedBubbleKey === bubbleKey
                     ? "cursor-grabbing z-[100] pointer-events-auto"
@@ -308,22 +368,25 @@ export function DialogueLayers({
                       ? `opacity 520ms cubic-bezier(0.22, 1, 0.36, 1), left 520ms cubic-bezier(0.22, 1, 0.36, 1), top 520ms cubic-bezier(0.22, 1, 0.36, 1)`
                       : "none",
                   touchAction: "none",
-                  opacity: isBubbleActive ? 1.0 : 0.18,
-                  pointerEvents: isBubbleActive ? "auto" : "none",
+                  opacity: isBubbleActive ? 1 : INACTIVE_BUBBLE_OPACITY,
+                  pointerEvents: "auto",
                 }}
               >
                 <DialogueBubble
                   line={line}
                   index={effIdx}
                   elasticTailNode={elasticTailNode}
-                  instant={showAllDialogues || zoomedOut}
+                  instant={showAllDialogues || zoomedOut || !isBubbleActive}
                   appearanceAnimation={appearanceAnimation}
                   fadeOutAnimation={fadeOutAnimation}
                   depth={dialogueDepth}
                   textScale={textScale}
+                  bubbleLayoutScale={bubbleLayoutScale}
                   speedMultiplier={speedMultiplier}
                   bubbleOpacity={bubbleOpacity}
                   staggerDelay={staggerDelay}
+                  suppressBalloonOutline={fusion.keys.has(bubbleKey)}
+                  onBodyMeasure={(size) => handleBodyMeasure(bubbleKey, size)}
                 />
               </div>
             );
@@ -340,20 +403,22 @@ export function DialogueLayers({
         const dialogueList = panel.dialogue || [];
         const isCurrentPanel = activePanelIdx === pIdx;
 
-        const joinBubbles = dialogueList.map((line, bIdx) => {
+        const joinBubbles: FusionBubbleRef[] = dialogueList.map((line, bIdx) => {
           const posX = line.posX ?? 50;
           const posY = line.posY ?? panel.focusY * 100;
           return {
             key: `${pIdx}-${bIdx}`,
+            index: bIdx,
             x: imgLeft + (posX / 100) * imgWidth,
             y: imgTop + (posY / 100) * imgHeight,
             line,
             active: true,
           };
         });
+        const fusion = { element: null as React.ReactNode, keys: new Set<string>() };
 
         return [
-          <SpeechJoins key={`joins-edit-${pIdx}`} bubbles={joinBubbles} />,
+          <React.Fragment key={`fusion-edit-${pIdx}`}>{fusion.element}</React.Fragment>,
           ...dialogueList.map((line, bIdx) => {
           const isActive = isCurrentPanel && activeBubbleIdx === bIdx;
           const posX = line.posX ?? 50;
@@ -529,8 +594,11 @@ export function DialogueLayers({
                     fadeOutAnimation={fadeOutAnimation}
                     depth={dialogueDepth}
                     textScale={textScale}
+                    bubbleLayoutScale={bubbleLayoutScale}
                     speedMultiplier={speedMultiplier}
                     bubbleOpacity={bubbleOpacity}
+                    suppressBalloonOutline={fusion.keys.has(`${pIdx}-${bIdx}`)}
+                    onBodyMeasure={(size) => handleBodyMeasure(`${pIdx}-${bIdx}`, size)}
                   />
                 </div>
               </motion.div>

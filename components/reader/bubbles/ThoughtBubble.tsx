@@ -29,6 +29,7 @@ interface ThoughtBubbleProps {
   fadeOutAnimation?: "fade" | "slide" | "zoom";
   depth?: number;
   textScale?: number;
+  bubbleLayoutScale?: number;
   speedMultiplier?: number;
   bubbleOpacity?: number;
   staggerDelay?: boolean;
@@ -43,6 +44,7 @@ export function ThoughtBubble({
   fadeOutAnimation,
   depth,
   textScale = 1.0,
+  bubbleLayoutScale = 1,
   speedMultiplier = 1.0,
   bubbleOpacity,
   staggerDelay = true,
@@ -84,8 +86,9 @@ export function ThoughtBubble({
   if (!baseFontSize) {
     baseFontSize = size === "small" ? 12 : size === "large" ? 18 : 14;
   }
-  const minFont = isMobile ? 8 : 10;
-  const finalFontSize = Math.max(minFont, baseFontSize * textScale);
+  const minFont = isMobile ? 6 : 10;
+  const fontLayoutScale = Math.max(bubbleLayoutScale, 0.88);
+  const finalFontSize = Math.max(minFont, baseFontSize * textScale * fontLayoutScale);
 
   const thoughtStyles: React.CSSProperties = {
     backgroundColor: resolveBgColor(thoughtBg, "#000000", bubbleOpacity),
@@ -96,11 +99,12 @@ export function ThoughtBubble({
     ...comicTextContainment(finalFontSize, 0, { mobile: isMobile }),
   };
 
-  if (line.width)       thoughtStyles.maxWidth   = `${line.width}px`;
+  const layoutWidth = line.width ? line.width * bubbleLayoutScale : undefined;
+  if (layoutWidth)       thoughtStyles.maxWidth   = `${layoutWidth}px`;
   if (customFontFamily) thoughtStyles.fontFamily = customFontFamily;
 
   const wrapperStyles: React.CSSProperties = { pointerEvents: "none" };
-  if (line.width) wrapperStyles.maxWidth = `${line.width}px`;
+  if (layoutWidth) wrapperStyles.maxWidth = `${layoutWidth}px`;
 
   return (
     <motion.div

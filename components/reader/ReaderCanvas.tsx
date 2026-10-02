@@ -1,13 +1,21 @@
 "use client";
 
 import React from "react";
+import dynamic from "next/dynamic";
 import { motion, AnimatePresence } from "framer-motion";
 import type { PanelStop, SceneFadeType } from "./audioPlayer";
 import { ReaderZoomControls } from "./ReaderZoomControls";
-import { getComicPageUrl } from "./readerUtils";
+import { computeSpoilerMasks, getComicPageUrl, type SpoilerMask } from "./readerUtils";
 import { SceneFadeLayer } from "./SceneFadeLayer";
 import { sceneFadeDurationMs, sceneFadeExit, sceneFadeOrigin } from "./sceneFade";
+
 import { PageEndGesture } from "./PageEndGesture";
+import { MaskedPageImage, NeighborPages, type GhostPanel } from "./pageFlip/NeighborPages";
+import type { PageFlipController } from "./pageFlip/usePageFlipGesture";
+
+const PageFlip3D = dynamic(() => import("./pageFlip/PageFlip3D").then((m) => m.PageFlip3D), {
+  ssr: false,
+});
 
 interface ReaderCanvasProps {
   mode: "read" | "edit";
@@ -71,6 +79,18 @@ interface ReaderCanvasProps {
   setZoomScale: React.Dispatch<React.SetStateAction<number>>;
   setPanOffset: React.Dispatch<React.SetStateAction<{ x: number; y: number }>> | ((val: { x: number; y: number }) => void);
   nextChapter: any;
+  pageFlip?: PageFlipController;
+  viewportSize?: { w: number; h: number };
+  neighborMasks?: { prev: SpoilerMask[]; next: SpoilerMask[] };
+  prevPanels?: GhostPanel[];
+  bubbleLayoutScale?: number;
+  pageLoading?: boolean;
+  pageSheetLayout?: {
+    imgWidth: number;
+    imgLeft: number;
+    imgTop: number;
+    imgHeight: number;
+  };
 }
 
 export function ReaderCanvas({
@@ -129,74 +149,96 @@ export function ReaderCanvas({
   resetPage,
   setZoomScale,
   setPanOffset,
+  pageFlip,
+  viewportSize,
+  neighborMasks,
+  prevPanels,
+  bubbleLayoutScale = 1,
+  pageLoading = false,
+  pageSheetLayout,
 }: ReaderCanvasProps) {
   const isLastPage = pageIdx === pages.length - 1;
+  const flipDir = pageFlip?.direction ?? null;
+  const readLayoutAtFlip = React.useRef({ left: imgLeft, top: imgTop, width: imgWidth, height: imgHeight });
+  if (!flipDir) {
+    readLayoutAtFlip.current = { left: imgLeft, top: imgTop, width: imgWidth, height: imgHeight };
+  }
+  const flipRect = readLayoutAtFlip.current;
+  const sheetActive = !!flipDir && flipRect.width > 0;
+  const neighborFrame = sheetActive
+    ? {
+        imgLeft: flipRect.left,
+        imgTop: flipRect.top,
+        imgWidth: flipRect.width,
+        imgHeight: flipRect.height,
+      }
+    : { imgLeft, imgTop, imgWidth, imgHeight };
+  const showPrevGhostDialogues = !!flipDir || zoomedOut;
+  const flipSheetMasks = React.useMemo(() => {
+    if (flipDir === "prev") return neighborMasks?.prev ?? [];
+    if (zoomedOut) return [];
+    return computeSpoilerMasks(currentPanels, maskRevealPanelIdx ?? panelIdx, maskRevealZoomIdx ?? zoomIdx);
+  }, [flipDir, neighborMasks, zoomedOut, currentPanels, maskRevealPanelIdx, panelIdx, maskRevealZoomIdx, zoomIdx]);
+
+  const takeOverFromPan = () => {
+    if (!isPanning) return;
+    setPanOffset({ x: 0, y: 0 });
+    (handleMouseUp as () => void)();
+  };
+  const onFlipMouseDown = (e: React.MouseEvent) => {
+    pageFlip?.onPointerStart(e.clientX, e.clientY, e.target);
+    handleMouseDown(e);
+  };
+  const onFlipMouseMove = (e: React.MouseEvent) => {
+    if (pageFlip?.onPointerMove(e.clientX, e.clientY)) {
+      takeOverFromPan();
+      return;
+    }
+    handleMouseMove(e);
+  };
+  const onFlipMouseUp = (e: React.MouseEvent) => {
+    pageFlip?.onPointerEnd();
+    handleMouseUp(e);
+  };
+  const onFlipTouchStart = (e: React.TouchEvent) => {
+    const t = e.touches[0];
+    if (e.touches.length === 1 && t) pageFlip?.onPointerStart(t.clientX, t.clientY, e.target);
+    else pageFlip?.onPointerEnd();
+    handleTouchStart(e);
+  };
+  const onFlipTouchMove = (e: React.TouchEvent) => {
+    const t = e.touches[0];
+    if (e.touches.length === 1 && t && pageFlip?.onPointerMove(t.clientX, t.clientY)) {
+      takeOverFromPan();
+      return;
+    }
+    handleTouchMove(e);
+  };
+  const onFlipTouchEnd = (e: React.TouchEvent) => {
+    pageFlip?.onPointerEnd();
+    handleTouchEnd(e);
+  };
+  const onReaderClick = (e: React.MouseEvent) => {
+    if (pageFlip?.shouldSuppressClick()) return;
+    handleReaderTap(e);
+  };
   const revealPanel = maskRevealPanelIdx ?? panelIdx;
   const revealZoom = maskRevealZoomIdx ?? zoomIdx;
   const panMs = cameraTransitionMs ?? sceneTransitionMs;
   const panEase = "cubic-bezier(0.22, 1, 0.36, 1)";
   const comicPanTransition =
-    mode === "read" && !isPageChanging && panMs > 0
+    mode === "read" && !pageLoading && panMs > 0
       ? `left ${panMs}ms ${panEase}, top ${panMs}ms ${panEase}, width ${panMs}ms ${panEase}, height ${panMs}ms ${panEase}`
       : "none";
+  const frameLayout = sheetActive
+    ? flipRect
+    : { left: imgLeft, top: imgTop, width: imgWidth, height: imgHeight };
 
   const renderReadSpoilerMasks = () => {
     if (mode !== "read" || zoomedOut || !imgSize || imgWidth <= 0 || imgHeight <= 0) return null;
 
-    const rawActiveMasks: {
-      key: string;
-      x: number;
-      y: number;
-      w: number;
-      h: number;
-      pIdx: number;
-      rIdx: number;
-      fadeOut?: number;
-      fadeOutType?: SceneFadeType;
-    }[] = [];
-
-    currentPanels.forEach((panel: PanelStop, pIdx: number) => {
-      const rects = panel.zoomRects || (panel.zoomRect ? [panel.zoomRect] : []);
-      rects.forEach((zoom: any, rIdx: number) => {
-        let shouldMask = false;
-        if (pIdx > revealPanel) {
-          shouldMask = panel.hideUntilReached !== false;
-        } else if (pIdx === revealPanel) {
-          shouldMask = rIdx > revealZoom && panel.hideUntilReached !== false;
-        }
-        if (shouldMask) {
-          rawActiveMasks.push({
-            key: `spoiler-mask-${pIdx}-${rIdx}`,
-            x: zoom.x ?? 0,
-            y: zoom.y ?? 0,
-            w: zoom.w ?? 100,
-            h: zoom.h ?? 25,
-            fadeOut: zoom.fadeOut,
-            fadeOutType: zoom.fadeOutType,
-            pIdx,
-            rIdx,
-          });
-        }
-      });
-    });
-
-    if (rawActiveMasks.length === 0) return null;
-
-    const sortedMasks = [...rawActiveMasks].sort((a, b) => a.y - b.y);
-    const processedMasks = sortedMasks.map((mask, idx) => {
-      let { x, y, w, h } = mask;
-      const nextMask = sortedMasks[idx + 1];
-      if (nextMask) {
-        const maskBottom = y + h;
-        const nextTop = nextMask.y;
-        if (nextTop > maskBottom && nextTop - maskBottom <= 15) {
-          h = nextTop - y + 0.5;
-        }
-      } else if (y + h >= 75) {
-        h = Math.max(h, 100 - y);
-      }
-      return { ...mask, x, y, w, h };
-    });
+    const processedMasks = computeSpoilerMasks(currentPanels, revealPanel, revealZoom);
+    if (processedMasks.length === 0) return null;
 
     return (
       <AnimatePresence>
@@ -228,16 +270,16 @@ export function ReaderCanvas({
   return (
     <div
       ref={containerRef}
-      onMouseDown={mode === "read" ? handleMouseDown : undefined}
-      onMouseMove={mode === "read" ? handleMouseMove : undefined}
-      onMouseUp={mode === "read" ? handleMouseUp : undefined}
-      onMouseLeave={mode === "read" ? handleMouseUp : undefined}
-      onTouchStart={mode === "read" ? handleTouchStart : undefined}
-      onTouchMove={mode === "read" ? handleTouchMove : undefined}
-      onTouchEnd={mode === "read" ? handleTouchEnd : undefined}
+      onMouseDown={mode === "read" ? onFlipMouseDown : undefined}
+      onMouseMove={mode === "read" ? onFlipMouseMove : undefined}
+      onMouseUp={mode === "read" ? onFlipMouseUp : undefined}
+      onMouseLeave={mode === "read" ? onFlipMouseUp : undefined}
+      onTouchStart={mode === "read" ? onFlipTouchStart : undefined}
+      onTouchMove={mode === "read" ? onFlipTouchMove : undefined}
+      onTouchEnd={mode === "read" ? onFlipTouchEnd : undefined}
       onWheel={mode === "read" ? handleWheel : undefined}
       onDoubleClick={mode === "read" ? handleDoubleClick : undefined}
-      onClick={mode === "read" ? handleReaderTap : undefined}
+      onClick={mode === "read" ? onReaderClick : undefined}
       className={`relative flex-1 h-full overflow-hidden select-none ${
         mode === "edit" ? "bg-zinc-900 border-r-3 border-[#0a0a0f]" : "brand-grain"
       } ${
@@ -265,16 +307,36 @@ export function ReaderCanvas({
             : undefined
         }
       >
+        {mode === "read" && imgSize && (
+          <NeighborPages
+            prevSrc={pageIdx > 0 ? pages[pageIdx - 1] : undefined}
+            nextSrc={pages[pageIdx + 1]}
+            prevMasks={neighborMasks?.prev}
+            nextMasks={neighborMasks?.next}
+            prevPanels={prevPanels}
+            bubbleLayoutScale={bubbleLayoutScale}
+            imgLeft={neighborFrame.imgLeft}
+            imgTop={neighborFrame.imgTop}
+            imgWidth={neighborFrame.imgWidth}
+            imgHeight={neighborFrame.imgHeight}
+            showPrevGhostDialogues={showPrevGhostDialogues}
+            transition={sheetActive ? "none" : comicPanTransition}
+            zIndex={sheetActive ? 27 : undefined}
+          />
+        )}
+
         {/* Comic page frame: image + spoiler masks share the same pan/zoom transform */}
         {imgSize && (
           <div
             style={{
               position: "absolute",
-              left: imgLeft,
-              top: imgTop,
-              width: imgWidth,
-              height: imgHeight,
-              transition: comicPanTransition,
+              left: frameLayout.left,
+              top: frameLayout.top,
+              width: frameLayout.width,
+              height: frameLayout.height,
+              transition: sheetActive ? "none" : comicPanTransition,
+              zIndex: sheetActive ? 23 : undefined,
+              visibility: sheetActive && flipDir === "next" ? "hidden" : undefined,
             }}
           >
             <img
@@ -302,6 +364,40 @@ export function ReaderCanvas({
             />
             {renderReadSpoilerMasks()}
           </div>
+        )}
+
+        {mode === "read" && imgSize && sheetActive && flipDir === "next" && pages[pageIdx + 1] && (
+          <div
+            className="absolute pointer-events-none"
+            style={{
+              left: flipRect.left,
+              top: flipRect.top,
+              width: flipRect.width,
+              height: flipRect.height,
+              zIndex: 24,
+              transition: "none",
+              boxShadow: "0 15px 40px rgba(0, 0, 0, 0.8), 0 8px 16px rgba(0, 0, 0, 0.6)",
+            }}
+          >
+            <MaskedPageImage src={pages[pageIdx + 1]} masks={neighborMasks?.next} />
+          </div>
+        )}
+
+        {mode === "read" && imgSize && pageFlip && viewportSize && (
+          <PageFlip3D
+            direction={flipDir}
+            progressRef={pageFlip.progressRef}
+            rect={{
+              left: flipRect.left,
+              top: flipRect.top,
+              width: flipRect.width,
+              height: flipRect.height,
+            }}
+            viewport={viewportSize}
+            frontSrc={flipDir === "next" ? pages[pageIdx] : pages[pageIdx - 1]}
+            frontMasks={flipSheetMasks}
+            expandT={1}
+          />
         )}
 
         {/* ── Grid Overlay (Editor Mode only) ── */}
@@ -456,7 +552,9 @@ export function ReaderCanvas({
           });
         })()}
 
-        {renderedDialogues}
+        <div style={{ opacity: flipDir ? 0 : 1, transition: "opacity 140ms ease-out" }}>
+          {renderedDialogues}
+        </div>
 
         {/* ── FocusY Indicator line in Editor Mode ── */}
         {mode === "edit" && currentPanels.map((panel, pIdx) => {
@@ -527,14 +625,8 @@ export function ReaderCanvas({
         />
       )}
 
-      {mode === "read" && zoomedOut && !showAllDialogues && (
-        <PageEndGesture
-          isFirst={pageIdx === 0}
-          isLast={isLastPage}
-          onPrev={() => resetPage(pageIdx - 1)}
-          onReplay={() => resetPage(pageIdx)}
-          onNext={() => resetPage(isLastPage ? 0 : pageIdx + 1)}
-        />
+      {mode === "read" && zoomedOut && !showAllDialogues && !sheetActive && (
+        <PageEndGesture onReplay={() => resetPage(pageIdx)} />
       )}
 
       {mode === "edit" && (
@@ -629,16 +721,18 @@ export function ReaderCanvas({
             style={{ transformOrigin: sceneFadeOrigin(pageFadeInType) }}
             onClick={(e) => e.stopPropagation()}
           >
-            <motion.div
-              animate={{ opacity: [0.4, 0.8, 0.4] }}
-              transition={{ duration: 1.5, repeat: Infinity, ease: "easeInOut" }}
-              className="flex flex-col items-center gap-3"
-            >
-              <div className="w-10 h-10 border-4 border-[#e8185a] border-t-transparent rounded-full animate-spin" />
-              <span className="font-[var(--font-bangers)] text-[#e8185a] text-lg tracking-widest">
-                CARGANDO PÁGINA...
-              </span>
-            </motion.div>
+            {pageLoading && (
+              <motion.div
+                animate={{ opacity: [0.4, 0.8, 0.4] }}
+                transition={{ duration: 1.5, repeat: Infinity, ease: "easeInOut" }}
+                className="flex flex-col items-center gap-3"
+              >
+                <div className="w-10 h-10 border-4 border-[#e8185a] border-t-transparent rounded-full animate-spin" />
+                <span className="font-[var(--font-bangers)] text-[#e8185a] text-lg tracking-widest">
+                  CARGANDO PÁGINA...
+                </span>
+              </motion.div>
+            )}
           </motion.div>
         )}
       </AnimatePresence>

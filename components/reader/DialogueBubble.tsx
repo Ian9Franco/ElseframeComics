@@ -91,10 +91,13 @@ export function DialogueBubble({
   fadeOutAnimation,
   depth,
   textScale = 1.0,
+  bubbleLayoutScale = 1,
   speedMultiplier = 1.0,
   bubbleOpacity,
   staggerDelay = true,
   inlineTextEdit,
+  suppressBalloonOutline,
+  onBodyMeasure,
 }: {
   line: DialogueLine;
   index: number;
@@ -104,10 +107,13 @@ export function DialogueBubble({
   fadeOutAnimation?: "fade" | "slide" | "zoom";
   depth?: number;
   textScale?: number;
+  bubbleLayoutScale?: number;
   speedMultiplier?: number;
   bubbleOpacity?: number;
   staggerDelay?: boolean;
   inlineTextEdit?: InlineTextEditProps;
+  suppressBalloonOutline?: boolean;
+  onBodyMeasure?: (size: { w: number; h: number }) => void;
 }) {
   const style = line.style ?? "normal";
 
@@ -121,6 +127,7 @@ export function DialogueBubble({
         fadeOutAnimation={fadeOutAnimation}
         depth={depth}
         textScale={textScale}
+        bubbleLayoutScale={bubbleLayoutScale}
         speedMultiplier={speedMultiplier}
         bubbleOpacity={bubbleOpacity}
         staggerDelay={staggerDelay}
@@ -140,6 +147,7 @@ export function DialogueBubble({
         fadeOutAnimation={fadeOutAnimation}
         depth={depth}
         textScale={textScale}
+        bubbleLayoutScale={bubbleLayoutScale}
         speedMultiplier={speedMultiplier}
         bubbleOpacity={bubbleOpacity}
         staggerDelay={staggerDelay}
@@ -158,6 +166,7 @@ export function DialogueBubble({
         fadeOutAnimation={fadeOutAnimation}
         depth={depth}
         textScale={textScale}
+        bubbleLayoutScale={bubbleLayoutScale}
         speedMultiplier={speedMultiplier}
         staggerDelay={staggerDelay}
         inlineTextEdit={inlineTextEdit}
@@ -175,10 +184,13 @@ export function DialogueBubble({
       fadeOutAnimation={fadeOutAnimation}
       depth={depth}
       textScale={textScale}
+      bubbleLayoutScale={bubbleLayoutScale}
       speedMultiplier={speedMultiplier}
       bubbleOpacity={bubbleOpacity}
       staggerDelay={staggerDelay}
       inlineTextEdit={inlineTextEdit}
+      suppressBalloonOutline={suppressBalloonOutline}
+      onBodyMeasure={onBodyMeasure}
     />
   );
 }

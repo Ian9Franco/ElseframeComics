@@ -15,9 +15,13 @@ import { DialogueLayers } from "./DialogueLayers";
 import { useReaderLayout } from "./useReaderLayout";
 import { useReaderAudio } from "./useReaderAudio";
 import { MiniMusicPlayer } from "./MiniMusicPlayer";
-import { getComicPageUrl, getPageKeyFromUrl } from "./readerUtils";
+import { computeSpoilerMasks, getComicPageUrl, getPageKeyFromUrl, getReadPanels } from "./readerUtils";
+import { usePageFlipGesture } from "./pageFlip/usePageFlipGesture";
+import { preloadPageTextures } from "./pageFlip/pageTextures";
 import { Dialogues, PanelStop, SceneFadeType } from "./audioPlayer";
 import { sceneFadeDurationMs } from "./sceneFade";
+
+const PAGE_LAND_EASE_MS = 1280;
 import { UnlockNotificationModal } from "@/components/UnlockNotificationModal";
 import { markChapterCompletionUnlock } from "@/lib/characterData/completionUnlocks";
 import { isPreviewAuthBypassedClient } from "@/lib/previewAuthClient";
@@ -99,6 +103,14 @@ export function CinematicReader({
   const [imgSize, setImgSize] = useState<{ w: number; h: number } | null>(null);
   const [containerSize, setContainerSize] = useState({ w: 0, h: 0 });
   const [isPageChanging, setIsPageChanging] = useState(false);
+  const [pageLoading, setPageLoading] = useState(false);
+  const [focusInToken, setFocusInToken] = useState(0);
+  const [pageLandCameraMs, setPageLandCameraMs] = useState(0);
+  const [holdSheetLayout, setHoldSheetLayout] = useState(false);
+  const pageSizeCache = useRef(new Map<string, { w: number; h: number }>());
+  const skipViewResetRef = useRef(false);
+  const skipPageChangeOverlayRef = useRef(false);
+  const pageLandTimerRef = useRef<number | null>(null);
 
   const [isAuthorized, setIsAuthorized] = useState(false);
   const [showAuthModal, setShowAuthModal] = useState(false);
@@ -355,39 +367,62 @@ export function CinematicReader({
   useEffect(() => {
     if (!pages[pageIdx]) return;
 
+    const skipOverlay = skipPageChangeOverlayRef.current;
+    skipPageChangeOverlayRef.current = false;
+
     const url = getComicPageUrl(pages[pageIdx]);
-    const img = new window.Image();
     const key = getPageKeyFromUrl(pages[pageIdx]);
     const fadeIn = key ? localDialogues.pages?.[key]?.fadeIn ?? 0 : 0;
-    const holdMs = fadeIn > 0 ? fadeIn : 150;
+    let cancelled = false;
 
-    if (img.complete && img.naturalWidth > 0) {
-      setImgSize({ w: img.naturalWidth, h: img.naturalHeight });
-      if (fadeIn > 0) {
+    const remember = (w: number, h: number) => {
+      pageSizeCache.current.set(url, { w, h });
+      setImgSize({ w, h });
+    };
+
+    const reveal = () => {
+      setPageLoading(false);
+      if (!skipOverlay && fadeIn > 0) {
         setIsPageChanging(true);
-        const cachedTimer = setTimeout(() => setIsPageChanging(false), fadeIn);
-        img.src = url;
-        return () => clearTimeout(cachedTimer);
+        window.setTimeout(() => {
+          if (!cancelled) setIsPageChanging(false);
+        }, 40);
+        return;
       }
       setIsPageChanging(false);
-      img.src = url;
-      return;
+    };
+
+    const known = pageSizeCache.current.get(url);
+    if (known) remember(known.w, known.h);
+
+    const img = new window.Image();
+    img.src = url;
+    if (img.complete && img.naturalWidth > 0) {
+      remember(img.naturalWidth, img.naturalHeight);
+      reveal();
+      return () => {
+        cancelled = true;
+      };
     }
 
-    setImgSize(null);
-    setIsPageChanging(true);
+    if (skipOverlay && known) {
+      reveal();
+      return () => {
+        cancelled = true;
+      };
+    }
 
-    let timer: NodeJS.Timeout;
+    setPageLoading(true);
+    setIsPageChanging(true);
     img.onload = () => {
-      setImgSize({ w: img.naturalWidth, h: img.naturalHeight });
-      timer = setTimeout(() => {
-        setIsPageChanging(false);
-      }, holdMs);
+      if (cancelled) return;
+      remember(img.naturalWidth, img.naturalHeight);
+      reveal();
     };
-    img.src = url;
 
     return () => {
-      if (timer) clearTimeout(timer);
+      cancelled = true;
+      img.onload = null;
     };
   }, [pageIdx, pages, localDialogues.pages]);
 
@@ -398,32 +433,126 @@ export function CinematicReader({
       (i) => i >= 0 && i < pages.length
     );
     toPreload.forEach((i) => {
+      const url = getComicPageUrl(pages[i]);
       const preImg = new window.Image();
-      preImg.src = getComicPageUrl(pages[i]);
+      preImg.onload = () => {
+        pageSizeCache.current.set(url, { w: preImg.naturalWidth, h: preImg.naturalHeight });
+      };
+      preImg.src = url;
     });
   }, [pageIdx, pages]);
 
-  const resetPage = useCallback((idx: number) => {
-    setPageIdx(idx);
-    setPanelIdx(0);
-    setZoomIdx(0);
-    setMaskRevealPanelIdx(0);
-    setMaskRevealZoomIdx(0);
-    setStopCover(null);
-    setZoomedOut(false);
-    setShowAllDialogues(false);
-    setActivePanelIdx(0);
-    setActiveBubbleIdx(null);
-    setZoomScale(1);
-    setPanOffset({ x: 0, y: 0 });
-    setBubbleOffsets({});
-  }, [setActivePanelIdx, setActiveBubbleIdx, setZoomScale, setPanOffset, setBubbleOffsets]);
+  const resetPage = useCallback(
+    (idx: number, options?: { fromPageFlip?: boolean }) => {
+      const fromPageFlip = options?.fromPageFlip === true && mode === "read";
+
+      if (pageLandTimerRef.current !== null) {
+        window.clearTimeout(pageLandTimerRef.current);
+        pageLandTimerRef.current = null;
+      }
+
+      setPageIdx(idx);
+      setPanelIdx(0);
+      setZoomIdx(0);
+      setMaskRevealPanelIdx(0);
+      setMaskRevealZoomIdx(0);
+      setStopCover(null);
+      setShowAllDialogues(false);
+      setActivePanelIdx(0);
+      setActiveBubbleIdx(null);
+      setBubbleOffsets({});
+
+      if (fromPageFlip) {
+        skipViewResetRef.current = true;
+        const destSrc = pages[idx];
+        if (destSrc && pageSizeCache.current.has(getComicPageUrl(destSrc))) {
+          skipPageChangeOverlayRef.current = true;
+        }
+        const key = getPageKeyFromUrl(pages[idx]);
+        const landPanels = getReadPanels(localDialogues.pages?.[key]?.panels);
+        const shouldSoftFocus = focusEnabled && landPanels.length > 0;
+        if (shouldSoftFocus) {
+          setHoldSheetLayout(true);
+          setZoomedOut(true);
+          setPageLandCameraMs(PAGE_LAND_EASE_MS);
+          pageLandTimerRef.current = window.setTimeout(() => {
+            pageLandTimerRef.current = null;
+            setZoomedOut(false);
+            window.setTimeout(() => {
+              setPageLandCameraMs(0);
+              setHoldSheetLayout(false);
+            }, PAGE_LAND_EASE_MS + 80);
+          }, 100);
+        } else {
+          setHoldSheetLayout(false);
+          setZoomedOut(true);
+          setPageLandCameraMs(0);
+        }
+        return;
+      }
+
+      if (mode === "read") {
+        setZoomedOut(true);
+        setFocusInToken((n) => n + 1);
+      } else {
+        setZoomedOut(false);
+      }
+      setZoomScale(1);
+      setPanOffset({ x: 0, y: 0 });
+    },
+    [
+      mode,
+      pages,
+      localDialogues.pages,
+      focusEnabled,
+      setActivePanelIdx,
+      setActiveBubbleIdx,
+      setZoomScale,
+      setPanOffset,
+      setBubbleOffsets,
+    ]
+  );
+
+  useEffect(() => {
+    if (mode !== "read" || focusInToken === 0) return;
+    let raf2 = 0;
+    const raf1 = requestAnimationFrame(() => {
+      raf2 = requestAnimationFrame(() => setZoomedOut(false));
+    });
+    return () => {
+      cancelAnimationFrame(raf1);
+      cancelAnimationFrame(raf2);
+    };
+  }, [focusInToken, mode]);
+
+  const neighborMasks = useMemo(() => {
+    const initialMasksFor = (idx: number) => {
+      const src = pages[idx];
+      if (!src) return [];
+      const panels = getReadPanels(localDialogues.pages?.[getPageKeyFromUrl(src)]?.panels);
+      return computeSpoilerMasks(panels, 0, 0);
+    };
+    return { prev: [] as ReturnType<typeof initialMasksFor>, next: initialMasksFor(pageIdx + 1) };
+  }, [pages, pageIdx, localDialogues.pages]);
+
+  const prevPanels = useMemo(() => {
+    const src = pages[pageIdx - 1];
+    if (!src) return [];
+    return getReadPanels(localDialogues.pages?.[getPageKeyFromUrl(src)]?.panels).map((panel) => ({
+      focusY: panel.focusY,
+      dialogue: panel.dialogue,
+    }));
+  }, [pages, pageIdx, localDialogues.pages]);
 
   useEffect(() => {
     setZoomIdx(0);
   }, [panelIdx, mode]);
 
   useEffect(() => {
+    if (skipViewResetRef.current) {
+      skipViewResetRef.current = false;
+      return;
+    }
     setZoomScale(1);
     setPanOffset({ x: 0, y: 0 });
     setBubbleOffsets({});
@@ -433,70 +562,24 @@ export function CinematicReader({
   const currentPageData = pgKey ? (localDialogues.pages?.[pgKey] || { panels: [] }) : { panels: [] };
 
   const currentPanels = useMemo(() => {
-    return mode === "read"
-      ? (currentPageData.panels || []).filter(
-          (p: PanelStop) =>
-            (p.dialogue && p.dialogue.length > 0) ||
-            p.zoomRect ||
-            (p.zoomRects && p.zoomRects.length > 0) ||
-            p.sound ||
-            (p.sounds && p.sounds.length > 0)
-        )
-      : currentPageData.panels || [];
+    return mode === "read" ? getReadPanels(currentPageData.panels) : currentPageData.panels || [];
   }, [mode, currentPageData.panels]);
+
+  useEffect(() => {
+    const currentMasks = computeSpoilerMasks(
+      currentPanels,
+      maskRevealPanelIdx,
+      maskRevealZoomIdx,
+    );
+    preloadPageTextures([
+      { src: pages[pageIdx - 1], masks: neighborMasks.prev },
+      { src: pages[pageIdx] },
+      { src: pages[pageIdx], masks: currentMasks },
+    ]);
+  }, [pageIdx, pages, neighborMasks, currentPanels, maskRevealPanelIdx, maskRevealZoomIdx]);
 
   // Ref to track pending dialogue timers so manual input can cancel them cleanly.
   const dialogueTimersRef = useRef<NodeJS.Timeout[]>([]);
-
-  // ── 6D: Read-mode keyboard shortcuts (placed after currentPanels declaration) ──
-  useEffect(() => {
-    if (mode !== "read") return;
-    const handleReadKey = (e: KeyboardEvent) => {
-      const tag = (e.target as HTMLElement).tagName;
-      if (tag === "INPUT" || tag === "TEXTAREA") return;
-      if (e.ctrlKey || e.metaKey || e.altKey) return;
-
-      if (e.key === " " || e.key === "ArrowRight") {
-        e.preventDefault();
-        if (Date.now() < previewGuardUntilRef.current) return;
-        const activePanelStop = currentPanels[panelIdx];
-        const rects = activePanelStop?.zoomRects || (activePanelStop?.zoomRect ? [activePanelStop.zoomRect] : []);
-        const dialogueCount = activePanelStop?.dialogue?.length || 0;
-        if (showAllDialogues) {
-          setShowAllDialogues(false);
-        } else if (zoomedOut) {
-          if (pageIdx < pages.length - 1) resetPage(pageIdx + 1);
-          else resetPage(0);
-        } else if (currentPanels.length === 0) {
-          setZoomedOut(true);
-        } else if (dialogueCount > 1 && activeReadingBubbleIdx < dialogueCount - 1) {
-          dialogueTimersRef.current.forEach((t) => clearTimeout(t));
-          dialogueTimersRef.current = [];
-          setActiveReadingBubbleIdx((prev) => prev + 1);
-        } else if (zoomIdx < rects.length - 1) {
-          setZoomIdx((prev) => prev + 1);
-        } else if (panelIdx < currentPanels.length - 1) {
-          setPanelIdx((prev) => prev + 1);
-        } else {
-          setZoomedOut(true);
-        }
-      } else if (e.key === "ArrowLeft") {
-        e.preventDefault();
-        if (zoomedOut) {
-          if (pageIdx > 0) resetPage(pageIdx - 1);
-        } else if (panelIdx > 0) {
-          setPanelIdx((prev) => prev - 1);
-          setZoomIdx(0);
-        } else if (pageIdx > 0) {
-          resetPage(pageIdx - 1);
-        }
-      } else if (e.key === "a" || e.key === "A") {
-        handleSetAutoplay(!autoplay);
-      }
-    };
-    window.addEventListener("keydown", handleReadKey);
-    return () => window.removeEventListener("keydown", handleReadKey);
-  }, [mode, currentPanels, panelIdx, activeReadingBubbleIdx, zoomIdx, zoomedOut, pageIdx, pages, showAllDialogues, autoplay, resetPage]);
 
   const activePanel = currentPanels[panelIdx] || { focusY: 0.5, dialogue: [] };
   const activePanelRects = activePanel
@@ -511,7 +594,9 @@ export function CinematicReader({
     0
   );
   const cameraTransitionMs =
-    mode === "read" && !zoomedOut ? Math.max(sceneTransitionMs, 720) : sceneTransitionMs;
+    mode === "read"
+      ? Math.max(sceneTransitionMs, pageLandCameraMs > 0 ? pageLandCameraMs : !zoomedOut ? 720 : 0)
+      : sceneTransitionMs;
 
   useEffect(() => {
     if (mode !== "read") {
@@ -636,7 +721,7 @@ export function CinematicReader({
   });
 
   // Calculate layout dimensions via custom hook
-  const { imgWidth, imgLeft, imgTop, imgHeight } = useReaderLayout({
+  const { imgWidth, imgLeft, imgTop, imgHeight, bubbleLayoutScale } = useReaderLayout({
     imgSize,
     containerSize,
     mode,
@@ -649,17 +734,95 @@ export function CinematicReader({
     focusDialogue: focusEnabled,
     pagesSidebarOpen: isPagesSidebarOpen,
     pagesSidebarWidth: 88,
+    holdSheetLayout,
   });
+
+  const pageSheetLayout = useReaderLayout({
+    imgSize,
+    containerSize,
+    mode,
+    activeZoomRect: null,
+    zoomedOut: false,
+    zoomScale,
+    activePanel,
+    activeReadingBubbleIdx: 0,
+    focusPanel: false,
+    focusDialogue: false,
+    pagesSidebarOpen: isPagesSidebarOpen,
+    pagesSidebarWidth: 88,
+    forcePageFit: true,
+  });
+
+  const pageFlip = usePageFlipGesture({
+    enabled: mode === "read" && zoomScale <= 1.01,
+    canNext: pageIdx < pages.length - 1,
+    canPrev: pageIdx > 0,
+    pageWidth: pageSheetLayout.imgWidth > 0 ? pageSheetLayout.imgWidth : containerSize.w,
+    onCommit: (dir) =>
+      resetPage(dir === "next" ? pageIdx + 1 : pageIdx - 1, { fromPageFlip: true }),
+  });
+
+  useEffect(() => {
+    if (mode !== "read") return;
+    const handleReadKey = (e: KeyboardEvent) => {
+      const tag = (e.target as HTMLElement).tagName;
+      if (tag === "INPUT" || tag === "TEXTAREA") return;
+      if (e.ctrlKey || e.metaKey || e.altKey) return;
+
+      if (e.key === " " || e.key === "ArrowRight") {
+        e.preventDefault();
+        if (Date.now() < previewGuardUntilRef.current) return;
+        const activePanelStop = currentPanels[panelIdx];
+        const rects = activePanelStop?.zoomRects || (activePanelStop?.zoomRect ? [activePanelStop.zoomRect] : []);
+        const dialogueCount = activePanelStop?.dialogue?.length || 0;
+        if (showAllDialogues) {
+          setShowAllDialogues(false);
+        } else if (zoomedOut) {
+          if (pageIdx < pages.length - 1) pageFlip.flipTo("next");
+          else resetPage(0);
+        } else if (currentPanels.length === 0) {
+          setZoomedOut(true);
+        } else if (dialogueCount > 1 && activeReadingBubbleIdx < dialogueCount - 1) {
+          dialogueTimersRef.current.forEach((t) => clearTimeout(t));
+          dialogueTimersRef.current = [];
+          setActiveReadingBubbleIdx((prev) => prev + 1);
+        } else if (zoomIdx < rects.length - 1) {
+          setZoomIdx((prev) => prev + 1);
+        } else if (panelIdx < currentPanels.length - 1) {
+          setPanelIdx((prev) => prev + 1);
+        } else {
+          setZoomedOut(true);
+        }
+      } else if (e.key === "ArrowLeft") {
+        e.preventDefault();
+        if (zoomedOut) {
+          if (pageIdx > 0) pageFlip.flipTo("prev");
+        } else if (panelIdx > 0) {
+          setPanelIdx((prev) => prev - 1);
+          setZoomIdx(0);
+        } else if (pageIdx > 0) {
+          pageFlip.flipTo("prev");
+        }
+      } else if (e.key === "a" || e.key === "A") {
+        handleSetAutoplay(!autoplay);
+      }
+    };
+    window.addEventListener("keydown", handleReadKey);
+    return () => window.removeEventListener("keydown", handleReadKey);
+  }, [mode, currentPanels, panelIdx, activeReadingBubbleIdx, zoomIdx, zoomedOut, pageIdx, pages, showAllDialogues, autoplay, resetPage, pageFlip.flipTo]);
 
   const handleReaderTap = (e: React.MouseEvent) => {
     if (Date.now() < previewGuardUntilRef.current) return;
+    if (pageFlip.direction || pageFlip.shouldSuppressClick()) return;
     if (isPanning || totalDragDistRef.current > 6) return;
 
     if (e && e.target) {
       if (
         (e.target as HTMLElement).closest(".btn") ||
         (e.target as HTMLElement).closest(".tag") ||
-        (e.target as HTMLElement).closest(".zoom-controls")
+        (e.target as HTMLElement).closest(".zoom-controls") ||
+        (e.target as HTMLElement).closest(".page-end-controls") ||
+        (e.target as HTMLElement).closest("[data-dialogue-bubble]")
       ) {
         return;
       }
@@ -791,6 +954,7 @@ export function CinematicReader({
         bubbleOffsets={bubbleOffsets}
         draggedBubbleKey={draggedBubbleKey}
         textScale={textScale}
+        bubbleLayoutScale={bubbleLayoutScale}
         autoplay={autoplay}
         speedMultiplier={speedMultiplier}
         isPageChanging={isPageChanging}
@@ -826,6 +990,7 @@ export function CinematicReader({
     bubbleOffsets,
     draggedBubbleKey,
     textScale,
+    bubbleLayoutScale,
     autoplay,
     speedMultiplier,
     isPageChanging,
@@ -982,6 +1147,13 @@ export function CinematicReader({
           setZoomScale={setZoomScale}
           setPanOffset={setPanOffset}
           nextChapter={nextChapter}
+          pageFlip={mode === "read" ? pageFlip : undefined}
+          viewportSize={containerSize}
+          neighborMasks={neighborMasks}
+          prevPanels={prevPanels}
+          bubbleLayoutScale={bubbleLayoutScale}
+          pageLoading={pageLoading}
+          pageSheetLayout={pageSheetLayout}
         />
 
         <DialogueEditorPanel

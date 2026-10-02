@@ -14,6 +14,10 @@ interface UseReaderLayoutProps {
   focusDialogue?: boolean;
   pagesSidebarOpen?: boolean;
   pagesSidebarWidth?: number;
+  /** Full-page fit (ignores panel/dialogue focus). Used for page-flip sheet geometry. */
+  forcePageFit?: boolean;
+  /** After a page flip, match sheet geometry instead of the smaller zoomed-out margin layout. */
+  holdSheetLayout?: boolean;
 }
 
 export function useReaderLayout({
@@ -29,12 +33,15 @@ export function useReaderLayout({
   focusDialogue = true,
   pagesSidebarOpen = false,
   pagesSidebarWidth = 88,
+  forcePageFit = false,
+  holdSheetLayout = false,
 }: UseReaderLayoutProps) {
   return useMemo(() => {
     let imgWidth = 0;
     let imgLeft = 0;
     let imgTop = 0;
     let imgHeight = 0;
+    let bubbleLayoutScale = 1;
 
     if (imgSize && containerSize.w > 0 && containerSize.h > 0) {
       const isMobile = containerSize.w < 768;
@@ -42,6 +49,13 @@ export function useReaderLayout({
       const sidebarGutter = hasSidebarGutter ? Math.min(pagesSidebarWidth, containerSize.w * 0.28) : 0;
       const usableWidth = Math.max(160, containerSize.w - sidebarGutter);
       const viewportCenterX = sidebarGutter + usableWidth / 2;
+      const sidebarScale = hasSidebarGutter ? 0.92 : 0.95;
+      const pageFitScale = Math.min(
+        (usableWidth * sidebarScale) / imgSize.w,
+        (containerSize.h * 0.95) / imgSize.h
+      );
+      const pageFitWidth = imgSize.w * pageFitScale;
+      bubbleLayoutScale = Math.min(1, Math.max(0.58, pageFitWidth / 780));
 
       if (mode === "edit") {
         const scale = Math.min((containerSize.w * 0.9) / imgSize.w, (containerSize.h * 0.85) / imgSize.h);
@@ -51,9 +65,13 @@ export function useReaderLayout({
         imgHeight = imgSize.h * scale;
       } else {
         // Mode: "read"
+        if (forcePageFit) {
+          imgWidth = imgSize.w * pageFitScale;
+          imgHeight = imgSize.h * pageFitScale;
+          imgLeft = sidebarGutter + (usableWidth - imgWidth) / 2;
+          imgTop = (containerSize.h - imgHeight) / 2;
+        } else {
         const activeBubble = activePanel?.dialogue?.[activeReadingBubbleIdx];
-        const sidebarScale = hasSidebarGutter ? 0.92 : 0.95;
-        const pageFitScale = Math.min((usableWidth * sidebarScale) / imgSize.w, (containerSize.h * 0.95) / imgSize.h);
         const finalPageFitScale = Math.min(
           (usableWidth * (isMobile ? 0.84 : 0.82)) / imgSize.w,
           (containerSize.h * (isMobile ? 0.78 : 0.72)) / imgSize.h
@@ -129,16 +147,18 @@ export function useReaderLayout({
         } else {
           // At the end of a page, leave visual breathing room for navigation
           // controls instead of letting them cover the artwork.
-          const fitScale = zoomedOut ? finalPageFitScale : pageFitScale;
+          const fitScale =
+            zoomedOut && !holdSheetLayout ? finalPageFitScale : pageFitScale;
           imgWidth = imgSize.w * fitScale;
           imgHeight = imgSize.h * fitScale;
           imgLeft = sidebarGutter + (usableWidth - imgWidth) / 2;
           imgTop = (containerSize.h - imgHeight) / 2;
         }
+        }
       }
     }
 
-    return { imgWidth, imgLeft, imgTop, imgHeight };
+    return { imgWidth, imgLeft, imgTop, imgHeight, bubbleLayoutScale };
   }, [
     imgSize,
     containerSize.w,
@@ -153,5 +173,7 @@ export function useReaderLayout({
     focusDialogue,
     pagesSidebarOpen,
     pagesSidebarWidth,
+    forcePageFit,
+    holdSheetLayout,
   ]);
 }

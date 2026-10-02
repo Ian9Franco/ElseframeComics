@@ -1,4 +1,6 @@
 import type { DialogueLine } from "./DialogueBubble";
+import type { PanelStop, SceneFadeType } from "./audioPlayer";
+import { comicTextContainment } from "./bubbles/bubbleHelpers";
 
 /**
  * Compute the path on the edge of the bubble (estimated as an ellipse/rect)
@@ -38,14 +40,130 @@ export function buildTailPath(
 /**
  * Estimate bubble half-dimensions from width/fontSize settings (approximate)
  */
-export function estimateBubbleSize(line: DialogueLine): { halfW: number; halfH: number } {
-  const w = line.width ?? 200;
-  // Height is roughly proportional to text length and font size
-  const fontSize = line.fontSize ?? 14;
-  const charPerLine = Math.max(1, w / (fontSize * 0.55));
-  const lines = Math.ceil((line.text?.length ?? 20) / charPerLine) + (line.speaker ? 1 : 0);
-  const h = lines * (fontSize * 1.5) + 16; // +padding
+export function estimateBubbleSize(
+  line: DialogueLine,
+  opts?: { mobile?: boolean }
+): { halfW: number; halfH: number } {
+  const size = line.size ?? "medium";
+  const style = line.style ?? "normal";
+  let baseFontSize = line.fontSize;
+  if (!baseFontSize) {
+    baseFontSize = size === "small" ? 12 : size === "large" ? 18 : 14;
+  }
+  const mobile =
+    opts?.mobile ?? (typeof window !== "undefined" && window.innerWidth < 768);
+  const isSpeech = style === "normal" || style === "whisper";
+  const pad = comicTextContainment(baseFontSize, 0, {
+    mobile,
+    speechBalloon: isSpeech,
+  });
+  const padX = parseFloat(pad.paddingLeft) || 10;
+  const padY = parseFloat(pad.paddingTop) || 8;
+
+  const textLen = line.text?.length ?? 8;
+  const w =
+    line.width ??
+    Math.min(300, Math.max(96, textLen * baseFontSize * 0.42 + padX * 2));
+  const charPerLine = Math.max(1, (w - padX * 2) / (baseFontSize * 0.52));
+  const lineCount =
+    Math.ceil(textLen / charPerLine) +
+    (line.speaker || line.showSpeakerName ? 1 : 0);
+  const h = lineCount * baseFontSize * pad.lineHeight + padY * 2 + baseFontSize * 0.2;
   return { halfW: w / 2, halfH: h / 2 };
+}
+
+export type FusionBubbleRef = {
+  key: string;
+  index: number;
+  x: number;
+  y: number;
+  line: DialogueLine;
+  active: boolean;
+};
+
+function isSpeechFusionStyle(line: DialogueLine): boolean {
+  const style = line.style ?? "normal";
+  return style === "normal" || style === "whisper";
+}
+
+class UnionFind {
+  parent: number[];
+  constructor(n: number) {
+    this.parent = Array.from({ length: n }, (_, i) => i);
+  }
+  find(i: number): number {
+    if (this.parent[i] !== i) this.parent[i] = this.find(this.parent[i]);
+    return this.parent[i];
+  }
+  union(a: number, b: number) {
+    const ra = this.find(a);
+    const rb = this.find(b);
+    if (ra !== rb) this.parent[rb] = ra;
+  }
+}
+
+/** Union-find groups from linkedTo + optional vertical auto-stack (speech bubbles only). */
+export function buildSpeechFusionGroups(bubbles: FusionBubbleRef[]): {
+  groups: FusionBubbleRef[][];
+  fusedKeys: Set<string>;
+} {
+  const n = bubbles.length;
+  const uf = new UnionFind(n);
+  const hasExplicitLink = bubbles.map((b) => b.line.linkedTo !== undefined);
+
+  for (let i = 0; i < n; i++) {
+    const link = bubbles[i].line.linkedTo;
+    if (link !== undefined && link >= 0 && link < n && i !== link) {
+      if (isSpeechFusionStyle(bubbles[i].line) && isSpeechFusionStyle(bubbles[link].line)) {
+        uf.union(i, link);
+      }
+    }
+  }
+
+  for (let i = 0; i < n; i++) {
+    for (let j = i + 1; j < n; j++) {
+      if (hasExplicitLink[i] || hasExplicitLink[j]) continue;
+      const a = bubbles[i];
+      const b = bubbles[j];
+      if (!isSpeechFusionStyle(a.line) || !isSpeechFusionStyle(b.line)) continue;
+      const sa = estimateBubbleSize(a.line);
+      const sb = estimateBubbleSize(b.line);
+      const dx = b.x - a.x;
+      const dy = b.y - a.y;
+      const len = Math.hypot(dx, dy);
+      if (len < 16) continue;
+      const radiusAlong = (halfW: number, halfH: number) => {
+        const c = dx / len;
+        const s = dy / len;
+        return (halfW * halfH) / (Math.hypot(halfH * c, halfW * s) || 1);
+      };
+      const surfaceGap = len - radiusAlong(sa.halfW, sa.halfH) - radiusAlong(sb.halfW, sb.halfH);
+      if (surfaceGap > 18) continue;
+      const gapX = Math.abs(dx) - sa.halfW - sb.halfW;
+      const gapY = Math.abs(dy) - sa.halfH - sb.halfH;
+      const stacked = gapY < 22 && -gapX > Math.min(sa.halfW, sb.halfW) * 0.55;
+      const sideBySide = gapX < 22 && -gapY > Math.min(sa.halfH, sb.halfH) * 0.4;
+      if (stacked || sideBySide) uf.union(i, j);
+    }
+  }
+
+  const buckets = new Map<number, FusionBubbleRef[]>();
+  for (let i = 0; i < n; i++) {
+    const root = uf.find(i);
+    const list = buckets.get(root) ?? [];
+    list.push(bubbles[i]);
+    buckets.set(root, list);
+  }
+
+  const groups: FusionBubbleRef[][] = [];
+  const fusedKeys = new Set<string>();
+  for (const list of buckets.values()) {
+    if (list.length > 1) {
+      groups.push(list);
+      for (const b of list) fusedKeys.add(b.key);
+    }
+  }
+  return { groups, fusedKeys };
 }
 
 /**
@@ -182,6 +300,72 @@ export function getPageKeyFromUrl(url: string | undefined): string {
   }
   const extensionIndex = filename.lastIndexOf(".");
   return extensionIndex > 0 ? filename.slice(0, extensionIndex) : filename;
+}
+
+/** Panels that matter in read mode (same filter the reader uses for its stops). */
+export function getReadPanels(panels: PanelStop[] | undefined): PanelStop[] {
+  return (panels || []).filter(
+    (p) =>
+      (p.dialogue && p.dialogue.length > 0) ||
+      p.zoomRect ||
+      (p.zoomRects && p.zoomRects.length > 0) ||
+      p.sound ||
+      (p.sounds && p.sounds.length > 0)
+  );
+}
+
+export type SpoilerMask = {
+  key: string;
+  x: number;
+  y: number;
+  w: number;
+  h: number;
+  fadeOut?: number;
+  fadeOutType?: SceneFadeType;
+};
+
+/** Spoiler masks (in % of the page) still hidden for the given reading position. */
+export function computeSpoilerMasks(
+  panels: PanelStop[],
+  revealPanel: number,
+  revealZoom: number
+): SpoilerMask[] {
+  const raw: SpoilerMask[] = [];
+  panels.forEach((panel, pIdx) => {
+    const rects = panel.zoomRects || (panel.zoomRect ? [panel.zoomRect] : []);
+    rects.forEach((zoom: any, rIdx: number) => {
+      let shouldMask = false;
+      if (pIdx > revealPanel) {
+        shouldMask = panel.hideUntilReached !== false;
+      } else if (pIdx === revealPanel) {
+        shouldMask = rIdx > revealZoom && panel.hideUntilReached !== false;
+      }
+      if (shouldMask) {
+        raw.push({
+          key: `spoiler-mask-${pIdx}-${rIdx}`,
+          x: zoom.x ?? 0,
+          y: zoom.y ?? 0,
+          w: zoom.w ?? 100,
+          h: zoom.h ?? 25,
+          fadeOut: zoom.fadeOut,
+          fadeOutType: zoom.fadeOutType,
+        });
+      }
+    });
+  });
+
+  const sorted = raw.sort((a, b) => a.y - b.y);
+  return sorted.map((mask, idx) => {
+    let h = mask.h;
+    const next = sorted[idx + 1];
+    if (next) {
+      const bottom = mask.y + h;
+      if (next.y > bottom && next.y - bottom <= 15) h = next.y - mask.y + 0.5;
+    } else if (mask.y + h >= 75) {
+      h = Math.max(h, 100 - mask.y);
+    }
+    return { ...mask, h };
+  });
 }
 
 /**

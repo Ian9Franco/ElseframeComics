@@ -478,6 +478,326 @@ export function buildComicBalloonPath(
   return smoothClosed(pts);
 }
 
+export type SpeechFusionNode = {
+  cx: number;
+  cy: number;
+  rx: number;
+  ry: number;
+  seed?: number;
+  /** Tail-like neck width in px. Clamped to 10–16. */
+  neckPx?: number;
+};
+
+type FusionPt = { x: number; y: number };
+
+function fusionEllipsePoint(
+  node: SpeechFusionNode,
+  angle: number,
+  kind: "smooth" | "scallop",
+  sampleIndex: number
+): FusionPt {
+  const seed = node.seed ?? 0;
+  const wobble = kind === "smooth" ? (balloonUnit(seed + sampleIndex * 97) - 0.5) * 0.07 : 0;
+  const scallop = kind === "scallop" ? Math.sin(angle * 7) * 0.09 : 0;
+  const scale = 1 + wobble + scallop;
+  const power = kind === "scallop" ? 2.15 : 3.1;
+  const c = Math.cos(angle);
+  const s = Math.sin(angle);
+  const a = node.rx * scale;
+  const b = node.ry * scale;
+  return {
+    x: node.cx + Math.sign(c || 1) * a * Math.pow(Math.abs(c), 2 / power),
+    y: node.cy + Math.sign(s || 1) * b * Math.pow(Math.abs(s), 2 / power),
+  };
+}
+
+function normalizeAngle(a: number): number {
+  let x = a % (Math.PI * 2);
+  if (x < 0) x += Math.PI * 2;
+  return x;
+}
+
+function forwardSpan(start: number, end: number): number {
+  let span = normalizeAngle(end) - normalizeAngle(start);
+  if (span <= 0.0001) span += Math.PI * 2;
+  return span;
+}
+
+function sampleIncreasing(
+  node: SpeechFusionNode,
+  start: number,
+  end: number,
+  steps: number,
+  kind: "smooth" | "scallop",
+  skipFirst: boolean
+): FusionPt[] {
+  const a0 = normalizeAngle(start);
+  const span = forwardSpan(start, end);
+  const pts: FusionPt[] = [];
+  const n = Math.max(3, steps);
+  for (let s = skipFirst ? 1 : 0; s <= n; s++) {
+    pts.push(fusionEllipsePoint(node, a0 + span * (s / n), kind, s));
+  }
+  return pts;
+}
+
+/** Longer way around the ellipse (the body, not the neck gap). */
+function sampleLongArc(
+  node: SpeechFusionNode,
+  from: number,
+  to: number,
+  kind: "smooth" | "scallop",
+  skipFirst: boolean
+): FusionPt[] {
+  const span = forwardSpan(from, to);
+  if (span >= Math.PI) return sampleIncreasing(node, from, to, 14, kind, skipFirst);
+  const rev = sampleIncreasing(node, to, from, 14, kind, false).reverse();
+  return skipFirst ? rev.slice(1) : rev;
+}
+
+/** Flank between two ports, preferring the side that faces `sideDir`. */
+function sampleSideArc(
+  node: SpeechFusionNode,
+  from: number,
+  to: number,
+  sideDir: FusionPt,
+  kind: "smooth" | "scallop"
+): FusionPt[] {
+  const forward = sampleIncreasing(node, from, to, 8, kind, true);
+  const backward = sampleIncreasing(node, to, from, 8, kind, false).reverse().slice(1);
+  const score = (pts: FusionPt[]) => {
+    const mid = pts[Math.floor(pts.length / 2)];
+    if (!mid) return -Infinity;
+    return (mid.x - node.cx) * sideDir.x + (mid.y - node.cy) * sideDir.y;
+  };
+  const chosen = score(forward) >= score(backward) ? forward : backward;
+  const span = forwardSpan(from, to);
+  const other = Math.PI * 2 - span;
+  const chosenSpan = chosen === forward ? span : other;
+  if (chosenSpan > Math.PI + 0.2) {
+    return score(forward) >= score(backward) ? backward : forward;
+  }
+  return chosen;
+}
+
+function neckWidthPx(a: SpeechFusionNode, b: SpeechFusionNode): number {
+  const raw = Math.min(a.neckPx ?? 14, b.neckPx ?? 14);
+  return Math.min(16, Math.max(10, raw));
+}
+
+function halfGap(node: SpeechFusionNode, dir: number, neckPx: number): number {
+  const c = Math.cos(dir);
+  const s = Math.sin(dir);
+  const r = (node.rx * node.ry) / (Math.hypot(node.ry * c, node.rx * s) || Math.min(node.rx, node.ry));
+  const fromWidth = Math.asin(Math.min(0.8, neckPx / 2 / Math.max(8, r)));
+  const minGap = (6 * Math.PI) / 180;
+  const maxGap = (16 * Math.PI) / 180;
+  return Math.min(maxGap, Math.max(minGap, fromWidth));
+}
+
+function quadPoint(from: FusionPt, ctrl: FusionPt, to: FusionPt, t: number): FusionPt {
+  const u = 1 - t;
+  return {
+    x: u * u * from.x + 2 * u * t * ctrl.x + t * t * to.x,
+    y: u * u * from.y + 2 * u * t * ctrl.y + t * t * to.y,
+  };
+}
+
+function nearFusionNodes(p: FusionPt, nodes: SpeechFusionNode[], neckPx: number): boolean {
+  for (const n of nodes) {
+    const nx = (p.x - n.cx) / (n.rx + 20);
+    const ny = (p.y - n.cy) / (n.ry + 20);
+    if (nx * nx + ny * ny <= 1) return true;
+  }
+  const sorted = [...nodes].sort((a, b) => a.cy - b.cy || a.cx - b.cx);
+  const limit = neckPx + 10;
+  for (let i = 0; i < sorted.length - 1; i++) {
+    const a = sorted[i];
+    const b = sorted[i + 1];
+    const abx = b.cx - a.cx;
+    const aby = b.cy - a.cy;
+    const ab2 = abx * abx + aby * aby || 1;
+    let t = ((p.x - a.cx) * abx + (p.y - a.cy) * aby) / ab2;
+    t = Math.max(0, Math.min(1, t));
+    const qx = a.cx + abx * t;
+    const qy = a.cy + aby * t;
+    if (Math.hypot(p.x - qx, p.y - qy) <= limit) return true;
+  }
+  return false;
+}
+
+type FusionSeg =
+  | { type: "arc"; pts: FusionPt[] }
+  | { type: "neck"; from: FusionPt; ctrl: FusionPt; to: FusionPt };
+
+function appendArc(d: string, pts: FusionPt[], move: boolean): string {
+  const clean = pts.filter((p) => p && Number.isFinite(p.x) && Number.isFinite(p.y));
+  if (clean.length === 0) return d;
+  let out = d;
+  const start = move ? 1 : 0;
+  if (move) {
+    out += `M ${clean[0].x.toFixed(2)} ${clean[0].y.toFixed(2)}`;
+  }
+  for (let i = start; i < clean.length; i++) {
+    const p0 = clean[Math.max(0, i - 2)] ?? clean[0];
+    const p1 = clean[i - 1] ?? clean[0];
+    const p2 = clean[i];
+    const p3 = clean[Math.min(clean.length - 1, i + 1)] ?? p2;
+    if (!p0 || !p1 || !p2 || !p3) continue;
+    const c1x = p1.x + (p2.x - p0.x) / 6;
+    const c1y = p1.y + (p2.y - p0.y) / 6;
+    const c2x = p2.x - (p3.x - p1.x) / 6;
+    const c2y = p2.y - (p3.y - p1.y) / 6;
+    out += ` C ${c1x.toFixed(2)} ${c1y.toFixed(2)} ${c2x.toFixed(2)} ${c2y.toFixed(2)} ${p2.x.toFixed(2)} ${p2.y.toFixed(2)}`;
+  }
+  return out;
+}
+
+/**
+ * Closed outline: ellipses joined by a tail-width neck (~10–16px).
+ * Returns null when the outline leaves the bubbles (degenerate arc).
+ */
+export function buildSpeechFusionPath(
+  nodes: SpeechFusionNode[],
+  opts?: { kind?: "smooth" | "scallop" }
+): string | null {
+  if (nodes.length < 2) return null;
+  const kind = opts?.kind ?? "smooth";
+  const sorted = [...nodes].sort((a, b) => a.cy - b.cy || a.cx - b.cx);
+
+  type Link = {
+    nw: number;
+    dir: number;
+    perp: FusionPt;
+    aPlus: FusionPt;
+    aMinus: FusionPt;
+    bPlus: FusionPt;
+    bMinus: FusionPt;
+    aPlusAng: number;
+    aMinusAng: number;
+    bPlusAng: number;
+    bMinusAng: number;
+    mid: FusionPt;
+  };
+
+  const links: Link[] = [];
+  for (let i = 0; i < sorted.length - 1; i++) {
+    const a = sorted[i];
+    const b = sorted[i + 1];
+    const dir = Math.atan2(b.cy - a.cy, b.cx - a.cx);
+    const back = dir + Math.PI;
+    const nw = neckWidthPx(a, b);
+    const ha = halfGap(a, dir, nw);
+    const hb = halfGap(b, back, nw);
+    const perp = { x: -Math.sin(dir), y: Math.cos(dir) };
+    let aPlusAng = dir + ha;
+    let aMinusAng = dir - ha;
+    let bPlusAng = back - hb;
+    let bMinusAng = back + hb;
+    let aPlus = fusionEllipsePoint(a, aPlusAng, kind, i);
+    let aMinus = fusionEllipsePoint(a, aMinusAng, kind, i + 3);
+    let bPlus = fusionEllipsePoint(b, bPlusAng, kind, i + 5);
+    let bMinus = fusionEllipsePoint(b, bMinusAng, kind, i + 7);
+    const side = (pt: FusionPt) => (pt.x - a.cx) * perp.x + (pt.y - a.cy) * perp.y;
+    if (side(aPlus) < side(aMinus)) {
+      [aPlus, aMinus] = [aMinus, aPlus];
+      [aPlusAng, aMinusAng] = [aMinusAng, aPlusAng];
+    }
+    if (side(bPlus) < side(bMinus)) {
+      [bPlus, bMinus] = [bMinus, bPlus];
+      [bPlusAng, bMinusAng] = [bMinusAng, bPlusAng];
+    }
+    links.push({
+      nw,
+      dir,
+      perp,
+      aPlus,
+      aMinus,
+      bPlus,
+      bMinus,
+      aPlusAng,
+      aMinusAng,
+      bPlusAng,
+      bMinusAng,
+      mid: { x: (a.cx + b.cx) / 2, y: (a.cy + b.cy) / 2 },
+    });
+  }
+
+  const neckCtrl = (from: FusionPt, to: FusionPt, mid: FusionPt): FusionPt => {
+    const c = { x: (from.x + to.x) / 2, y: (from.y + to.y) / 2 };
+    return {
+      x: c.x + (mid.x - c.x) * 0.18,
+      y: c.y + (mid.y - c.y) * 0.18,
+    };
+  };
+
+  const segs: FusionSeg[] = [];
+  const first = links[0];
+  segs.push({
+    type: "arc",
+    pts: sampleLongArc(sorted[0], first.aMinusAng, first.aPlusAng, kind, false),
+  });
+
+  for (let i = 0; i < links.length; i++) {
+    const L = links[i];
+    segs.push({
+      type: "neck",
+      from: L.aPlus,
+      ctrl: neckCtrl(L.aPlus, L.bPlus, L.mid),
+      to: L.bPlus,
+    });
+    if (i < links.length - 1) {
+      segs.push({
+        type: "arc",
+        pts: sampleSideArc(sorted[i + 1], L.bPlusAng, links[i + 1].aPlusAng, L.perp, kind),
+      });
+    } else {
+      segs.push({
+        type: "arc",
+        pts: sampleLongArc(sorted[i + 1], L.bPlusAng, L.bMinusAng, kind, true),
+      });
+    }
+  }
+
+  for (let i = links.length - 1; i >= 0; i--) {
+    const L = links[i];
+    segs.push({
+      type: "neck",
+      from: L.bMinus,
+      ctrl: neckCtrl(L.bMinus, L.aMinus, L.mid),
+      to: L.aMinus,
+    });
+    if (i > 0) {
+      segs.push({
+        type: "arc",
+        pts: sampleSideArc(sorted[i], L.aMinusAng, links[i - 1].bMinusAng, {
+          x: -L.perp.x,
+          y: -L.perp.y,
+        }, kind),
+      });
+    }
+  }
+
+  const samples: FusionPt[] = [];
+  let d = "";
+  let moved = false;
+  const neckLimit = Math.max(...links.map((l) => l.nw));
+  for (const seg of segs) {
+    if (seg.type === "arc") {
+      if (seg.pts.length === 0) return null;
+      d = appendArc(d, seg.pts, !moved);
+      moved = true;
+      samples.push(...seg.pts);
+    } else {
+      d += ` Q ${seg.ctrl.x.toFixed(2)} ${seg.ctrl.y.toFixed(2)} ${seg.to.x.toFixed(2)} ${seg.to.y.toFixed(2)}`;
+      for (let t = 0.25; t <= 1; t += 0.25) samples.push(quadPoint(seg.from, seg.ctrl, seg.to, t));
+    }
+  }
+  if (!moved || samples.length < 8) return null;
+  if (samples.some((p) => !nearFusionNodes(p, sorted, neckLimit))) return null;
+  return `${d} Z`;
+}
+
 export function comicBalloonSeed(index: number, text: string): number {
   let h = Math.imul(index + 1, 374761393) ^ 668265263;
   const sample = text || "";

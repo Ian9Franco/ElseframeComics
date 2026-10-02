@@ -33,9 +33,13 @@ interface StandardBubbleProps {
   fadeOutAnimation?: "fade" | "slide" | "zoom";
   depth?: number;
   textScale?: number;
+  bubbleLayoutScale?: number;
   speedMultiplier?: number;
   bubbleOpacity?: number;
   staggerDelay?: boolean;
+  inlineTextEdit?: InlineTextEditProps;
+  suppressBalloonOutline?: boolean;
+  onBodyMeasure?: (size: { w: number; h: number }) => void;
 }
 
 // ─── Triangle Tail Helpers ─────────────────────────────────────────────────────
@@ -179,10 +183,13 @@ export function StandardBubble({
   fadeOutAnimation,
   depth,
   textScale = 1.0,
+  bubbleLayoutScale = 1,
   speedMultiplier = 1.0,
   bubbleOpacity,
   staggerDelay = true,
   inlineTextEdit,
+  suppressBalloonOutline = false,
+  onBodyMeasure,
 }: StandardBubbleProps & { inlineTextEdit?: InlineTextEditProps }) {
   const style   = line.style ?? "normal";
   const tailDir = line.tail  ?? "bottom-left";
@@ -299,7 +306,8 @@ export function StandardBubble({
 
 
   const wrapperStyles: React.CSSProperties = { pointerEvents: "none" };
-  if (line.width) wrapperStyles.maxWidth = `${line.width}px`;
+  const layoutWidth = line.width ? line.width * bubbleLayoutScale : undefined;
+  if (layoutWidth) wrapperStyles.maxWidth = `${layoutWidth}px`;
 
   const bubbleStyles: React.CSSProperties = {
     backgroundColor: organicBalloon ? "transparent" : bgColor,
@@ -319,18 +327,23 @@ export function StandardBubble({
       ? (size === "small" ? 18 : size === "large" ? 48 : 32)
       : (size === "small" ? 12 : size === "large" ? 18 : 14);
   }
-  const minFont = style === "sfx" ? 10 : (isMobile ? 8 : 10);
-  const finalFontSize = Math.max(minFont, baseFontSize * textScale);
+  const minFont = style === "sfx" ? 10 : isMobile ? 6 : 10;
+  const fontLayoutScale = Math.max(bubbleLayoutScale, 0.88);
+  const finalFontSize = Math.max(minFont, baseFontSize * textScale * fontLayoutScale);
   useLayoutEffect(() => {
     if (!organicBalloon) return;
     const el = bodyRef.current;
     if (!el) return;
-    const measure = () => setBalloonBox({ w: el.offsetWidth, h: el.offsetHeight });
+    const measure = () => {
+      const next = { w: el.offsetWidth, h: el.offsetHeight };
+      setBalloonBox(next);
+      if (next.w > 0 && next.h > 0) onBodyMeasure?.(next);
+    };
     measure();
     const ro = new ResizeObserver(measure);
     ro.observe(el);
     return () => ro.disconnect();
-  }, [organicBalloon, line.text, line.width, finalFontSize, textScale, isMobile]);
+  }, [organicBalloon, line.text, line.width, finalFontSize, textScale, isMobile, onBodyMeasure]);
 
   const balloonBleed = isMobile ? 10 : 16;
   const balloonW = balloonBox.w + balloonBleed * 2;
@@ -356,7 +369,7 @@ export function StandardBubble({
     );
   }
   bubbleStyles.fontSize = `${finalFontSize}px`;
-  if (line.width)     bubbleStyles.maxWidth  = `${line.width}px`;
+  if (layoutWidth)    bubbleStyles.maxWidth  = `${layoutWidth}px`;
   if (line.textColor) bubbleStyles.color     = line.textColor;
   if (customFontFamily) bubbleStyles.fontFamily = customFontFamily;
 
@@ -424,7 +437,7 @@ export function StandardBubble({
       {/* SVG Elastic Tail */}
       {hasElasticTail && elasticTailNode}
 
-      {organicBalloon && balloonPath && (
+      {organicBalloon && balloonPath && !suppressBalloonOutline && (
         <svg
           className="absolute pointer-events-none"
           viewBox={`0 0 ${balloonW} ${balloonH}`}
