@@ -1,13 +1,18 @@
 /**
  * app/api/editor/pages/route.ts
  *
- * API para renombrar archivos de imagen dentro de la carpeta de un capítulo.
- * PATCH → { chapterId, oldName, newName }  → renombra el archivo manteniendo extensión.
+ * Páginas de un capítulo. En producción (GitHub) delega en lib/editorPages; en dev usa el disco.
+ * POST { action: "upload", chapterId, fileName, data(base64) } → agrega la página al final.
+ * POST { action: "apply", chapterId, orderedKeys, deletedKeys } → renumera 1..N y remapea diálogos.
+ * PATCH { chapterId, oldName, newName } → renombra un archivo (solo dev).
  */
 
 import { NextRequest, NextResponse } from "next/server";
 import { getDynamicSagas, parsePrefix, getAssetsComicsDir } from "@/lib/serverData";
 import { validateEditorApiAccess } from "@/lib/editorAccess";
+import { useGithubEditorStorage } from "@/lib/editorStorage";
+import { applyChapterPageLayout, uploadChapterPage } from "@/lib/editorPages";
+import { formatGithubApiAuthError } from "@/lib/githubEditor";
 import fs from "fs";
 import path from "path";
 
@@ -52,6 +57,12 @@ export async function PATCH(request: NextRequest) {
 
   if (!chapterId || !oldName || !newName) {
     return NextResponse.json({ error: "Faltan parámetros" }, { status: 400 });
+  }
+  if (useGithubEditorStorage()) {
+    return NextResponse.json(
+      { error: "En producción usá el gestor de Páginas (Editor 2.0) para renombrar y ordenar." },
+      { status: 400 }
+    );
   }
 
   const found = findChapterDir(chapterId);
@@ -136,49 +147,58 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  const contentType = request.headers.get("content-type") || "";
-  if (contentType.includes("multipart/form-data")) {
-    const form = await request.formData();
-    const chapterId = String(form.get("chapterId") || "");
-    if (!chapterId) return NextResponse.json({ error: "Falta chapterId" }, { status: 400 });
+  const body = await request.json().catch(() => ({}));
+  const chapterId = String(body.chapterId || "");
+  if (!chapterId) return NextResponse.json({ error: "Falta chapterId" }, { status: 400 });
+
+  if (body.action === "upload") {
+    const fileName = String(body.fileName || "");
+    const data = String(body.data || "");
+    if (!fileName || !data) return NextResponse.json({ error: "Falta la imagen" }, { status: 400 });
+
+    if (useGithubEditorStorage()) {
+      try {
+        const uploaded = await uploadChapterPage({ chapterId, fileName, base64: data });
+        return NextResponse.json({ success: true, ...uploaded });
+      } catch (err: any) {
+        return NextResponse.json({ error: formatGithubApiAuthError(err.message) }, { status: 500 });
+      }
+    }
+
     const found = findChapterDir(chapterId);
     if (!found) return NextResponse.json({ error: "Capítulo no encontrado" }, { status: 404 });
-
-    const comicsDir = path.join(process.cwd(), "public", "comics");
-    const chapterPath = path.join(comicsDir, found.sagaDir, found.chapterDir);
+    const ext = path.extname(fileName).toLowerCase();
+    if (!IMAGE_EXT.includes(ext)) return NextResponse.json({ error: "Formato no soportado" }, { status: 400 });
+    const chapterPath = path.join(process.cwd(), "public", "comics", found.sagaDir, found.chapterDir);
     const adjacentChapterPath = path.join(ASSETS_COMICS_DIR, found.sagaDir, found.chapterDir);
-    const existing = listPageFiles(chapterPath);
-    let nextIndex = existing.length + 1;
-    const written: string[] = [];
-    const files = form.getAll("files").filter((f): f is File => f instanceof File);
-    files.sort((a, b) => a.lastModified - b.lastModified);
-
-    for (const file of files) {
-      const ext = path.extname(file.name).toLowerCase() || ".webp";
-      if (!IMAGE_EXT.includes(ext)) continue;
-      const destName = `${nextIndex}${ext}`;
-      const buf = Buffer.from(await file.arrayBuffer());
-      fs.writeFileSync(path.join(chapterPath, destName), buf);
-      if (fs.existsSync(adjacentChapterPath)) {
-        fs.mkdirSync(adjacentChapterPath, { recursive: true });
-        fs.writeFileSync(path.join(adjacentChapterPath, destName), buf);
-      }
-      written.push(destName);
-      nextIndex += 1;
-    }
-    return NextResponse.json({ success: true, files: written });
+    const maxNumber = listPageFiles(chapterPath).reduce((max, f) => {
+      const n = Number.parseInt(path.basename(f, path.extname(f)), 10);
+      return Number.isFinite(n) && n > max ? n : max;
+    }, 0);
+    const destName = `${maxNumber + 1}${ext}`;
+    const buf = Buffer.from(data, "base64");
+    fs.writeFileSync(path.join(chapterPath, destName), buf);
+    if (fs.existsSync(adjacentChapterPath)) fs.writeFileSync(path.join(adjacentChapterPath, destName), buf);
+    return NextResponse.json({ success: true, key: String(maxNumber + 1), fileName: destName });
   }
 
-  const body = await request.json();
   if (body.action !== "apply") {
     return NextResponse.json({ error: "Acción no soportada" }, { status: 400 });
   }
 
-  const chapterId = String(body.chapterId || "");
   const orderedKeys: string[] = Array.isArray(body.orderedKeys) ? body.orderedKeys.map(String) : [];
   const deletedKeys: string[] = Array.isArray(body.deletedKeys) ? body.deletedKeys.map(String) : [];
-  if (!chapterId || orderedKeys.length === 0 && deletedKeys.length === 0) {
+  if (orderedKeys.length === 0 && deletedKeys.length === 0) {
     return NextResponse.json({ error: "Faltan orderedKeys" }, { status: 400 });
+  }
+
+  if (useGithubEditorStorage()) {
+    try {
+      const result = await applyChapterPageLayout({ chapterId, orderedKeys, deletedKeys });
+      return NextResponse.json({ success: true, ...result });
+    } catch (err: any) {
+      return NextResponse.json({ error: formatGithubApiAuthError(err.message) }, { status: 500 });
+    }
   }
 
   const found = findChapterDir(chapterId);

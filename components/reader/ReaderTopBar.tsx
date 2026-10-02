@@ -16,6 +16,7 @@ import {
   Wrench,
 } from "lucide-react";
 import { PublishModal } from "./PublishModal";
+import { PublishStatusToast } from "./PublishStatusToast";
 import type { EditorVersion } from "@/lib/editorVersion";
 
 const fontLabels: Record<number, string> = {
@@ -481,6 +482,7 @@ export function ReaderTopBar({
       </div>
 
       <PublishModal isOpen={showPublish} onClose={() => setShowPublish(false)} />
+      <PublishStatusToast />
     </>
   );
 }

@@ -53,7 +53,8 @@ export async function GET(
 
   if (useGithubEditorStorage()) {
     const loaded = await loadEditorTextFile(
-      contextRepoPath(chapterLocation.sagaFolder, chapterLocation.chapterFolder)
+      contextRepoPath(chapterLocation.sagaFolder, chapterLocation.chapterFolder),
+      id
     );
     if (!loaded.content.trim()) {
       return NextResponse.json({ context: createEmptyDialogueContext(), sha: loaded.sha });

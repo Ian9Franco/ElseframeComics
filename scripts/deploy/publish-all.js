@@ -2,7 +2,7 @@ const { execSync, spawnSync } = require("child_process");
 const path = require("path");
 const fs = require("fs");
 
-const projectRoot = path.join(__dirname, "..", "..");
+const projectRoot = process.env.PUBLISH_PROJECT_ROOT || path.join(__dirname, "..", "..");
 
 function getSiblingRoot(root) {
   const possibleNames = ["the-boyz-comic", "theboyz-comic-v1", "theboyz-comic"];
@@ -27,29 +27,60 @@ function getSiblingRoot(root) {
   return path.join(root, "..", "the-boyz-comic");
 }
 
-const siblingRoot = getSiblingRoot(projectRoot);
+const siblingRoot = process.env.PUBLISH_ASSETS_ROOT || getSiblingRoot(projectRoot);
+const skipAssetsPush = process.env.PUBLISH_SKIP_ASSETS_PUSH === "1";
 
 const commitMsg = process.argv[2] || "chore: sync y actualizaciones de diálogos/cómics";
 
 console.log("🚀 Iniciando flujo de publicación unificado...\n");
 console.log(`Mensaje de commit: "\x1b[32m${commitMsg}\x1b[0m"\n`);
 
+// ── 0. Integrar main antes de tocar archivos (el merge necesita working tree limpio) ──
+if (process.env.PUBLISH_TARGET_BRANCH) {
+  try {
+    console.log("--- 🔀 Integrando rama destino antes de sincronizar ---");
+    mergeTargetBranchBeforePublish(projectRoot, process.env.PUBLISH_TARGET_BRANCH);
+    if (!skipAssetsPush) {
+      mergeTargetBranchBeforePublish(siblingRoot, process.env.PUBLISH_TARGET_BRANCH);
+    }
+    console.log();
+  } catch (error) {
+    reportError(error.message);
+    process.exit(1);
+  }
+}
+
 // ── 1. Optimizar y sincronizar assets (Imágenes y Audios) ──────────────────
+const skipOptimize = process.env.PUBLISH_SKIP_OPTIMIZE === "1";
 console.log("--- 🎨 Preparando Assets ---");
-try {
-  console.log("⏳ Corriendo optimización de imágenes locales de cómics (convert en the-boyz-comic)...");
-  execSync("npm run convert", { cwd: siblingRoot, stdio: "inherit" });
+if (skipOptimize) {
+  console.log("⏭️ PUBLISH_SKIP_OPTIMIZE=1: omitiendo convert/compress (típico en GitHub Actions).");
+  console.log("⏳ Sincronizando marcadores...");
+  const syncResult = spawnSync(process.execPath, [path.join(__dirname, "sync-placeholders.js")], {
+    cwd: projectRoot,
+    stdio: "inherit",
+    env: { ...process.env, PUBLISH_PROJECT_ROOT: projectRoot, PUBLISH_ASSETS_ROOT: siblingRoot },
+  });
+  if (syncResult.status !== 0) {
+    reportError("Falló la sincronización de marcadores entre assets y la app.");
+    process.exit(1);
+  }
+} else {
+  try {
+    console.log("⏳ Corriendo optimización de imágenes locales de cómics (convert en the-boyz-comic)...");
+    execSync("npm run convert", { cwd: siblingRoot, stdio: "inherit" });
 
-  console.log("⏳ Corriendo optimización general de imágenes (compress en the-boys)...");
-  execSync("npm run compress", { cwd: projectRoot, stdio: "inherit" });
+    console.log("⏳ Corriendo optimización general de imágenes (compress en the-boys)...");
+    execSync("npm run compress", { cwd: projectRoot, stdio: "inherit" });
 
-  console.log("⏳ Corriendo compresión de audios (compress:audio en the-boys)...");
-  execSync("npm run compress:audio", { cwd: projectRoot, stdio: "inherit" });
-  
-  console.log("⏳ Sincronizando marcadores con el proyecto principal (sync en the-boyz-comic)...");
-  execSync("npm run sync", { cwd: siblingRoot, stdio: "inherit" });
-} catch (error) {
-  console.error("⚠️ Ocurrió un error al procesar/sincronizar los assets. Continuando con git push...", error.message);
+    console.log("⏳ Corriendo compresión de audios (compress:audio en the-boys)...");
+    execSync("npm run compress:audio", { cwd: projectRoot, stdio: "inherit" });
+
+    console.log("⏳ Sincronizando marcadores con el proyecto principal (sync en the-boyz-comic)...");
+    execSync("npm run sync", { cwd: siblingRoot, stdio: "inherit" });
+  } catch (error) {
+    console.error("⚠️ Ocurrió un error al procesar/sincronizar los assets. Continuando con git push...", error.message);
+  }
 }
 console.log();
 
@@ -153,46 +184,193 @@ function generateCommitMessage(statusText, baseMsg) {
   return `editor [${timeStr}] - ${changeSummary}${context} (${baseMsg})`;
 }
 
-// Helper para publicar un repositorio
+function assertAllowedPublishBranch(branch) {
+  if (branch !== "main" && branch !== "editor-workspace") {
+    throw new Error(`Rama de publicación no permitida: ${branch}`);
+  }
+}
+
+function gitSpawn(args, dir, inherit = false) {
+  const result = spawnSync("git", args, {
+    cwd: dir,
+    encoding: "utf-8",
+    stdio: inherit ? "inherit" : "pipe",
+  });
+  if (result.status !== 0) {
+    const detail = result.stderr?.trim() || result.stdout?.trim() || `git ${args.join(" ")}`;
+    throw new Error(detail);
+  }
+  return (result.stdout || "").trim();
+}
+
+function revCount(range, dir) {
+  try {
+    const out = gitSpawn(["rev-list", "--count", range], dir);
+    const n = parseInt(out, 10);
+    return Number.isFinite(n) ? n : 0;
+  } catch {
+    return 0;
+  }
+}
+
+function isGitAncestor(ancestor, descendant, dir) {
+  const result = spawnSync("git", ["merge-base", "--is-ancestor", ancestor, descendant], {
+    cwd: dir,
+    encoding: "utf-8",
+  });
+  return result.status === 0;
+}
+
+function mergeTargetBranchBeforePublish(dir, publishTarget) {
+  assertAllowedPublishBranch(publishTarget);
+  const remoteRef = `origin/${publishTarget}`;
+  try {
+    gitSpawn(["fetch", "origin", publishTarget], dir, true);
+  } catch (error) {
+    throw new Error(`No se pudo hacer fetch de origin/${publishTarget}: ${error.message}`);
+  }
+
+  if (isGitAncestor(remoteRef, "HEAD", dir)) {
+    return;
+  }
+
+  const behind = revCount(`HEAD..${remoteRef}`, dir);
+  const label =
+    behind > 0
+      ? `${behind} commit(s) de ${remoteRef}`
+      : `historial divergente con ${remoteRef}`;
+  console.log(`Integrando ${label} antes de publicar...`);
+  const mergeResult = spawnSync(
+    "git",
+    ["merge", remoteRef, "-m", `merge ${publishTarget} into workspace before publish`],
+    { cwd: dir, stdio: "inherit" }
+  );
+  if (mergeResult.status !== 0) {
+    throw new Error(
+      `Merge con ${remoteRef} falló. Resolvé conflictos en editor-workspace antes de publicar.`
+    );
+  }
+}
+
+function pushHeadToBranch(dir, branch) {
+  assertAllowedPublishBranch(branch);
+  gitSpawn(["push", "origin", `HEAD:${branch}`], dir, true);
+}
+
+function pushToPublishTargets(dir, publishTarget) {
+  try {
+    pushHeadToBranch(dir, publishTarget);
+  } catch (error) {
+    const msg = error.message || "";
+    if (!/rejected|non-fast-forward|fetch first/i.test(msg)) {
+      throw error;
+    }
+    console.log("Push rechazado (non-fast-forward). Reintentando tras integrar main...");
+    mergeTargetBranchBeforePublish(dir, publishTarget);
+    pushHeadToBranch(dir, publishTarget);
+  }
+  try {
+    gitSpawn(["push", "origin", "HEAD:editor-workspace", "--force-with-lease"], dir, true);
+  } catch (error) {
+    // Un guardado durante la publicación mueve editor-workspace; main ya quedó publicado
+    // y el próximo Publicar integra lo nuevo.
+    reportWarning(`No se actualizó editor-workspace tras publicar: ${error.message}`);
+  }
+}
+
+function reportError(message) {
+  console.error(`❌ ${message}`);
+  if (process.env.GITHUB_ACTIONS) console.log(`::error::${message.replace(/\r?\n/g, " ")}`);
+}
+
+function reportWarning(message) {
+  console.warn(`⚠️ ${message}`);
+  if (process.env.GITHUB_ACTIONS) console.log(`::warning::${message.replace(/\r?\n/g, " ")}`);
+}
+
+// Helper para publicar un repositorio. Devuelve { pushed, error }.
 function publishRepo(name, dir) {
   console.log(`--- 📤 Publicando repo: ${name} ---`);
+  const publishTarget = process.env.PUBLISH_TARGET_BRANCH;
+  let pushed = false;
+
   try {
+    if (publishTarget) {
+      mergeTargetBranchBeforePublish(dir, publishTarget);
+    }
+
     console.log("Staging de archivos...");
     execSync("git add .", { cwd: dir, stdio: "inherit" });
 
-    const status = execSync("git status --porcelain", { cwd: dir }).toString().trim();
-    if (!status) {
-      console.log(`✅ No hay cambios pendientes en ${name}.\n`);
-      return;
-    }
+    const status = gitSpawn(["status", "--porcelain"], dir);
+    if (status) {
+      console.log("Creando commit...");
+      const dynamicCommitMsg = generateCommitMessage(status, commitMsg);
+      console.log(`Mensaje dinámico generado: "\x1b[32m${dynamicCommitMsg}\x1b[0m"\n`);
 
-    console.log("Creando commit...");
-    const dynamicCommitMsg = generateCommitMessage(status, commitMsg);
-    console.log(`Mensaje dinámico generado: "\x1b[32m${dynamicCommitMsg}\x1b[0m"\n`);
-
-    const commitResult = spawnSync("git", ["commit", "-m", dynamicCommitMsg], { cwd: dir, stdio: "inherit" });
-    if (commitResult.status !== 0) {
-      throw new Error("git commit falló");
-    }
-
-    console.log("Haciendo git push...");
-    const publishTarget = process.env.PUBLISH_TARGET_BRANCH;
-    if (publishTarget) {
-      execSync(`git push origin HEAD:${publishTarget}`, { cwd: dir, stdio: "inherit" });
-      execSync("git push origin HEAD:editor-workspace --force-with-lease", { cwd: dir, stdio: "inherit" });
+      const commitResult = spawnSync("git", ["commit", "-m", dynamicCommitMsg], { cwd: dir, stdio: "inherit" });
+      if (commitResult.status !== 0) {
+        throw new Error("git commit falló");
+      }
     } else {
-      execSync("git push", { cwd: dir, stdio: "inherit" });
+      console.log(`✅ Working tree limpio en ${name}.`);
     }
 
-    console.log(`🎉 ¡${name} publicado con éxito!\n`);
+    if (publishTarget) {
+      assertAllowedPublishBranch(publishTarget);
+      const ahead = revCount(`origin/${publishTarget}..HEAD`, dir);
+      if (ahead > 0) {
+        if (!status) {
+          console.log(`📤 Nada que commitear, pero ${ahead} commit(s) por publicar a ${publishTarget}...`);
+        }
+        console.log("Haciendo git push...");
+        pushToPublishTargets(dir, publishTarget);
+        pushed = true;
+        console.log(`🎉 ¡${name} publicado con éxito!\n`);
+      } else if (!status) {
+        console.log(`✅ No hay commits por publicar a ${publishTarget} en ${name}.\n`);
+      }
+    } else if (status) {
+      console.log("Haciendo git push...");
+      execSync("git push", { cwd: dir, stdio: "inherit" });
+      pushed = true;
+      console.log(`🎉 ¡${name} publicado con éxito!\n`);
+    } else {
+      console.log(`✅ No hay cambios pendientes en ${name}.\n`);
+    }
+
+    return { pushed, error: false };
   } catch (error) {
-    console.error(`❌ Error al publicar ${name}:`, error.message);
+    reportError(`Error al publicar ${name}: ${error.message}`);
     console.log();
+    return { pushed: false, error: true };
   }
 }
 
 // ── 2. Hacer commit y push de ambos repositorios ──────────────────────────
-publishRepo("the-boyz-comic (Assets)", siblingRoot);
-publishRepo("the-boys (Main App)", projectRoot);
+let hadError = false;
+let mainAppPushed = false;
+
+if (skipAssetsPush) {
+  console.log("⏭️ PUBLISH_SKIP_ASSETS_PUSH=1: omitiendo push del repo de assets (PAT inválido en CI).\n");
+} else {
+  const assetsResult = publishRepo("the-boyz-comic (Assets)", siblingRoot);
+  if (assetsResult.error) {
+    reportError("No se publica la app porque falló el repo de assets (páginas y diálogos quedarían desalineados).");
+    process.exit(1);
+  }
+}
+
+const appResult = publishRepo("the-boys (Main App)", projectRoot);
+if (appResult.error) hadError = true;
+mainAppPushed = appResult.pushed;
+
+if (mainAppPushed) {
+  console.log("PUBLISH_MAIN_PUSHED=1");
+}
 
 console.log("🏁 ¡Flujo de publicación unificado completado!");
+
+if (hadError) {
+  process.exit(1);
+}
