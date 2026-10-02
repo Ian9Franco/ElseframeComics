@@ -20,25 +20,32 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Validate ELSEFRAME_PUBLISH_TOKEN (repo ElseframeComics)
+      - name: Check ELSEFRAME_PUBLISH_TOKEN
+        id: pat
         env:
           PUBLISH_TOKEN: ${{ secrets.ELSEFRAME_PUBLISH_TOKEN }}
         run: |
           set -euo pipefail
           if [ -z "$PUBLISH_TOKEN" ]; then
-            echo "::error::Falta ELSEFRAME_PUBLISH_TOKEN en ElseframeComics → Settings → Secrets → Actions (no en theboyz-comic-v1)."
-            exit 1
+            echo "mode=public" >> "$GITHUB_OUTPUT"
+            echo "::warning::Falta ELSEFRAME_PUBLISH_TOKEN en ElseframeComics → Settings → Secrets → Actions. Solo se publicará el repo de la app si hay cambios; push a assets requiere PAT."
+            exit 0
           fi
           code=$(curl -s -o /dev/null -w "%{http_code}" \
             -H "Authorization: Bearer ${PUBLISH_TOKEN}" \
             -H "Accept: application/vnd.github+json" \
             "https://api.github.com/repos/Ian9Franco/theboyz-comic-v1")
-          if [ "$code" != "200" ]; then
-            echo "::error::El PAT no accede a theboyz-comic-v1 (HTTP ${code}). En el fine-grained token incluí ambos repos con Contents read/write."
-            exit 1
+          if [ "$code" = "200" ]; then
+            echo "mode=auth" >> "$GITHUB_OUTPUT"
+            echo "PAT OK para theboyz-comic-v1"
+          elif [ "$code" = "401" ]; then
+            echo "mode=public" >> "$GITHUB_OUTPUT"
+            echo "::warning::HTTP 401: el valor de ELSEFRAME_PUBLISH_TOKEN no es un PAT válido (revocado, mal pegado o expirado). Regenerá el token, actualizá el secret en ElseframeComics Actions y Vercel GITHUB_EDITOR_TOKEN con el mismo github_pat_.... Mientras tanto: clone público de assets."
+          else
+            echo "mode=public" >> "$GITHUB_OUTPUT"
+            echo "::warning::PAT no accede a theboyz-comic-v1 (HTTP ${code}). Incluí ambos repos en el fine-grained token. Clone público de assets."
           fi
 
-      # Mismo repo que el workflow: usa GITHUB_TOKEN del runner.
       - name: Checkout main app workspace
         uses: actions/checkout@v4
         with:
@@ -46,25 +53,29 @@ jobs:
           path: the-boys
           fetch-depth: 1
 
-      # actions/checkout a veces no autentica el 2º repo; clone explícito con PAT.
       - name: Checkout assets workspace
         env:
           GH_TOKEN: ${{ secrets.ELSEFRAME_PUBLISH_TOKEN }}
         run: |
           set -euo pipefail
-          API="https://api.github.com/repos/Ian9Franco/theboyz-comic-v1"
-          if curl -fsSL -H "Authorization: Bearer ${GH_TOKEN}" -H "Accept: application/vnd.github+json" \
-            "${API}/branches/editor-workspace" >/dev/null 2>&1; then
-            BRANCH=editor-workspace
+          REPO="https://github.com/Ian9Franco/theboyz-comic-v1.git"
+          BRANCH=main
+          if [ "${{ steps.pat.outputs.mode }}" = "auth" ]; then
+            if curl -fsSL -H "Authorization: Bearer ${GH_TOKEN}" -H "Accept: application/vnd.github+json" \
+              "https://api.github.com/repos/Ian9Franco/theboyz-comic-v1/branches/editor-workspace" >/dev/null 2>&1; then
+              BRANCH=editor-workspace
+            fi
+            git clone --depth 1 --branch "$BRANCH" \
+              "https://x-access-token:${GH_TOKEN}@github.com/Ian9Franco/theboyz-comic-v1.git" \
+              theboyz-comic-v1
+            git -C theboyz-comic-v1 remote set-url origin \
+              "https://x-access-token:${GH_TOKEN}@github.com/Ian9Franco/theboyz-comic-v1.git"
           else
-            echo "Rama editor-workspace no existe en assets; clonando main."
-            BRANCH=main
+            if git ls-remote --exit-code "$REPO" refs/heads/editor-workspace >/dev/null 2>&1; then
+              BRANCH=editor-workspace
+            fi
+            git clone --depth 1 --branch "$BRANCH" "$REPO" theboyz-comic-v1
           fi
-          git clone --depth 1 --branch "$BRANCH" \
-            "https://x-access-token:${GH_TOKEN}@github.com/Ian9Franco/theboyz-comic-v1.git" \
-            theboyz-comic-v1
-          git -C theboyz-comic-v1 remote set-url origin \
-            "https://x-access-token:${GH_TOKEN}@github.com/Ian9Franco/theboyz-comic-v1.git"
 
       - name: Setup Node
         uses: actions/setup-node@v4
@@ -90,10 +101,15 @@ jobs:
         working-directory: the-boys
         env:
           PUBLISH_TARGET_BRANCH: main
-          # En CI omitimos convert/compress (lento); optimizá assets en local si hace falta.
           PUBLISH_SKIP_OPTIMIZE: "1"
           GH_TOKEN: ${{ secrets.ELSEFRAME_PUBLISH_TOKEN }}
+          ASSETS_PAT_AUTH: ${{ steps.pat.outputs.mode }}
         run: |
-          git -C ../theboyz-comic-v1 remote set-url origin \
-            "https://x-access-token:${GH_TOKEN}@github.com/Ian9Franco/theboyz-comic-v1.git"
+          if [ "$ASSETS_PAT_AUTH" = "auth" ]; then
+            git -C ../theboyz-comic-v1 remote set-url origin \
+              "https://x-access-token:${GH_TOKEN}@github.com/Ian9Franco/theboyz-comic-v1.git"
+          else
+            echo "Sin PAT válido: no se intentará push a theboyz-comic-v1 si hubiera cambios en assets."
+            export PUBLISH_SKIP_ASSETS_PUSH=1
+          fi
           npm run publish:all "${{ inputs.message }}"

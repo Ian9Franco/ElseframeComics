@@ -203,7 +203,11 @@ function publishRepo(name, dir) {
 }
 
 // ── 2. Hacer commit y push de ambos repositorios ──────────────────────────
-publishRepo("the-boyz-comic (Assets)", siblingRoot);
+if (process.env.PUBLISH_SKIP_ASSETS_PUSH === "1") {
+  console.log("⏭️ PUBLISH_SKIP_ASSETS_PUSH=1: omitiendo push del repo de assets (PAT inválido en CI).\n");
+} else {
+  publishRepo("the-boyz-comic (Assets)", siblingRoot);
+}
 publishRepo("the-boys (Main App)", projectRoot);
 
 console.log("🏁 ¡Flujo de publicación unificado completado!");
