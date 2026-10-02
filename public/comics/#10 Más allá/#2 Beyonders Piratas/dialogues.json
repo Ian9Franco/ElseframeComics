@@ -48,7 +48,9 @@
       "panels": [
         {
           "focusY": 0.2188284887282529,
-          "dialogue": []
+          "dialogue": [
+            { "text": "", "size": "small", "posX": 22.70890243906688, "posY": 12.0151252915053, "tailX": 22.70890243906688, "tailY": 27.0151252915053, "tailWidth": 6, "tailCurvature": -22, "width": 120, "fontSize": 8, "borderRadius": 18 }
+          ]
         },
         {
           "focusY": 0.8,
