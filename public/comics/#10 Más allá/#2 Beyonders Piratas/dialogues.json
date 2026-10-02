@@ -9,8 +9,8 @@
             { "text": "hola", "size": "small", "posX": 42.1840354767184, "posY": 30.488716956802058, "tailX": 23.863636363636363, "tailY": 21.06060606060606, "tailWidth": 6, "tailCurvature": -22, "width": 205, "fontSize": 8, "borderRadius": 18, "fontFamily": "arcane", "style": "thought" },
             { "text": "hola", "size": "small", "posX": 81.98051948051949, "posY": 17.374689140646588, "tailX": 23.863636363636363, "tailY": 21.06060606060606, "tailWidth": 6, "tailCurvature": -22, "width": 205, "fontSize": 8, "borderRadius": 18, "fontFamily": "arcane", "style": "caption" },
             { "text": "La fuente de su poder era ", "size": "small", "posX": -7.21585152436216, "posY": 30.488716956802058, "tailX": -10.714285714285708, "tailY": 17.705627705627705, "tailWidth": 6, "tailCurvature": -22, "width": 205, "fontSize": 8, "borderRadius": 18, "fontFamily": "arcane" },
-            { "text": "Era una muy loca\n", "size": "small", "posX": -20, "posY": 6.745187436676799, "tailX": 2.597402597402601, "tailY": 16.19047619047619, "tailWidth": 6, "tailCurvature": -22, "width": 228, "fontSize": 8, "borderRadius": 18, "style": "whisper" },
-            { "text": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", "style": "electronic", "size": "small", "posX": 70, "posY": 40, "tailX": 44.48664543004165, "tailY": 69.80982755452095, "tailWidth": 6, "tailCurvature": -22, "width": 231, "fontSize": 8, "borderRadius": 18 }
+            { "text": "Era una muy loca\n", "size": "small", "posX": 30.488716956802058, "posY": 6.745187436676799, "tailX": 2.597402597402601, "tailY": 16.19047619047619, "tailWidth": 6, "tailCurvature": -22, "width": 228, "fontSize": 8, "borderRadius": 18, "style": "whisper" },
+            { "text": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", "style": "scream", "size": "small", "posX": 70, "posY": 40, "tailX": 44.48664543004165, "tailY": 69.80982755452095, "tailWidth": 6, "tailCurvature": -22, "width": 231, "fontSize": 8, "borderRadius": 18 }
           ],
           "zoomRects": [
             { "x": 18.98738054398431, "y": 50.981109103160996, "w": 29.864003920607697, "h": 8.576329331046303 }
@@ -27,7 +27,14 @@
         {
           "focusY": 0.88,
           "dialogue": [
-            { "text": "", "size": "small", "posX": 40.35162950257289, "posY": 22.64859256309728, "tailX": 40.35162950257289, "tailY": 37.64859256309728, "tailWidth": 6, "tailCurvature": -22, "width": 120, "fontSize": 8, "borderRadius": 18 }
+            { "text": "", "size": "small", "posX": 17.67771125107616, "posY": 62.21681673207094, "tailX": 40.35162950257289, "tailY": 37.64859256309728, "tailWidth": 6, "tailCurvature": -22, "width": 120, "fontSize": 8, "borderRadius": 18 },
+            { "text": "", "size": "small", "posX": 20.67771125107616, "posY": 65.21681673207094, "tailX": 40.35162950257289, "tailY": 37.64859256309728, "tailWidth": 6, "tailCurvature": -22, "width": 120, "fontSize": 8, "borderRadius": 18 },
+            { "text": "", "size": "small", "posX": 23.67771125107616, "posY": 68.21681673207094, "tailX": 40.35162950257289, "tailY": 37.64859256309728, "tailWidth": 6, "tailCurvature": -22, "width": 120, "fontSize": 8, "borderRadius": 18 },
+            { "text": "", "size": "small", "posX": 26.67771125107616, "posY": 71.21681673207094, "tailX": 40.35162950257289, "tailY": 37.64859256309728, "tailWidth": 6, "tailCurvature": -22, "width": 120, "fontSize": 8, "borderRadius": 18 },
+            { "text": "", "size": "small", "posX": 29.67771125107616, "posY": 74.21681673207094, "tailX": 40.35162950257289, "tailY": 37.64859256309728, "tailWidth": 6, "tailCurvature": -22, "width": 120, "fontSize": 8, "borderRadius": 18 },
+            { "text": "", "size": "small", "posX": 32.67771125107616, "posY": 77.21681673207094, "tailX": 40.35162950257289, "tailY": 37.64859256309728, "tailWidth": 6, "tailCurvature": -22, "width": 120, "fontSize": 8, "borderRadius": 18 },
+            { "text": "", "size": "small", "posX": 35.67771125107616, "posY": 80.21681673207094, "tailX": 40.35162950257289, "tailY": 37.64859256309728, "tailWidth": 6, "tailCurvature": -22, "width": 120, "fontSize": 8, "borderRadius": 18 },
+            { "text": "", "size": "small", "posX": 38.67771125107616, "posY": 83.21681673207094, "tailX": 40.35162950257289, "tailY": 37.64859256309728, "tailWidth": 6, "tailCurvature": -22, "width": 120, "fontSize": 8, "borderRadius": 18 }
           ],
           "zoomRects": [
             { "x": 0, "y": 0, "w": 100, "h": 23.2108989758503 }
