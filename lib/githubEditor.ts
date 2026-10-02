@@ -17,10 +17,38 @@ export class GithubConflictError extends Error {
   }
 }
 
+function normalizeSecret(value: string | undefined): string | undefined {
+  if (!value) return undefined;
+  let t = value.trim();
+  if (
+    (t.startsWith('"') && t.endsWith('"')) ||
+    (t.startsWith("'") && t.endsWith("'"))
+  ) {
+    t = t.slice(1, -1).trim();
+  }
+  return t || undefined;
+}
+
 /** PAT fine-grained solo para escritura del editor y Actions (no usar GITHUB_TOKEN de lectura). */
 export function getEditorToken(): string | undefined {
-  const raw = process.env.GITHUB_EDITOR_TOKEN?.trim();
-  return raw || undefined;
+  return normalizeSecret(process.env.GITHUB_EDITOR_TOKEN);
+}
+
+/** Solo para diagnóstico (nunca devolver el token completo). */
+export function describeEditorToken(): {
+  configured: boolean;
+  length: number;
+  shape: "fine-grained" | "classic" | "empty" | "unexpected";
+} {
+  const token = getEditorToken();
+  if (!token) return { configured: false, length: 0, shape: "empty" };
+  if (token.startsWith("github_pat_")) {
+    return { configured: true, length: token.length, shape: "fine-grained" };
+  }
+  if (token.startsWith("ghp_") || token.startsWith("gho_")) {
+    return { configured: true, length: token.length, shape: "classic" };
+  }
+  return { configured: true, length: token.length, shape: "unexpected" };
 }
 
 export function editorTokenMissingMessage(): string {
