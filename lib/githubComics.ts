@@ -19,6 +19,7 @@ interface GithubContentItem {
   path: string;
   type: "file" | "dir";
   download_url: string | null;
+  sha?: string;
 }
 
 /**
@@ -55,18 +56,21 @@ async function fetchGithubContents(
 
   const url = `https://api.github.com/repos/${GITHUB_OWNER}/${GITHUB_REPO}/contents/${encodedPath}?ref=${encodeURIComponent(ref)}`;
 
+  // El editor lee editor-workspace justo después de reordenar/subir: sin caché.
+  const cacheInit: RequestInit = ref === GITHUB_BRANCH ? { next: { revalidate: 60 } } : { cache: "no-store" };
+
   try {
     const readToken = getGithubReadToken();
     let res = await fetch(url, {
       headers: buildGithubHeaders(readToken),
-      next: { revalidate: 60 },
+      ...cacheInit,
     });
 
     // PAT inválido o sin acceso: reintentar sin auth (repo público)
     if ((res.status === 401 || res.status === 403) && readToken) {
       res = await fetch(url, {
         headers: buildGithubHeaders(),
-        next: { revalidate: 60 },
+        ...cacheInit,
       });
     }
 
@@ -97,21 +101,23 @@ async function fetchGithubContents(
 function buildAssetUrl(
   githubPath: string,
   downloadUrl: string | null,
-  ref: string = GITHUB_BRANCH
+  ref: string = GITHUB_BRANCH,
+  blobSha?: string
 ): string {
   const baseUrl = process.env.NEXT_PUBLIC_ASSETS_BASE_URL?.replace(/\/$/, "");
+  const encodedPath = githubPath.split("/").map(encodeURIComponent).join("/");
 
   if (ref === GITHUB_BRANCH && baseUrl) {
-    return `${baseUrl}/${githubPath
-      .split("/")
-      .map(encodeURIComponent)
-      .join("/")}`;
+    return `${baseUrl}/${encodedPath}`;
   }
 
-  return downloadUrl ?? `https://raw.githubusercontent.com/${GITHUB_OWNER}/${GITHUB_REPO}/${encodeURIComponent(ref)}/${githubPath
-    .split("/")
-    .map(encodeURIComponent)
-    .join("/")}`;
+  if (ref !== GITHUB_BRANCH) {
+    // raw.githubusercontent cachea por URL ~5 min: tras renumerar, "3.webp" mostraría la imagen vieja.
+    const version = blobSha ? `?v=${blobSha.slice(0, 12)}` : "";
+    return `https://raw.githubusercontent.com/${GITHUB_OWNER}/${GITHUB_REPO}/${encodeURIComponent(ref)}/${encodedPath}${version}`;
+  }
+
+  return downloadUrl ?? `https://raw.githubusercontent.com/${GITHUB_OWNER}/${GITHUB_REPO}/${encodeURIComponent(ref)}/${encodedPath}`;
 }
 
 /** Verifica si un nombre de archivo es una imagen de cómic soportada */
@@ -227,7 +233,7 @@ export async function fetchComicPages(
 
   for (const file of imageFiles) {
     const baseName = file.name.slice(0, file.name.lastIndexOf(".")).toLowerCase();
-    const assetUrl = buildAssetUrl(file.path, file.download_url, ref);
+    const assetUrl = buildAssetUrl(file.path, file.download_url, ref, file.sha);
 
     if (baseName === "portada") {
       coverUrl = assetUrl;
@@ -246,7 +252,7 @@ export async function fetchComicPages(
         sensitivity: "base",
       });
     })
-    .map((f) => buildAssetUrl(f.path, f.download_url, ref));
+    .map((f) => buildAssetUrl(f.path, f.download_url, ref, f.sha));
 
   // Si no hay portada explícita, usar la primera página
   const finalCover = coverUrl ?? (sortedPages.length > 0 ? sortedPages[0] : null);

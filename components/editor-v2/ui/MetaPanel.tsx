@@ -87,10 +87,11 @@ export function MetaPanel({
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState<"idle" | "saga" | "chapter">("idle");
   const [error, setError] = useState<string | null>(null);
+  const [savedNotice, setSavedNotice] = useState<"saga" | "chapter" | null>(null);
+  const [shas, setShas] = useState<{ saga: string | null; chapter: string | null }>({ saga: null, chapter: null });
 
   useEffect(() => {
     let cancelled = false;
-    setLoading(true);
     fetch(`/api/editor/meta?sagaId=${encodeURIComponent(sagaId)}&chapterId=${encodeURIComponent(chapterId)}`, {
       headers: { "x-editor-password": editorPass() },
     })
@@ -102,6 +103,7 @@ export function MetaPanel({
         if (cancelled) return;
         const s = data.saga || {};
         const c = data.chapter || {};
+        setShas({ saga: data.sagaSha ?? null, chapter: data.chapterSha ?? null });
         setSaga({
           title: s.title || "",
           tagline: s.tagline || "",
@@ -138,6 +140,7 @@ export function MetaPanel({
   const save = async (type: "saga" | "chapter") => {
     setSaving(type);
     setError(null);
+    setSavedNotice(null);
     const fields = type === "saga" ? saga : chapter;
     const res = await fetch("/api/editor/meta", {
       method: "PATCH",
@@ -145,15 +148,16 @@ export function MetaPanel({
         "Content-Type": "application/json",
         "x-editor-password": editorPass(),
       },
-      body: JSON.stringify({ type, sagaId, chapterId, fields }),
+      body: JSON.stringify({ type, sagaId, chapterId, fields, sha: shas[type] }),
     });
+    const data = await res.json().catch(() => ({}));
+    setSaving("idle");
     if (!res.ok) {
-      const data = await res.json().catch(() => ({}));
       setError(data.error || "No se pudo guardar");
-      setSaving("idle");
       return;
     }
-    setSaving("idle");
+    setShas((prev) => ({ ...prev, [type]: data.sha ?? prev[type] }));
+    setSavedNotice(type);
     router.refresh();
   };
 
@@ -177,7 +181,15 @@ export function MetaPanel({
           <div className="p-4 text-sm text-zinc-400">Cargando…</div>
         ) : (
           <div className="p-4 space-y-6">
+            <p className="text-xs text-zinc-400">
+              Guardar deja los cambios en el workspace del editor. Se ven en el sitio cuando usás <strong className="text-zinc-200">Publicar</strong>.
+            </p>
             {error && <p className="text-sm text-red-400">{error}</p>}
+            {savedNotice && (
+              <p className="text-sm text-emerald-400">
+                {savedNotice === "saga" ? "Saga guardada." : "Capítulo guardado."} Pendiente de publicar.
+              </p>
+            )}
 
             <section className="space-y-3">
               <h3 className="text-xs font-bold uppercase tracking-widest text-[#e8185a]">Saga</h3>

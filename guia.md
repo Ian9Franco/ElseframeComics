@@ -198,6 +198,41 @@ PREVIEW_PASSWORD="tu_contraseña_secreta"
 |---|---|
 | `NEXT_PUBLIC_ASSETS_BASE_URL` | `https://cdn.jsdelivr.net/gh/Ian9Franco/theboyz-comic-v1@main` |
 | `PREVIEW_PASSWORD` | `tu_contraseña_secreta` |
+| `GITHUB_EDITOR_TOKEN` | PAT fine-grained (ElseframeComics + theboyz-comic-v1, Contents + Actions read/write) |
+
+En **GitHub Actions** del repo ElseframeComics, el secret `ELSEFRAME_PUBLISH_TOKEN` debe llevar **el mismo valor** que `GITHUB_EDITOR_TOKEN` en Vercel (no es otra app: es el mismo PAT pegado en otro lugar).
+
+---
+
+## Editor web: ramas, contenido y CI
+
+### Qué toca el editor (no es “código de la app”)
+
+- `dialogues.json`, `chapter.json`, `saga.json` bajo `public/comics/…`
+- Renombres / rutas de imágenes acordes al editor
+- El propio editor valida forma y reglas del JSON antes de guardar (API + esquema)
+
+Eso **no debería exigir suite de tests de aplicación**: no cambia componentes React ni lógica de build salvo que edites código a mano en otra rama.
+
+### Ramas (por diseño)
+
+| Acción | Rama | Quién lo ve |
+|--------|------|-------------|
+| **Guardar JSON** (desde Vercel) | `editor-workspace` | Solo GitHub / editor con `?source=editor` |
+| **Publicar** (GitHub Actions) | merge + push a `main` | Lectores, Vercel, API en producción |
+
+Los commits `editor: save dialogues for …` en `editor-workspace` son **normales**. Los diálogos nuevos en el sitio público aparecen cuando **Publicar** deja ese contenido en `main` (y Vercel termina el deploy).
+
+### Qué corre hoy en CI (y qué no)
+
+| Paso | ¿Tests unitarios? | Notas |
+|------|-------------------|--------|
+| Guardar desde el editor | No | Commit directo por API a `editor-workspace` |
+| Workflow `publish-editor.yml` | No | `npm ci` + sync de assets + git; **no hay** `npm test` en el repo |
+| PR con cambios de **código** (`app/`, `components/`, etc.) | Codacy / revisión | Configurar exclusiones de rutas de cómic si molestan |
+| Push a `main` | Vercel **build** | Deploy del sitio; no valida cada globo del JSON |
+
+Si Codacy o branch protection marcan rojo en commits solo de `public/comics/**`, en Codacy conviene **ignorar** esas rutas o no exigir ese check en pushes de contenido del editor. Los PR de **código** sí pueden seguir con revisión.
 
 ---
 

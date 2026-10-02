@@ -1,3 +1,4 @@
+# Publicación de contenido del editor (JSON / sync de assets), no suite de tests de app.
 name: Publish Elseframe Editor
 
 on:
@@ -28,7 +29,7 @@ jobs:
           set -euo pipefail
           if [ -z "$PUBLISH_TOKEN" ]; then
             echo "mode=public" >> "$GITHUB_OUTPUT"
-            echo "::warning::Falta ELSEFRAME_PUBLISH_TOKEN en ElseframeComics → Settings → Secrets → Actions. Solo se publicará el repo de la app si hay cambios; push a assets requiere PAT."
+            echo "::warning::Falta el secret ELSEFRAME_PUBLISH_TOKEN (ElseframeComics → Settings → Secrets and variables → Actions). Sin él no se puede publicar el repo de assets."
             exit 0
           fi
           code=$(curl -s -o /dev/null -w "%{http_code}" \
@@ -40,10 +41,10 @@ jobs:
             echo "PAT OK para theboyz-comic-v1"
           elif [ "$code" = "401" ]; then
             echo "mode=public" >> "$GITHUB_OUTPUT"
-            echo "::warning::HTTP 401: el valor de ELSEFRAME_PUBLISH_TOKEN no es un PAT válido (revocado, mal pegado o expirado). Regenerá el token, actualizá el secret en ElseframeComics Actions y Vercel GITHUB_EDITOR_TOKEN con el mismo github_pat_.... Mientras tanto: clone público de assets."
+            echo "::warning::HTTP 401 con ELSEFRAME_PUBLISH_TOKEN: GitHub no acepta el valor guardado en el secret de Actions (aunque el PAT esté activo). Pegá en el secret exactamente el mismo github_pat_... que GITHUB_EDITOR_TOKEN de Vercel."
           else
             echo "mode=public" >> "$GITHUB_OUTPUT"
-            echo "::warning::PAT no accede a theboyz-comic-v1 (HTTP ${code}). Incluí ambos repos en el fine-grained token. Clone público de assets."
+            echo "::warning::ELSEFRAME_PUBLISH_TOKEN no accede a theboyz-comic-v1 (HTTP ${code}). Incluí ese repo en el fine-grained token."
           fi
 
       - name: Checkout main app workspace
@@ -53,65 +54,58 @@ jobs:
           path: the-boys
           fetch-depth: 0
 
+      - name: Record workspace commit
+        id: ws
+        run: echo "sha=$(git -C the-boys rev-parse HEAD)" >> "$GITHUB_OUTPUT"
+
       - name: Checkout assets workspace
         env:
           GH_TOKEN: ${{ secrets.ELSEFRAME_PUBLISH_TOKEN }}
+          PAT_MODE: ${{ steps.pat.outputs.mode }}
         run: |
           set -euo pipefail
-          REPO="https://github.com/Ian9Franco/theboyz-comic-v1.git"
-          BRANCH=main
-          if [ "${{ steps.pat.outputs.mode }}" = "auth" ]; then
-            if curl -fsSL -H "Authorization: Bearer ${GH_TOKEN}" -H "Accept: application/vnd.github+json" \
-              "https://api.github.com/repos/Ian9Franco/theboyz-comic-v1/branches/editor-workspace" >/dev/null 2>&1; then
-              BRANCH=editor-workspace
-            fi
-            git clone --depth 1 --branch "$BRANCH" \
-              "https://x-access-token:${GH_TOKEN}@github.com/Ian9Franco/theboyz-comic-v1.git" \
-              theboyz-comic-v1
-            git -C theboyz-comic-v1 remote set-url origin \
-              "https://x-access-token:${GH_TOKEN}@github.com/Ian9Franco/theboyz-comic-v1.git"
+          if [ "$PAT_MODE" = "auth" ]; then
+            REPO="https://x-access-token:${GH_TOKEN}@github.com/Ian9Franco/theboyz-comic-v1.git"
           else
-            if git ls-remote --exit-code "$REPO" refs/heads/editor-workspace >/dev/null 2>&1; then
-              BRANCH=editor-workspace
+            REPO="https://github.com/Ian9Franco/theboyz-comic-v1.git"
+          fi
+          BRANCH=main
+          if git ls-remote --exit-code "$REPO" refs/heads/editor-workspace >/dev/null 2>&1; then
+            BRANCH=editor-workspace
+          fi
+          # Blobless (no shallow): el merge con main necesita historial; las imágenes se bajan solo si hacen falta.
+          git clone --filter=blob:none --branch "$BRANCH" "$REPO" theboyz-comic-v1
+          git -C theboyz-comic-v1 fetch origin main
+
+          if [ "$BRANCH" = "editor-workspace" ] && \
+             ! git -C theboyz-comic-v1 merge-base --is-ancestor origin/editor-workspace origin/main; then
+            if [ "$PAT_MODE" != "auth" ]; then
+              echo "::error::Hay cambios de páginas (subidas, borrados o renumeración) en theboyz-comic-v1/editor-workspace, pero ELSEFRAME_PUBLISH_TOKEN no es válido, así que no se pueden publicar. Corregí el secret y volvé a publicar."
+              exit 1
             fi
-            git clone --depth 1 --branch "$BRANCH" "$REPO" theboyz-comic-v1
+            echo "Hay cambios de páginas pendientes en assets/editor-workspace."
           fi
 
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
           node-version: 22
-          cache: npm
-          cache-dependency-path: the-boys/package-lock.json
-
-      - name: Install app dependencies
-        working-directory: the-boys
-        run: npm ci
-
-      - name: Install asset dependencies
-        working-directory: theboyz-comic-v1
-        run: npm ci
 
       - name: Configure Git
         run: |
           git config --global user.name "Elseframe Editor"
           git config --global user.email "actions@github.com"
 
-      - name: Fetch git refs for publish merge
+      # editor-workspace puede tener versiones viejas de los scripts. Se usan los de main,
+      # copiados fuera del checkout para que el working tree quede limpio para el merge.
+      - name: Load publish scripts from main
         working-directory: the-boys
         run: |
           set -euo pipefail
           git fetch origin main editor-workspace --prune
-
-      # editor-workspace suele no tener los fixes de publish-all.js (solo vive en main).
-      # Sin esto, Actions corre un script viejo: push directo sin merge → non-fast-forward.
-      - name: Use publish script from main
-        working-directory: the-boys
-        run: |
-          set -euo pipefail
-          git fetch origin main
-          git checkout origin/main -- scripts/deploy/publish-all.js
-          node -e "const fs=require('fs'); const s=fs.readFileSync('scripts/deploy/publish-all.js','utf8'); if(!s.includes('pushToPublishTargets')) { console.error('publish-all.js from main is missing expected helpers'); process.exit(1); }"
+          mkdir -p "$RUNNER_TEMP/publish-tools"
+          git show origin/main:scripts/deploy/publish-all.js > "$RUNNER_TEMP/publish-tools/publish-all.js"
+          git show origin/main:scripts/deploy/sync-placeholders.js > "$RUNNER_TEMP/publish-tools/sync-placeholders.js"
 
       - name: Publish
         id: publish
@@ -119,39 +113,37 @@ jobs:
         env:
           PUBLISH_TARGET_BRANCH: main
           PUBLISH_SKIP_OPTIMIZE: "1"
-          GH_TOKEN: ${{ secrets.ELSEFRAME_PUBLISH_TOKEN }}
-          ASSETS_PAT_AUTH: ${{ steps.pat.outputs.mode }}
+          SYNC_JSON_SOURCE: web
+          PUBLISH_PROJECT_ROOT: ${{ github.workspace }}/the-boys
+          PUBLISH_ASSETS_ROOT: ${{ github.workspace }}/theboyz-comic-v1
+          PAT_MODE: ${{ steps.pat.outputs.mode }}
+          COMMIT_MESSAGE: ${{ inputs.message }}
         run: |
           set -euo pipefail
-          git fetch origin main editor-workspace --prune
-          if [ "$ASSETS_PAT_AUTH" = "auth" ]; then
-            git -C ../theboyz-comic-v1 remote set-url origin \
-              "https://x-access-token:${GH_TOKEN}@github.com/Ian9Franco/theboyz-comic-v1.git"
-            git -C ../theboyz-comic-v1 fetch origin main --depth=50 || true
-          else
-            echo "Sin PAT válido: no se intentará push a theboyz-comic-v1 si hubiera cambios en assets."
+          if [ "$PAT_MODE" != "auth" ]; then
+            echo "Sin PAT válido: no se intentará push a theboyz-comic-v1."
             export PUBLISH_SKIP_ASSETS_PUSH=1
           fi
-          npm run publish:all "${{ inputs.message }}" | tee /tmp/publish-all.log
+          node "$RUNNER_TEMP/publish-tools/publish-all.js" "$COMMIT_MESSAGE" | tee /tmp/publish-all.log
           if ! grep -q "PUBLISH_MAIN_PUSHED=1" /tmp/publish-all.log; then
             WS_SHA=$(git rev-parse HEAD)
             git fetch origin main
             if ! git merge-base --is-ancestor "$WS_SHA" origin/main; then
-              echo "::error::Publicación no llevó editor-workspace a main (workspace $WS_SHA no está en origin/main)."
-              echo "Los guardados del editor ya están commiteados en editor-workspace; hace falta push a main."
+              echo "::error::No se pudo llevar editor-workspace a main (workspace $WS_SHA no está en origin/main). Revisá el paso Publish."
               exit 1
             fi
             echo "main ya contenía el workspace; no hubo commits nuevos que publicar."
           fi
 
-      - name: Verify main contains workspace tip
+      - name: Verify main contains published workspace
         working-directory: the-boys
+        env:
+          WS_SHA: ${{ steps.ws.outputs.sha }}
         run: |
           set -euo pipefail
-          git fetch origin main editor-workspace
-          WS_SHA=$(git rev-parse origin/editor-workspace)
+          git fetch origin main
           if ! git merge-base --is-ancestor "$WS_SHA" origin/main; then
-            echo "::error::Tras publicar, origin/main aún no incluye el tip de editor-workspace ($WS_SHA)."
+            echo "::error::Tras publicar, origin/main aún no incluye editor-workspace @ $WS_SHA."
             exit 1
           fi
           echo "OK: origin/main incluye editor-workspace @ $WS_SHA"
