@@ -1,6 +1,6 @@
 import fs from "fs";
 import path from "path";
-import { findLocalChapter } from "@/lib/chapterFiles";
+import { findLocalChapter, readLocalChapterTextFile } from "@/lib/chapterFiles";
 import { getDynamicSagas } from "@/lib/serverData";
 import { fetchChapterFolders, fetchSagaFolders, resolveFolderName } from "@/lib/githubComics";
 import {
@@ -29,18 +29,10 @@ export function contextRepoPath(sagaFolder: string, chapterFolder: string) {
   return `public/comics/${sagaFolder}/${chapterFolder}/ai-context.json`;
 }
 
-function readChapterFileFromDisk(chapterId: string, fileName: "dialogues.json" | "ai-context.json"): string | null {
-  const local = findLocalChapter(chapterId);
-  if (!local) return null;
-  const filePath = path.join(local.chapterPath, fileName);
-  if (!fs.existsSync(filePath)) return null;
-  return fs.readFileSync(filePath, "utf-8");
-}
-
 /** Lectura de dialogues.json en la rama `main` (lector público en producción). */
 export async function loadMainBranchTextFile(chapterId: string): Promise<string | null> {
   if (!useGithubEditorStorage()) {
-    return readChapterFileFromDisk(chapterId, "dialogues.json");
+    return readLocalChapterTextFile(chapterId, "dialogues.json");
   }
 
   const location = await resolveChapterFolders(chapterId);
@@ -67,7 +59,7 @@ export async function loadEditorTextFile(
   if (!useGithubEditorStorage()) {
     if (!chapterId) return { content: "", sha: null, source: "filesystem" };
     const fileName = relativePath.endsWith("ai-context.json") ? "ai-context.json" : "dialogues.json";
-    const content = readChapterFileFromDisk(chapterId, fileName);
+    const content = readLocalChapterTextFile(chapterId, fileName);
     if (!content) return { content: "", sha: null, source: "filesystem" };
     return { content, sha: null, source: "filesystem" };
   }
