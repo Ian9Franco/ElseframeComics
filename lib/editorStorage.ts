@@ -1,6 +1,6 @@
 import fs from "fs";
 import path from "path";
-import { findLocalChapter, readLocalChapterTextFile } from "@/lib/chapterFiles";
+import { findLocalChapter } from "@/lib/chapterFiles";
 import { getDynamicSagas } from "@/lib/serverData";
 import { fetchChapterFolders, fetchSagaFolders, resolveFolderName } from "@/lib/githubComics";
 import {
@@ -29,12 +29,8 @@ export function contextRepoPath(sagaFolder: string, chapterFolder: string) {
   return `public/comics/${sagaFolder}/${chapterFolder}/ai-context.json`;
 }
 
-/** Lectura de dialogues.json en la rama `main` (lector público en producción). */
+/** Lectura de dialogues.json en la rama `main` (lector público; también dev sin PAT). */
 export async function loadMainBranchTextFile(chapterId: string): Promise<string | null> {
-  if (!useGithubEditorStorage()) {
-    return readLocalChapterTextFile(chapterId, "dialogues.json");
-  }
-
   const location = await resolveChapterFolders(chapterId);
   if (!location) return null;
   const repoPath = dialoguesRepoPath(location.sagaFolder, location.chapterFolder);
@@ -50,18 +46,20 @@ export async function loadMainBranchTextFile(chapterId: string): Promise<string 
 
 export async function loadEditorTextFile(
   relativePath: string,
-  chapterId?: string
+  _chapterId?: string
 ): Promise<{
   content: string;
   sha: string | null;
   source: "workspace" | "main" | "filesystem";
 }> {
   if (!useGithubEditorStorage()) {
-    if (!chapterId) return { content: "", sha: null, source: "filesystem" };
-    const fileName = relativePath.endsWith("ai-context.json") ? "ai-context.json" : "dialogues.json";
-    const content = readLocalChapterTextFile(chapterId, fileName);
-    if (!content) return { content: "", sha: null, source: "filesystem" };
-    return { content, sha: null, source: "filesystem" };
+    try {
+      const main = await getFile(GITHUB_MAIN_REPO, relativePath, "main");
+      if (main) return { content: main.content, sha: null, source: "main" };
+    } catch (error) {
+      console.error("[editorStorage] loadEditorTextFile (main via API) failed:", error);
+    }
+    return { content: "", sha: null, source: "filesystem" };
   }
 
   await ensureEditorBranch(GITHUB_MAIN_REPO);

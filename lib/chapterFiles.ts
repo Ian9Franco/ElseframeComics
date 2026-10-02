@@ -32,14 +32,3 @@ export function findLocalChapter(chapterId: string) {
   };
 }
 
-export function readLocalChapterTextFile(
-  chapterId: string,
-  fileName: "dialogues.json" | "ai-context.json"
-): string | null {
-  const local = findLocalChapter(chapterId);
-  if (!local) return null;
-  const filePath = path.join(local.chapterPath, fileName);
-  if (!fs.existsSync(filePath)) return null;
-  return fs.readFileSync(filePath, "utf-8");
-}
-
