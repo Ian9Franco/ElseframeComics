@@ -22,7 +22,16 @@ export type DialogueLine = {
   customColor?: string;
   customBg?: string;
   textColor?: string;    // Custom text/typography color in hex
-  fontFamily?: "marker" | "bangers" | "mono" | "sans" | "serif" | "bungee" | "luckiest"; // Custom font
+  fontFamily?:
+    | "marker"
+    | "bangers"
+    | "mono"
+    | "sans"
+    | "serif"
+    | "bungee"
+    | "luckiest"
+    | "arcane"
+    | "diabolic";
   width?: number;        // Custom max-width in pixels
   fontSize?: number;     // Custom font-size in pixels
   borderRadius?: number; // Custom border-radius in pixels
@@ -84,6 +93,7 @@ export function DialogueBubble({
   textScale = 1.0,
   speedMultiplier = 1.0,
   bubbleOpacity,
+  staggerDelay = true,
   inlineTextEdit,
 }: {
   line: DialogueLine;
@@ -96,6 +106,7 @@ export function DialogueBubble({
   textScale?: number;
   speedMultiplier?: number;
   bubbleOpacity?: number;
+  staggerDelay?: boolean;
   inlineTextEdit?: InlineTextEditProps;
 }) {
   const style = line.style ?? "normal";
@@ -112,6 +123,7 @@ export function DialogueBubble({
         textScale={textScale}
         speedMultiplier={speedMultiplier}
         bubbleOpacity={bubbleOpacity}
+        staggerDelay={staggerDelay}
         inlineTextEdit={inlineTextEdit}
       />
     );
@@ -130,6 +142,7 @@ export function DialogueBubble({
         textScale={textScale}
         speedMultiplier={speedMultiplier}
         bubbleOpacity={bubbleOpacity}
+        staggerDelay={staggerDelay}
         inlineTextEdit={inlineTextEdit}
       />
     );
@@ -146,6 +159,7 @@ export function DialogueBubble({
         depth={depth}
         textScale={textScale}
         speedMultiplier={speedMultiplier}
+        staggerDelay={staggerDelay}
         inlineTextEdit={inlineTextEdit}
       />
     );
@@ -163,6 +177,7 @@ export function DialogueBubble({
       textScale={textScale}
       speedMultiplier={speedMultiplier}
       bubbleOpacity={bubbleOpacity}
+      staggerDelay={staggerDelay}
       inlineTextEdit={inlineTextEdit}
     />
   );

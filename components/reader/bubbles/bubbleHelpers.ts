@@ -4,6 +4,8 @@ import type { DialogueLine } from "../DialogueBubble";
 /**
  * Renders bubble text with inline markup support:
  *  - `*text*` or `**text**`  → bold
+ *  - `_text_`                → italic
+ *  - `~~text~~`              → strikethrough
  *  - `[color:#hex]text[/color]` → colored span (overrides bubble-level textColor)
  *
  * Raw HTML tags (e.g. from older editor versions) are stripped before parsing
@@ -12,14 +14,12 @@ import type { DialogueLine } from "../DialogueBubble";
 export function renderStyledText(text: string): React.ReactNode {
   if (!text) return "";
 
-  // Strip any raw HTML that may have been stored by older editor versions
   const cleaned = text.replace(/<[^>]+>/g, "");
-
-  // Tokenize: **bold**, *bold* (single), [color:#hex], [/color]
-  // The `(?!\*)` negative lookahead ensures single `*` doesn't match inside `**`
-  const tokenRegex = /(\*\*|\*(?!\*)|\[color:[^\]]+\]|\[\/color\])/g;
+  const tokenRegex = /(\*\*|\*(?!\*)|~~|_(?!_)|\[color:[^\]]+\]|\[\/color\])/g;
   const parts = cleaned.split(tokenRegex);
   let isBold = false;
+  let isItalic = false;
+  let isStrike = false;
   const colorStack: string[] = [];
 
   return React.createElement(
@@ -29,34 +29,65 @@ export function renderStyledText(text: string): React.ReactNode {
       if (part === "**" || part === "*") {
         isBold = !isBold;
         return null;
-      } else if (part.startsWith("[color:") && part.endsWith("]")) {
-        const colorValue = part.slice(7, -1);
-        colorStack.push(colorValue);
+      }
+      if (part === "_") {
+        isItalic = !isItalic;
         return null;
-      } else if (part === "[/color]") {
+      }
+      if (part === "~~") {
+        isStrike = !isStrike;
+        return null;
+      }
+      if (part.startsWith("[color:") && part.endsWith("]")) {
+        colorStack.push(part.slice(7, -1));
+        return null;
+      }
+      if (part === "[/color]") {
         colorStack.pop();
         return null;
       }
       if (part === "") return null;
 
       const style: React.CSSProperties = {};
-      if (isBold) {
-        style.fontWeight = "bold";
-      }
-      if (colorStack.length > 0) {
-        // Inline `color` on a child span always overrides an inherited `color`
-        // from the parent element — this is standard CSS cascade behavior.
-        // So `[color:...]` will override the bubble-level `line.textColor`.
-        style.color = colorStack[colorStack.length - 1];
-      }
+      if (isBold) style.fontWeight = 800;
+      if (isItalic) style.fontStyle = "italic";
+      if (isStrike) style.textDecoration = "line-through";
+      if (colorStack.length > 0) style.color = colorStack[colorStack.length - 1];
 
-      if (isBold || colorStack.length > 0) {
+      if (isBold || isItalic || isStrike || colorStack.length > 0) {
         return React.createElement("span", { key: index, style }, part);
       }
       return part;
     })
   );
 }
+
+export function lineShowsSpeaker(line: DialogueLine): boolean {
+  return Boolean(line.speaker && (line.showSpeakerName || line.offscreen));
+}
+
+export function InlineSpeakerLabel({ name, color }: { name: string; color: string }) {
+  return React.createElement(
+    "strong",
+    {
+      style: { color, fontWeight: 800, fontStyle: "inherit", letterSpacing: "0.02em" },
+    },
+    `${name}: `
+  );
+}
+
+export const BUBBLE_FONT_OPTIONS: { id: NonNullable<DialogueLine["fontFamily"]> | ""; label: string }[] = [
+  { id: "", label: "Por defecto del estilo" },
+  { id: "marker", label: "Marker — cómic" },
+  { id: "bangers", label: "Bangers — grito" },
+  { id: "luckiest", label: "Luckiest — SFX" },
+  { id: "bungee", label: "Bungee — bloque" },
+  { id: "arcane", label: "Arcana — magos" },
+  { id: "diabolic", label: "Diabólica — demonios" },
+  { id: "mono", label: "Mono — tech" },
+  { id: "sans", label: "Sans — limpia" },
+  { id: "serif", label: "Serif — clásica" },
+];
 
 // ─── Speaker Color Palette ─────────────────────────────────────────────────────
 // Maps a lowercase speaker name to their canonical accent color.
@@ -210,6 +241,8 @@ export function resolveFontFamily(
       case "serif":    return "ui-serif, Georgia, serif";
       case "bungee":   return "var(--font-bungee)";
       case "luckiest": return "var(--font-luckiest)";
+      case "arcane":   return "var(--font-arcane)";
+      case "diabolic": return "var(--font-diabolic)";
     }
   }
   // Style-based defaults
@@ -236,6 +269,8 @@ export function resolveFontClass(line: DialogueLine, style?: string): string {
       case "serif":    return "font-serif";
       case "bungee":   return "font-[var(--font-bungee)]";
       case "luckiest": return "font-[var(--font-luckiest)]";
+      case "arcane":   return "font-[var(--font-arcane)]";
+      case "diabolic": return "font-[var(--font-diabolic)]";
       default:         return "font-[var(--font-marker)]";
     }
   }
@@ -291,10 +326,21 @@ export function buildExitVariant(fadeOutAnimation: FadeOutAnimation | undefined)
 export function buildAnimTransition(
   appearanceAnimation: AppearanceAnimation | undefined,
   delay: number,
-  instant: boolean
+  instant: boolean,
+  stagger: boolean = true
 ): object {
   if (instant) {
     return { delay: 0, duration: 0.15, ease: "easeOut" };
+  }
+  const softSpring = { delay, type: "spring" as const, stiffness: 160, damping: 26, mass: 0.95 };
+  if (!stagger) {
+    if (appearanceAnimation === "spring" || !appearanceAnimation) {
+      return softSpring;
+    }
+    if (appearanceAnimation === "pop") {
+      return { delay, type: "spring", stiffness: 220, damping: 22, mass: 0.9 };
+    }
+    return { delay, duration: 0.48, ease: [0.22, 1, 0.36, 1] };
   }
   if (appearanceAnimation === "spring" || !appearanceAnimation) {
     return { delay, type: "spring", stiffness: 280, damping: 20 };
@@ -317,9 +363,11 @@ export function computeBubbleDelay(
   index: number,
   line: DialogueLine,
   instant: boolean,
-  speedMultiplier: number = 1.0
+  speedMultiplier: number = 1.0,
+  stagger: boolean = true
 ): number {
   if (instant) return 0;
+  if (!stagger) return 0.05;
 
   const words = (line.text || "").split(" ").length;
   // Base delay + reading time estimate
@@ -341,4 +389,131 @@ export function computeBubbleDelay(
   // Divide by speedMultiplier so that slow (0.5) → double the delay (more time to read)
   // and fast (1.5) → two-thirds of the delay. This matches the autoplay timer logic in CinematicReader.
   return (index * baseMs * styleMul) / (speedMultiplier * 1000);
+}
+
+function balloonUnit(seed: number): number {
+  let x = seed >>> 0;
+  x = Math.imul(x ^ (x >>> 16), 0x7feb352d);
+  x = Math.imul(x ^ (x >>> 15), 0x846ca68b);
+  x = (x ^ (x >>> 16)) >>> 0;
+  return (x % 10000) / 10000;
+}
+
+const TAIL_ANGLE: Record<string, number> = {
+  right: 0,
+  "bottom-right": Math.PI / 4,
+  "bottom-left": (3 * Math.PI) / 4,
+  left: Math.PI,
+  "top-left": (-3 * Math.PI) / 4,
+  "top-right": -Math.PI / 4,
+};
+
+function smoothClosed(pts: { x: number; y: number }[]): string {
+  const n = pts.length;
+  let d = `M ${pts[0].x.toFixed(2)} ${pts[0].y.toFixed(2)}`;
+  for (let i = 0; i < n; i++) {
+    const p0 = pts[(i - 1 + n) % n];
+    const p1 = pts[i];
+    const p2 = pts[(i + 1) % n];
+    const p3 = pts[(i + 2) % n];
+    const c1x = p1.x + (p2.x - p0.x) / 6;
+    const c1y = p1.y + (p2.y - p0.y) / 6;
+    const c2x = p2.x - (p3.x - p1.x) / 6;
+    const c2y = p2.y - (p3.y - p1.y) / 6;
+    d += ` C ${c1x.toFixed(2)} ${c1y.toFixed(2)} ${c2x.toFixed(2)} ${c2y.toFixed(2)} ${p2.x.toFixed(2)} ${p2.y.toFixed(2)}`;
+  }
+  return `${d} Z`;
+}
+
+/**
+ * Closed comic balloon in pixel space so the stroke stays sharp.
+ * "scallop" is the bumpy whisper outline.
+ */
+export function buildComicBalloonPath(
+  seed: number,
+  tail: string | null | undefined,
+  boxW: number,
+  boxH: number,
+  kind: "smooth" | "scallop" = "smooth"
+): string {
+  const w = Math.max(24, boxW);
+  const h = Math.max(24, boxH);
+  const n = kind === "scallop" ? 18 : 12;
+  const cx = w / 2;
+  const cy = h / 2;
+  const fit = kind === "scallop" ? 1.14 : 1.06;
+  const a = (w / 2 - 2) / fit;
+  const b = (h / 2 - 2) / fit;
+  const power = kind === "scallop" ? 2.15 : 3.1;
+  const tailAngle = tail && tail !== "none" ? TAIL_ANGLE[tail] : undefined;
+
+  let tailIdx = -1;
+  if (tailAngle !== undefined) {
+    let best = Infinity;
+    for (let i = 0; i < n; i++) {
+      const angle = (i / n) * Math.PI * 2 - Math.PI / 2;
+      const delta = Math.atan2(Math.sin(angle - tailAngle), Math.cos(angle - tailAngle));
+      const abs = Math.abs(delta);
+      if (abs < best) {
+        best = abs;
+        tailIdx = i;
+      }
+    }
+  }
+
+  const pts: { x: number; y: number }[] = [];
+  for (let i = 0; i < n; i++) {
+    const angle = (i / n) * Math.PI * 2 - Math.PI / 2;
+    const wobble = kind === "smooth" ? (balloonUnit(seed + i * 97) - 0.5) * 0.08 : 0;
+    const scallop = kind === "scallop" ? Math.sin((i / n) * Math.PI * 2 * 7) * 0.1 : 0;
+    let scale = 1 + wobble + scallop;
+    if (i === tailIdx) scale += kind === "scallop" ? 0.28 : 0.22;
+    const c = Math.cos(angle);
+    const s = Math.sin(angle);
+    const x = cx + Math.sign(c || 1) * a * scale * Math.pow(Math.abs(c), 2 / power);
+    const y = cy + Math.sign(s || 1) * b * scale * Math.pow(Math.abs(s), 2 / power);
+    pts.push({ x, y });
+  }
+
+  return smoothClosed(pts);
+}
+
+export function comicBalloonSeed(index: number, text: string): number {
+  let h = Math.imul(index + 1, 374761393) ^ 668265263;
+  const sample = text || "";
+  const limit = Math.min(sample.length, 32);
+  for (let i = 0; i < limit; i++) {
+    h = Math.imul(h ^ sample.charCodeAt(i), 16777619);
+  }
+  return h >>> 0;
+}
+
+/** Padding and wrapping so glyphs stay inside the bubble at any font size. */
+export function comicTextContainment(fontSizePx: number, extraPad = 0): {
+  paddingTop: string;
+  paddingRight: string;
+  paddingBottom: string;
+  paddingLeft: string;
+  overflowWrap: "anywhere";
+  wordBreak: "break-word";
+  whiteSpace: "normal";
+  maxWidth: string;
+  boxSizing: "border-box";
+  lineHeight: number;
+} {
+  const padX = Math.max(14, fontSizePx * 0.7) + extraPad;
+  const padY = Math.max(10, fontSizePx * 0.55) + extraPad * 0.65;
+  const descender = fontSizePx * 0.25;
+  return {
+    paddingTop: `${padY}px`,
+    paddingRight: `${padX}px`,
+    paddingBottom: `${padY + descender}px`,
+    paddingLeft: `${padX}px`,
+    overflowWrap: "anywhere",
+    wordBreak: "break-word",
+    whiteSpace: "normal",
+    maxWidth: "100%",
+    boxSizing: "border-box",
+    lineHeight: 1.2,
+  };
 }

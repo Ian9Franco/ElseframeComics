@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect, useCallback, useRef } from "react";
 import type { DialogueLine } from "./DialogueBubble";
 import type { Dialogues, PageData, PanelStop as PanelConfig, ChapterSettings, AudioTrack } from "./audioPlayer";
 import type { AiDialogueProposal } from "./dialogueAi";
@@ -531,7 +531,15 @@ export function useDialogueEditor({
   };
 
   // Save changes to disk using our API endpoint
-  const handleSaveChanges = async () => {
+  const localDialoguesRef = useRef(localDialogues);
+  localDialoguesRef.current = localDialogues;
+  const hasUnsavedChangesRef = useRef(hasUnsavedChanges);
+  hasUnsavedChangesRef.current = hasUnsavedChanges;
+  const isSavingRef = useRef(isSaving);
+  isSavingRef.current = isSaving;
+
+  const handleSaveChanges = useCallback(async () => {
+    if (isSavingRef.current) return;
     setIsSaving(true);
     setSaveStatus("idle");
     try {
@@ -542,7 +550,7 @@ export function useDialogueEditor({
           "Content-Type": "application/json",
           "x-editor-password": savedPass,
         },
-        body: JSON.stringify({ dialogues: localDialogues }),
+        body: JSON.stringify({ dialogues: localDialoguesRef.current }),
       });
       if (res.ok) {
         setSaveStatus("success");
@@ -562,7 +570,15 @@ export function useDialogueEditor({
       setIsSaving(false);
       setTimeout(() => setSaveStatus("idle"), 3000);
     }
-  };
+  }, [chapterId]);
+
+  useEffect(() => {
+    const id = window.setInterval(() => {
+      if (!hasUnsavedChangesRef.current || isSavingRef.current) return;
+      void handleSaveChanges();
+    }, 30000);
+    return () => window.clearInterval(id);
+  }, [handleSaveChanges]);
 
   const handlePanelRectResizeStart = (
     e: React.PointerEvent,

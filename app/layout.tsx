@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from "next";
-import { Inter, Bangers, Permanent_Marker, Bungee, Luckiest_Guy } from "next/font/google";
+import { Inter, Bangers, Permanent_Marker, Bungee, Luckiest_Guy, Uncial_Antiqua, Nosifer } from "next/font/google";
 import "./globals.css";
 import NavBar from "@/components/NavBar";
 
@@ -8,6 +8,8 @@ const bangers  = Bangers({ weight: "400", variable: "--font-bangers", subsets: [
 const marker   = Permanent_Marker({ weight: "400", variable: "--font-marker", subsets: ["latin"] });
 const bungee   = Bungee({ weight: "400", variable: "--font-bungee", subsets: ["latin"] });
 const luckiest = Luckiest_Guy({ weight: "400", variable: "--font-luckiest", subsets: ["latin"] });
+const arcane   = Uncial_Antiqua({ weight: "400", variable: "--font-arcane", subsets: ["latin"] });
+const diabolic = Nosifer({ weight: "400", variable: "--font-diabolic", subsets: ["latin"] });
 
 export const viewport: Viewport = {
   width: "device-width",
@@ -58,7 +60,7 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="es-AR" suppressHydrationWarning className={`${inter.variable} ${bangers.variable} ${marker.variable} ${bungee.variable} ${luckiest.variable}`}>
+    <html lang="es-AR" suppressHydrationWarning className={`${inter.variable} ${bangers.variable} ${marker.variable} ${bungee.variable} ${luckiest.variable} ${arcane.variable} ${diabolic.variable}`}>
       <body className="antialiased min-h-screen flex flex-col font-sans brand-grain-light" suppressHydrationWarning>
         <NavBar />
         <main className="flex-1 flex flex-col">{children}</main>

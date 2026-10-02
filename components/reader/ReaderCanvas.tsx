@@ -2,10 +2,12 @@
 
 import React from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import Link from "next/link";
-import type { PanelStop } from "./audioPlayer";
+import type { PanelStop, SceneFadeType } from "./audioPlayer";
 import { ReaderZoomControls } from "./ReaderZoomControls";
 import { getComicPageUrl } from "./readerUtils";
+import { SceneFadeLayer } from "./SceneFadeLayer";
+import { sceneFadeDurationMs, sceneFadeExit, sceneFadeOrigin } from "./sceneFade";
+import { PageEndGesture } from "./PageEndGesture";
 
 interface ReaderCanvasProps {
   mode: "read" | "edit";
@@ -30,9 +32,21 @@ interface ReaderCanvasProps {
   activeBubbleIdx: number | null;
   panelIdx: number;
   zoomIdx: number;
+  maskRevealPanelIdx?: number;
+  maskRevealZoomIdx?: number;
   zoomedOut: boolean;
   showAllDialogues: boolean;
   isPageChanging: boolean;
+  sceneTransitionMs?: number;
+  cameraTransitionMs?: number;
+  pageFadeInType?: SceneFadeType;
+  pageFadeInMs?: number;
+  stopCover?: {
+    show: boolean;
+    type?: SceneFadeType;
+    durationMs: number;
+    direction: "in" | "out";
+  } | null;
   renderedDialogues: React.ReactNode;
   undoStack: any[];
   handleMouseDown: (e: React.MouseEvent) => void;
@@ -82,9 +96,16 @@ export function ReaderCanvas({
   activeBubbleIdx,
   panelIdx,
   zoomIdx,
+  maskRevealPanelIdx,
+  maskRevealZoomIdx,
   zoomedOut,
   showAllDialogues,
   isPageChanging,
+  sceneTransitionMs = 0,
+  cameraTransitionMs,
+  pageFadeInType,
+  pageFadeInMs = 0,
+  stopCover,
   renderedDialogues,
   undoStack,
   handleMouseDown,
@@ -108,9 +129,101 @@ export function ReaderCanvas({
   resetPage,
   setZoomScale,
   setPanOffset,
-  nextChapter,
 }: ReaderCanvasProps) {
   const isLastPage = pageIdx === pages.length - 1;
+  const revealPanel = maskRevealPanelIdx ?? panelIdx;
+  const revealZoom = maskRevealZoomIdx ?? zoomIdx;
+  const panMs = cameraTransitionMs ?? sceneTransitionMs;
+  const panEase = "cubic-bezier(0.22, 1, 0.36, 1)";
+  const comicPanTransition =
+    mode === "read" && !isPageChanging && panMs > 0
+      ? `left ${panMs}ms ${panEase}, top ${panMs}ms ${panEase}, width ${panMs}ms ${panEase}, height ${panMs}ms ${panEase}`
+      : "none";
+
+  const renderReadSpoilerMasks = () => {
+    if (mode !== "read" || zoomedOut || !imgSize || imgWidth <= 0 || imgHeight <= 0) return null;
+
+    const rawActiveMasks: {
+      key: string;
+      x: number;
+      y: number;
+      w: number;
+      h: number;
+      pIdx: number;
+      rIdx: number;
+      fadeOut?: number;
+      fadeOutType?: SceneFadeType;
+    }[] = [];
+
+    currentPanels.forEach((panel: PanelStop, pIdx: number) => {
+      const rects = panel.zoomRects || (panel.zoomRect ? [panel.zoomRect] : []);
+      rects.forEach((zoom: any, rIdx: number) => {
+        let shouldMask = false;
+        if (pIdx > revealPanel) {
+          shouldMask = panel.hideUntilReached !== false;
+        } else if (pIdx === revealPanel) {
+          shouldMask = rIdx > revealZoom && panel.hideUntilReached !== false;
+        }
+        if (shouldMask) {
+          rawActiveMasks.push({
+            key: `spoiler-mask-${pIdx}-${rIdx}`,
+            x: zoom.x ?? 0,
+            y: zoom.y ?? 0,
+            w: zoom.w ?? 100,
+            h: zoom.h ?? 25,
+            fadeOut: zoom.fadeOut,
+            fadeOutType: zoom.fadeOutType,
+            pIdx,
+            rIdx,
+          });
+        }
+      });
+    });
+
+    if (rawActiveMasks.length === 0) return null;
+
+    const sortedMasks = [...rawActiveMasks].sort((a, b) => a.y - b.y);
+    const processedMasks = sortedMasks.map((mask, idx) => {
+      let { x, y, w, h } = mask;
+      const nextMask = sortedMasks[idx + 1];
+      if (nextMask) {
+        const maskBottom = y + h;
+        const nextTop = nextMask.y;
+        if (nextTop > maskBottom && nextTop - maskBottom <= 15) {
+          h = nextTop - y + 0.5;
+        }
+      } else if (y + h >= 75) {
+        h = Math.max(h, 100 - y);
+      }
+      return { ...mask, x, y, w, h };
+    });
+
+    return (
+      <AnimatePresence>
+        {processedMasks.map((zoom) => (
+          <motion.div
+            key={zoom.key}
+            initial={{ opacity: 1, scale: 1, scaleX: 1, scaleY: 1 }}
+            animate={{ opacity: 1, scale: 1, scaleX: 1, scaleY: 1 }}
+            exit={sceneFadeExit(zoom.fadeOutType, zoom.fadeOut ?? 0)}
+            transition={{
+              duration: sceneFadeDurationMs(zoom.fadeOutType, zoom.fadeOut ?? 0) / 1000,
+              ease: "easeOut",
+            }}
+            className="absolute brand-grain select-none overflow-hidden"
+            style={{
+              left: `calc(${zoom.x}% - 2px)`,
+              top: `calc(${zoom.y}% - 2px)`,
+              width: `calc(${zoom.w}% + 4px)`,
+              height: `calc(${zoom.h}% + 4px)`,
+              zIndex: 20,
+              transformOrigin: sceneFadeOrigin(zoom.fadeOutType),
+            }}
+          />
+        ))}
+      </AnimatePresence>
+    );
+  };
 
   return (
     <div
@@ -152,35 +265,43 @@ export function ReaderCanvas({
             : undefined
         }
       >
-        {/* Image with dynamic zoom + pan */}
+        {/* Comic page frame: image + spoiler masks share the same pan/zoom transform */}
         {imgSize && (
-          <img
-            ref={imgRef}
-            key={pages[pageIdx]}
-            src={getComicPageUrl(pages[pageIdx])}
-            alt={`${chapter.title} — Página ${pageIdx + 1}`}
-            draggable={false}
+          <div
             style={{
               position: "absolute",
-              width: imgWidth,
               left: imgLeft,
               top: imgTop,
-              height: "auto",
-              display: "block",
-              userSelect: "none",
-              WebkitUserSelect: "none",
-              maxWidth: "none",
-              // 3B: transition specific props only, avoids width jitter on zoom change
-              transition:
-                mode === "read" && !isPageChanging
-                  ? "left 400ms cubic-bezier(0.25, 1, 0.5, 1), top 400ms cubic-bezier(0.25, 1, 0.5, 1), width 400ms cubic-bezier(0.25, 1, 0.5, 1)"
-                  : "none",
-              boxShadow:
-                mode === "read"
-                  ? "0 15px 40px rgba(0, 0, 0, 0.8), 0 8px 16px rgba(0, 0, 0, 0.6)"
-                  : "none",
+              width: imgWidth,
+              height: imgHeight,
+              transition: comicPanTransition,
             }}
-          />
+          >
+            <img
+              ref={imgRef}
+              key={pages[pageIdx]}
+              src={getComicPageUrl(pages[pageIdx])}
+              alt={`${chapter.title} — Página ${pageIdx + 1}`}
+              draggable={false}
+              style={{
+                position: "absolute",
+                inset: 0,
+                width: "100%",
+                height: "100%",
+                objectFit: "fill",
+                display: "block",
+                userSelect: "none",
+                WebkitUserSelect: "none",
+                maxWidth: "none",
+                transition: "none",
+                boxShadow:
+                  mode === "read"
+                    ? "0 15px 40px rgba(0, 0, 0, 0.8), 0 8px 16px rgba(0, 0, 0, 0.6)"
+                    : "none",
+              }}
+            />
+            {renderReadSpoilerMasks()}
+          </div>
         )}
 
         {/* ── Grid Overlay (Editor Mode only) ── */}
@@ -335,96 +456,6 @@ export function ReaderCanvas({
           });
         })()}
 
-        {/* Spoiler Masks for future panels & sequences */}
-        <AnimatePresence>
-          {mode === "read" && !zoomedOut && imgSize && imgWidth > 0 && imgHeight > 0 && (() => {
-            // 1. Gather all active spoiler masks on the page
-            const rawActiveMasks: { key: string; x: number; y: number; w: number; h: number; pIdx: number; rIdx: number }[] = [];
-            
-            currentPanels.forEach((panel: PanelStop, pIdx: number) => {
-              const rects = panel.zoomRects || (panel.zoomRect ? [panel.zoomRect] : []);
-              rects.forEach((zoom: any, rIdx: number) => {
-                let shouldMask = false;
-                if (pIdx > panelIdx) {
-                  shouldMask = panel.hideUntilReached !== false;
-                } else if (pIdx === panelIdx) {
-                  shouldMask = rIdx > zoomIdx && panel.hideUntilReached !== false;
-                }
-                if (shouldMask) {
-                  rawActiveMasks.push({
-                    key: `spoiler-mask-${pIdx}-${rIdx}`,
-                    x: zoom.x ?? 0,
-                    y: zoom.y ?? 0,
-                    w: zoom.w ?? 100,
-                    h: zoom.h ?? 25,
-                    pIdx,
-                    rIdx,
-                  });
-                }
-              });
-            });
-
-            if (rawActiveMasks.length === 0) return null;
-
-            // 2. Sort active masks by Y coordinate
-            const sortedMasks = [...rawActiveMasks].sort((a, b) => a.y - b.y);
-
-            // 3. Bridge/merge vertical gaps between consecutive active masks
-            const processedMasks = sortedMasks.map((mask, idx) => {
-              let { x, y, w, h } = mask;
-              
-              // If there's a next active mask, check if there's a vertical gap to bridge
-              const nextMask = sortedMasks[idx + 1];
-              if (nextMask) {
-                const maskBottom = y + h;
-                const nextTop = nextMask.y;
-                // If nextMask starts below current mask and the gap is up to 15%
-                if (nextTop > maskBottom && nextTop - maskBottom <= 15) {
-                  // Extend current mask height to meet the top of nextMask
-                  h = nextTop - y + 0.5;
-                }
-              } else {
-                // If it's the last mask on the page and it ends near the bottom (>= 75%), extend all the way to 100%
-                if (y + h >= 75) {
-                  h = Math.max(h, 100 - y);
-                }
-              }
-
-              return { ...mask, x, y, w, h };
-            });
-
-            // 4. Render processed masks
-            return processedMasks.map((zoom) => {
-              const maskLeft = imgLeft + (zoom.x / 100) * imgWidth;
-              const maskTop = imgTop + (zoom.y / 100) * imgHeight;
-              const maskWidth = (zoom.w / 100) * imgWidth;
-              const maskHeight = (zoom.h / 100) * imgHeight;
-
-              return (
-                <motion.div
-                  key={zoom.key}
-                  initial={{ opacity: 1 }}
-                  animate={{ opacity: 1 }}
-                  exit={{ opacity: 0 }}
-                  transition={{ duration: 0.25, ease: "easeOut" }}
-                  className="absolute brand-grain select-none overflow-hidden"
-                  style={{
-                    left: maskLeft - 2,
-                    top: maskTop - 2,
-                    width: maskWidth + 4,
-                    height: maskHeight + 4,
-                    zIndex: 20,
-                    transition:
-                      mode === "read" && !isPageChanging
-                        ? "left 400ms cubic-bezier(0.25, 1, 0.5, 1), top 400ms cubic-bezier(0.25, 1, 0.5, 1), width 400ms cubic-bezier(0.25, 1, 0.5, 1), height 400ms cubic-bezier(0.25, 1, 0.5, 1)"
-                        : "none",
-                  }}
-                />
-              );
-            });
-          })()}
-        </AnimatePresence>
-
         {renderedDialogues}
 
         {/* ── FocusY Indicator line in Editor Mode ── */}
@@ -496,72 +527,14 @@ export function ReaderCanvas({
         />
       )}
 
-      {/* Tap instructions / Next Page overlay in Reader Mode */}
       {mode === "read" && zoomedOut && !showAllDialogues && (
-        <motion.div
-          initial={{ opacity: 0, y: 24 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.15, type: "spring", stiffness: 220, damping: 24 }}
-          className="absolute inset-0 flex flex-col items-center justify-end gap-3 sm:gap-4 z-40 pointer-events-none"
-          style={{
-            background: "linear-gradient(to top, rgba(10,10,15,0.92) 0%, rgba(10,10,15,0.7) 40%, transparent 75%)",
-            paddingBottom: "max(5.25rem, calc(2rem + env(safe-area-inset-bottom)))",
-          }}
-        >
-          {/* Review / Control Row */}
-          <div className="flex gap-2 sm:gap-3 px-4 mb-1 pointer-events-auto" onClick={(e) => e.stopPropagation()}>
-            <button
-              onClick={() => {
-                resetPage(pageIdx);
-              }}
-              className="px-3 py-1.5 sm:px-4 sm:py-2 border-2 border-white bg-black/60 text-white font-[var(--font-bangers)] tracking-wide hover:bg-white hover:text-black transition-colors rounded text-xs sm:text-sm uppercase shadow-lg"
-            >
-              🔄 Volver a ver
-            </button>
-            <button
-              onClick={() => resetPage(pageIdx)}
-              className="hidden" // Placeholder button kept for state alignment
-            />
-            <button
-              onClick={() => handleReaderTap(null as any)} // advances or handles click
-              className="hidden"
-            />
-          </div>
-
-          {/* Navigation Row */}
-          <div className="flex gap-2 sm:gap-3 flex-wrap justify-center px-4 pointer-events-auto" onClick={(e) => e.stopPropagation()}>
-            {pageIdx > 0 && (
-              <button 
-                onClick={() => resetPage(pageIdx - 1)} 
-                className="btn btn-dark text-xs sm:text-base md:text-lg px-3 py-2 sm:px-5 sm:py-3 shadow-md"
-              >
-                ← <span className="hidden sm:inline">Página</span> Anterior
-              </button>
-            )}
-            {!isLastPage ? (
-              <button 
-                onClick={() => resetPage(pageIdx + 1)} 
-                className="btn btn-magenta text-sm sm:text-lg md:text-xl px-4 py-2 sm:px-6 sm:py-3.5 shadow-md"
-              >
-                Siguiente <span className="hidden sm:inline">Página</span> →
-              </button>
-            ) : nextChapter ? (
-              <Link 
-                href={`/chapters/${nextChapter.id}`} 
-                className="btn btn-magenta text-sm sm:text-lg md:text-xl px-4 py-2 sm:px-6 sm:py-3.5 shadow-md"
-              >
-                {nextChapter.title} →
-              </Link>
-            ) : (
-              <Link 
-                href="/" 
-                className="btn btn-magenta text-sm sm:text-lg md:text-xl px-4 py-2 sm:px-6 sm:py-3.5 shadow-md"
-              >
-                Fin del capítulo →
-              </Link>
-            )}
-          </div>
-        </motion.div>
+        <PageEndGesture
+          isFirst={pageIdx === 0}
+          isLast={isLastPage}
+          onPrev={() => resetPage(pageIdx - 1)}
+          onReplay={() => resetPage(pageIdx)}
+          onNext={() => resetPage(isLastPage ? 0 : pageIdx + 1)}
+        />
       )}
 
       {mode === "edit" && (
@@ -632,16 +605,28 @@ export function ReaderCanvas({
         </div>
       )}
 
+      {mode === "read" && stopCover?.show && (
+        <SceneFadeLayer
+          key={`stop-cover-${stopCover.direction}-${stopCover.type}`}
+          show
+          type={stopCover.type}
+          durationMs={stopCover.durationMs}
+          direction={stopCover.direction}
+          zIndex={90}
+        />
+      )}
+
       {/* Page Preload Overlay Mask — 1A: animated entrance + exit */}
       <AnimatePresence>
         {isPageChanging && (
           <motion.div
             key="page-preload-overlay"
-            initial={{ opacity: 1 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.4, ease: "easeInOut" }}
+            initial={{ opacity: 1, scale: 1, scaleX: 1, scaleY: 1 }}
+            animate={{ opacity: 1, scale: 1, scaleX: 1, scaleY: 1 }}
+            exit={sceneFadeExit(pageFadeInType, pageFadeInMs)}
+            transition={{ duration: sceneFadeDurationMs(pageFadeInType, pageFadeInMs) / 1000, ease: "easeInOut" }}
             className="absolute inset-0 brand-grain z-[100] flex flex-col items-center justify-center pointer-events-auto cursor-default"
+            style={{ transformOrigin: sceneFadeOrigin(pageFadeInType) }}
             onClick={(e) => e.stopPropagation()}
           >
             <motion.div

@@ -12,10 +12,29 @@ import {
   buildExitVariant,
   buildAnimTransition,
   computeBubbleDelay,
+  comicTextContainment,
   resolveBgColor,
   renderStyledText,
+  lineShowsSpeaker,
+  InlineSpeakerLabel,
 } from "./bubbleHelpers";
 import { BubbleInlineEditor } from "./BubbleInlineEditor";
+
+function captionOffsetColor(color: string): string {
+  const value = color.trim().toLowerCase();
+  if (
+    !value ||
+    value === "#0a0a0f" ||
+    value === "#000" ||
+    value === "#000000" ||
+    value === "#111" ||
+    value === "#111111" ||
+    value === "black"
+  ) {
+    return "#e23b3b";
+  }
+  return color;
+}
 
 interface CaptionBubbleProps {
   line: DialogueLine;
@@ -27,6 +46,7 @@ interface CaptionBubbleProps {
   textScale?: number;
   speedMultiplier?: number;
   bubbleOpacity?: number;
+  staggerDelay?: boolean;
   inlineTextEdit?: import("../DialogueBubble").InlineTextEditProps;
 }
 
@@ -40,6 +60,7 @@ export function CaptionBubble({
   textScale = 1.0,
   speedMultiplier = 1.0,
   bubbleOpacity,
+  staggerDelay = true,
   inlineTextEdit,
 }: CaptionBubbleProps) {
   const [isMobile, setIsMobile] = React.useState(false);
@@ -54,17 +75,11 @@ export function CaptionBubble({
   const size = line.size ?? "medium";
 
   // ── Dynamic shadow based on depth ──
-  const depthVal      = depth ?? 2;
-  const shadowOffsetY = 2 + depthVal * 1.5;
-  const shadowBlur    = 4 + depthVal * 2.5;
-  const shadowAlpha   = 0.12 + depthVal * 0.04;
-  const customDropShadow = `drop-shadow(0px ${shadowOffsetY}px ${shadowBlur}px rgba(0, 0, 0, ${shadowAlpha}))`;
-
   // ── Animation ──
-  const delay      = computeBubbleDelay(index, line, instant ?? false, speedMultiplier);
+  const delay      = computeBubbleDelay(index, line, instant ?? false, speedMultiplier, staggerDelay);
   const animVars   = buildAnimVariants(appearanceAnimation);
   const exitVar    = buildExitVariant(fadeOutAnimation);
-  const transition = buildAnimTransition(appearanceAnimation, delay, instant ?? false);
+  const transition = buildAnimTransition(appearanceAnimation, delay, instant ?? false, staggerDelay);
 
   // ── Font ──
   const customFontFamily    = resolveFontFamily(line, "caption");
@@ -76,9 +91,9 @@ export function CaptionBubble({
   const captionSpeakerColor = getSpeakerColor(line.speaker, "#000000");
 
   // ── Size classes ──
-  let captionSizeClass = "text-sm sm:text-base px-3.5 py-2";
-  if (size === "small") captionSizeClass = "text-xs px-2.5 py-1.5";
-  if (size === "large") captionSizeClass = "text-base sm:text-lg px-5 py-3.5";
+  let captionSizeClass = "text-sm sm:text-base";
+  if (size === "small") captionSizeClass = "text-xs";
+  if (size === "large") captionSizeClass = "text-base sm:text-lg";
 
   const isTranslucent = captionBg.includes("rgba") || captionBg === "transparent";
   const backdropBlurStyles: React.CSSProperties = isTranslucent
@@ -87,12 +102,15 @@ export function CaptionBubble({
 
   const captionStyles: React.CSSProperties = {
     pointerEvents: "none",
-    border: `1.75px solid ${captionBorderColor}`, // slightly thicker for better contrast when transparent
+    border: "2px solid #0a0a0f",
     background: captionBg,
     boxShadow: "none",
-    borderRadius: line.borderRadius !== undefined ? `${line.borderRadius}px` : undefined,
+    borderRadius: 0,
+    position: "relative",
+    zIndex: 1,
     ...backdropBlurStyles,
   };
+  const slabColor = captionOffsetColor(captionBorderColor);
 
   let baseFontSize = line.fontSize;
   if (!baseFontSize) {
@@ -100,6 +118,7 @@ export function CaptionBubble({
   }
   const minFont = isMobile ? 8 : 10;
   const finalFontSize = Math.max(minFont, baseFontSize * textScale);
+  Object.assign(captionStyles, comicTextContainment(finalFontSize));
   captionStyles.fontSize = `${finalFontSize}px`;
   if (line.width)     captionStyles.maxWidth = `${line.width}px`;
   if (line.textColor) captionStyles.color    = line.textColor;
@@ -117,20 +136,14 @@ export function CaptionBubble({
       transition={transition}
       className={`caption leading-snug text-left max-w-sm ${captionSizeClass}`}
       style={{
-        ...captionStyles,
         ...wrapperStyles,
-        filter: customDropShadow,
+        background: "transparent",
+        border: "none",
+        filter: "none",
+        position: "relative",
       }}
     >
-      {line.speaker && (
-        <div
-          className="font-[var(--font-bangers)] text-xs tracking-wider mb-1 uppercase"
-          style={{ color: captionSpeakerColor }}
-        >
-          {line.speaker}
-        </div>
-      )}
-      <div className="flex flex-col gap-2">
+      <div className="flex flex-col gap-2" style={{ ...captionStyles, boxShadow: `2px 2px 0 #f2c14e, 4px 4px 0 ${slabColor}` }}>
         {paragraphs.map((p, i) => (
           <div
             key={i}
@@ -140,10 +153,11 @@ export function CaptionBubble({
               ...(line.textColor ? { color: line.textColor } : {}),
             }}
           >
-            {p.speaker && (
-              <strong className="font-[var(--font-bangers)] font-bold mr-1 tracking-wide" style={{ color: getSpeakerColor(p.speaker, "#000000"), fontWeight: "bold" }}>
-                {p.speaker}:{" "}
-              </strong>
+            {i === 0 && lineShowsSpeaker(line) && line.speaker && (
+              <InlineSpeakerLabel name={line.speaker} color={captionSpeakerColor} />
+            )}
+            {p.speaker && (!line.speaker || p.speaker.toUpperCase().trim() !== line.speaker.toUpperCase().trim()) && (
+              <InlineSpeakerLabel name={p.speaker} color={getSpeakerColor(p.speaker, "#000000")} />
             )}
             {inlineTextEdit ? (
               <BubbleInlineEditor inlineTextEdit={inlineTextEdit} />

@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useEffect, useMemo, useRef, useState } from "react";
-import type { PanelStop } from "@/components/reader/audioPlayer";
+import type { PanelStop, ZoomRect } from "@/components/reader/audioPlayer";
 import { getComicPageUrl } from "@/components/reader/readerUtils";
 import { BubbleNode } from "./BubbleNode";
 import { SmartGuides, snapWithGuides } from "./SmartGuides";
@@ -15,11 +15,13 @@ type StoreApi = {
   activeTool: EditorV2Tool;
   pendingBubbleStyle: BubbleStylePreset;
   beginGesture: () => void;
-  addPanelWithMask: (rect: { x: number; y: number; w: number; h: number }) => void;
+  addMaskToPanel: (panelIdx: number, rect: { x: number; y: number; w: number; h: number }) => void;
   addBubble: (panelIdx: number, pos: { posX: number; posY: number }, style?: BubbleStylePreset) => void;
   updateBubble: (pIdx: number, bIdx: number, fields: Partial<import("@/components/reader/DialogueBubble").DialogueLine>) => void;
   updateBubbleLive: (pIdx: number, bIdx: number, fields: Partial<import("@/components/reader/DialogueBubble").DialogueLine>) => void;
   updatePanel: (pIdx: number, u: Partial<PanelStop>) => void;
+  updatePanelLive: (pIdx: number, u: Partial<PanelStop>) => void;
+  updateMaskLive: (pIdx: number, rIdx: number, rect: { x: number; y: number; w: number; h: number }) => void;
   findPanelForPoint: (x: number, y: number) => number;
 };
 
@@ -56,9 +58,23 @@ export function PageCanvas({
   const [containerSize, setContainerSize] = useState({ w: 0, h: 0 });
   const [imgSize, setImgSize] = useState<{ w: number; h: number } | null>(null);
   const [drawRect, setDrawRect] = useState<{ x1: number; y1: number; x2: number; y2: number } | null>(null);
-  const [marquee, setMarquee] = useState<{ x1: number; y1: number; x2: number; y2: number } | null>(null);
   const panRef = useRef<{ sx: number; sy: number; ox: number; oy: number } | null>(null);
+  const stopDrag = useRef<number | null>(null);
+  const maskDrag = useRef<{
+    pIdx: number;
+    rIdx: number;
+    mode: "move" | "nw" | "ne" | "sw" | "se";
+    startX: number;
+    startY: number;
+    orig: ZoomRect;
+  } | null>(null);
   const gestureStarted = useRef(false);
+  const [editingBubble, setEditingBubble] = useState<{ pIdx: number; bIdx: number } | null>(null);
+  const tool = spaceHeld ? "hand" : store.activeTool;
+
+  useEffect(() => {
+    if (tool !== "bubble") setEditingBubble(null);
+  }, [tool]);
 
   useEffect(() => {
     const img = new window.Image();
@@ -102,26 +118,26 @@ export function PageCanvas({
 
   const handlePointerDown = (e: React.PointerEvent) => {
     if (e.button !== 0) return;
-    const tool = spaceHeld ? "hand" : store.activeTool;
     if (tool === "hand") {
       panRef.current = { sx: e.clientX, sy: e.clientY, ox: pan.x, oy: pan.y };
       return;
     }
     const { posX, posY } = clientToPercent(e.clientX, e.clientY);
-    if (tool === "stop") {
+    if (tool === "mask") {
       store.beginGesture();
       gestureStarted.current = true;
       setDrawRect({ x1: posX, y1: posY, x2: posX, y2: posY });
       return;
     }
-    if (tool === "select" && e.target === e.currentTarget) {
-      store.setSelection({ kind: "none" });
-      setMarquee({ x1: posX, y1: posY, x2: posX, y2: posY });
-      return;
-    }
-    if (tool === "bubble") {
-      const pIdx = store.findPanelForPoint(posX, posY);
-      store.addBubble(pIdx >= 0 ? pIdx : 0, { posX, posY }, store.pendingBubbleStyle);
+    if (tool === "stops") {
+      const pIdx =
+        store.selection.kind === "stop" ? store.selection.panelIdx : Math.max(0, activePanelIdx);
+      if (panels[pIdx]) {
+        store.beginGesture();
+        store.setSelection({ kind: "stop", panelIdx: pIdx });
+        stopDrag.current = pIdx;
+        store.updatePanelLive(pIdx, { focusY: Math.max(0, Math.min(1, posY / 100)) });
+      }
     }
   };
 
@@ -133,60 +149,72 @@ export function PageCanvas({
       });
       return;
     }
+    if (stopDrag.current !== null) {
+      const { posY } = clientToPercent(e.clientX, e.clientY);
+      store.updatePanelLive(stopDrag.current, { focusY: Math.max(0, Math.min(1, posY / 100)) });
+      return;
+    }
+    if (maskDrag.current && layout) {
+      const d = maskDrag.current;
+      const dx = ((e.clientX - d.startX) / (layout.imgWidth * scale)) * 100;
+      const dy = ((e.clientY - d.startY) / (layout.imgHeight * scale)) * 100;
+      let { x, y, w, h } = d.orig;
+      if (d.mode === "move") {
+        x = Math.max(0, Math.min(100 - w, x + dx));
+        y = Math.max(0, Math.min(100 - h, y + dy));
+      } else {
+        if (d.mode.includes("e")) w = Math.max(4, w + dx);
+        if (d.mode.includes("s")) h = Math.max(4, h + dy);
+        if (d.mode.includes("w")) {
+          const nx = x + dx;
+          w = Math.max(4, w - dx);
+          x = nx;
+        }
+        if (d.mode.includes("n")) {
+          const ny = y + dy;
+          h = Math.max(4, h - dy);
+          y = ny;
+        }
+      }
+      store.updateMaskLive(d.pIdx, d.rIdx, { x, y, w, h });
+      return;
+    }
     const { posX, posY } = clientToPercent(e.clientX, e.clientY);
     if (drawRect) setDrawRect({ ...drawRect, x2: posX, y2: posY });
-    if (marquee) setMarquee({ ...marquee, x2: posX, y2: posY });
   };
 
   const handlePointerUp = () => {
     panRef.current = null;
+    maskDrag.current = null;
+    stopDrag.current = null;
+    gestureStarted.current = false;
     if (drawRect) {
       const x = Math.min(drawRect.x1, drawRect.x2);
       const y = Math.min(drawRect.y1, drawRect.y2);
       const w = Math.abs(drawRect.x2 - drawRect.x1);
       const h = Math.abs(drawRect.y2 - drawRect.y1);
       if (w > 3 && h > 3) {
-        store.addPanelWithMask({ x, y, w, h });
-        store.setSelection({ kind: "stop", panelIdx: panels.length });
+        store.addMaskToPanel(activePanelIdx, { x, y, w, h });
       }
       setDrawRect(null);
       gestureStarted.current = false;
     }
-    if (marquee && layout) {
-      const xMin = Math.min(marquee.x1, marquee.x2);
-      const xMax = Math.max(marquee.x1, marquee.x2);
-      const yMin = Math.min(marquee.y1, marquee.y2);
-      const yMax = Math.max(marquee.y1, marquee.y2);
-      const items: { panelIdx: number; bubbleIdx: number }[] = [];
-      panels.forEach((panel, pIdx) => {
-        (panel.dialogue || []).forEach((line, bIdx) => {
-          const px = line.posX ?? 50;
-          const py = line.posY ?? (panel.focusY ?? 0.5) * 100;
-          if (px >= xMin && px <= xMax && py >= yMin && py <= yMax) {
-            items.push({ panelIdx: pIdx, bubbleIdx: bIdx });
-          }
-        });
-      });
-      if (items.length === 1) store.setSelection({ kind: "bubble", panelIdx: items[0].panelIdx, bubbleIdx: items[0].bubbleIdx });
-      else if (items.length > 1) store.setSelection({ kind: "bubbles", items });
-      setMarquee(null);
-    }
   };
 
   const handleDoubleClick = (e: React.MouseEvent) => {
-    if (store.activeTool !== "select" && store.activeTool !== "bubble") return;
+    if (tool !== "bubble") return;
     const { posX, posY } = clientToPercent(e.clientX, e.clientY);
     const pIdx = store.findPanelForPoint(posX, posY);
     store.addBubble(pIdx >= 0 ? pIdx : 0, { posX, posY }, store.pendingBubbleStyle);
   };
 
   const handleDragOver = (e: React.DragEvent) => {
-    if (dragBubbleStyle) e.preventDefault();
+    if (dragBubbleStyle && tool === "bubble") e.preventDefault();
   };
 
   const handleDrop = (e: React.DragEvent) => {
     e.preventDefault();
-    if (!dragBubbleStyle) return;
+    if (!dragBubbleStyle || tool !== "bubble") return;
     const { posX, posY } = clientToPercent(e.clientX, e.clientY);
     const pIdx = store.findPanelForPoint(posX, posY);
     store.addBubble(pIdx >= 0 ? pIdx : 0, { posX, posY }, dragBubbleStyle);
@@ -198,8 +226,9 @@ export function PageCanvas({
   }
 
   const { imgWidth, imgHeight, imgLeft, imgTop } = layout;
-  const scaledW = imgWidth * scale;
-  const scaledH = imgHeight * scale;
+  const canMoveStops = tool === "stops" || tool === "hand";
+  const canMoveMasks = tool === "mask" || tool === "hand";
+  const canMoveBubbles = tool === "bubble" || tool === "hand";
 
   const isSelectedBubble = (pIdx: number, bIdx: number) => {
     const s = store.selection;
@@ -208,16 +237,14 @@ export function PageCanvas({
     return false;
   };
 
-  const activeBubble =
-    store.selection.kind === "bubble"
-      ? { pIdx: store.selection.panelIdx, bIdx: store.selection.bubbleIdx }
-      : null;
+  const cursor =
+    spaceHeld || tool === "hand" ? "grab" : tool === "mask" ? "crosshair" : tool === "stops" ? "ns-resize" : "default";
 
   return (
     <div
       ref={containerRef}
       className="flex-1 relative overflow-hidden bg-[#0a0a0f] touch-none"
-      style={{ cursor: spaceHeld || store.activeTool === "hand" ? "grab" : store.activeTool === "stop" ? "crosshair" : "default" }}
+      style={{ cursor }}
       onPointerDown={handlePointerDown}
       onPointerMove={handlePointerMove}
       onPointerUp={handlePointerUp}
@@ -246,23 +273,74 @@ export function PageCanvas({
       <div className="absolute inset-0 pointer-events-none" style={{ transform: `translate(${pan.x}px, ${pan.y}px)` }}>
         {panels.map((panel, pIdx) => {
           const rects = panel.zoomRects || (panel.zoomRect ? [panel.zoomRect] : []);
-          return rects.map((r, rIdx) => (
-            <div
-              key={`mask-${pIdx}-${rIdx}`}
-              className={`absolute border-2 pointer-events-none ${activePanelIdx === pIdx ? "border-[#e8185a]/80 bg-[#e8185a]/5" : "border-white/20 bg-white/5"}`}
-              style={{
-                left: imgLeft + (r.x / 100) * imgWidth * scale + (scale - 1) * 0,
-                top: imgTop + (r.y / 100) * imgHeight * scale,
-                width: (r.w / 100) * imgWidth * scale,
-                height: (r.h / 100) * imgHeight * scale,
-                transform: `scale(${1})`,
-              }}
-            />
-          ));
+          return rects.map((r, rIdx) => {
+            const selected =
+              store.selection.kind === "mask" && store.selection.panelIdx === pIdx && store.selection.rectIdx === rIdx;
+            const left = imgLeft + (r.x / 100) * imgWidth * scale;
+            const top = imgTop + (r.y / 100) * imgHeight * scale;
+            const width = (r.w / 100) * imgWidth * scale;
+            const height = (r.h / 100) * imgHeight * scale;
+            return (
+              <div
+                key={`mask-${pIdx}-${rIdx}`}
+                className={`absolute border-2 ${canMoveMasks ? "pointer-events-auto" : "pointer-events-none"} ${
+                  selected
+                    ? "border-cyan-300 bg-cyan-300/15 cursor-move"
+                    : activePanelIdx === pIdx
+                      ? "border-[#e8185a]/80 bg-[#e8185a]/5 cursor-move"
+                      : "border-white/20 bg-white/5 cursor-move"
+                } ${canMoveMasks ? "opacity-100" : "opacity-35"}`}
+                style={{ left, top, width, height }}
+                onPointerDown={(e) => {
+                  if (!canMoveMasks) return;
+                  e.stopPropagation();
+                  store.setSelection({ kind: "mask", panelIdx: pIdx, rectIdx: rIdx });
+                  store.beginGesture();
+                  maskDrag.current = {
+                    pIdx,
+                    rIdx,
+                    mode: "move",
+                    startX: e.clientX,
+                    startY: e.clientY,
+                    orig: { ...r },
+                  };
+                  (e.currentTarget as HTMLElement).setPointerCapture(e.pointerId);
+                }}
+              >
+                {selected && canMoveMasks &&
+                  (["nw", "ne", "sw", "se"] as const).map((handle) => (
+                    <div
+                      key={handle}
+                      className="absolute w-3 h-3 bg-cyan-300 border border-black rounded-sm z-10"
+                      style={{
+                        left: handle.includes("w") ? -6 : undefined,
+                        right: handle.includes("e") ? -6 : undefined,
+                        top: handle.includes("n") ? -6 : undefined,
+                        bottom: handle.includes("s") ? -6 : undefined,
+                        cursor: `${handle}-resize`,
+                      }}
+                      onPointerDown={(e) => {
+                        e.stopPropagation();
+                        store.beginGesture();
+                        maskDrag.current = {
+                          pIdx,
+                          rIdx,
+                          mode: handle,
+                          startX: e.clientX,
+                          startY: e.clientY,
+                          orig: { ...r },
+                        };
+                        (e.currentTarget as HTMLElement).setPointerCapture(e.pointerId);
+                      }}
+                    />
+                  ))}
+              </div>
+            );
+          });
         })}
 
-        {panels.map((panel, pIdx) => (
-          activePanelIdx === pIdx && store.activeTool === "select" ? (
+        {panels.map((panel, pIdx) =>
+          canMoveStops ? (
             <StopRegionFocusHandle
               key={`focus-handle-${pIdx}`}
               focusY={panel.focusY ?? 0.5}
@@ -272,13 +350,18 @@ export function PageCanvas({
               imgHeight={imgHeight}
               scale={scale}
               panY={pan.y}
-              onBegin={() => store.beginGesture()}
-              onChange={(fy) => store.updatePanel(pIdx, { focusY: fy })}
+              label={`Parada ${pIdx + 1}`}
+              selected={store.selection.kind === "stop" && store.selection.panelIdx === pIdx}
+              onBegin={() => {
+                store.beginGesture();
+                store.setSelection({ kind: "stop", panelIdx: pIdx });
+              }}
+              onChange={(fy) => store.updatePanelLive(pIdx, { focusY: fy })}
             />
           ) : (
             <div
               key={`focus-${pIdx}`}
-              className="absolute w-full h-px bg-cyan-400/40 pointer-events-none"
+              className="absolute w-full h-px bg-cyan-400/25 pointer-events-none"
               style={{
                 top: pan.y + imgTop + (panel.focusY ?? 0.5) * imgHeight * scale,
                 left: imgLeft,
@@ -286,7 +369,7 @@ export function PageCanvas({
               }}
             />
           )
-        ))}
+        )}
 
         {drawRect && (
           <div
@@ -300,24 +383,16 @@ export function PageCanvas({
           />
         )}
 
-        {marquee && (
-          <div
-            className="absolute border border-sky-400 bg-sky-400/10 pointer-events-none"
-            style={{
-              left: imgLeft + (Math.min(marquee.x1, marquee.x2) / 100) * imgWidth * scale,
-              top: imgTop + (Math.min(marquee.y1, marquee.y2) / 100) * imgHeight * scale,
-              width: (Math.abs(marquee.x2 - marquee.x1) / 100) * imgWidth * scale,
-              height: (Math.abs(marquee.y2 - marquee.y1) / 100) * imgHeight * scale,
-            }}
-          />
-        )}
-
         <SmartGuides guides={guides} imgLeft={imgLeft} imgTop={imgTop} imgWidth={imgWidth * scale} imgHeight={imgHeight * scale} />
       </div>
 
       <div
-        className="absolute inset-0"
-        style={{ transform: `translate(${pan.x}px, ${pan.y}px) scale(${scale})`, transformOrigin: `${imgLeft}px ${imgTop}px` }}
+        className="absolute inset-0 pointer-events-none"
+        style={{
+          transform: `translate(${pan.x}px, ${pan.y}px) scale(${scale})`,
+          transformOrigin: `${imgLeft}px ${imgTop}px`,
+          opacity: canMoveBubbles ? 1 : 0.35,
+        }}
       >
         {panels.flatMap((panel, pIdx) =>
           (panel.dialogue || []).map((line, bIdx) => {
@@ -332,13 +407,23 @@ export function PageCanvas({
                 pIdx={pIdx}
                 bIdx={bIdx}
                 isActive={activePanelIdx === pIdx}
-                isSelected={isSelectedBubble(pIdx, bIdx)}
+                isSelected={isSelectedBubble(pIdx, bIdx) && (tool === "bubble" || tool === "hand")}
                 imgLeft={imgLeft}
                 imgTop={imgTop}
                 imgWidth={imgWidth}
                 imgHeight={imgHeight}
-                editingText={activeBubble?.pIdx === pIdx && activeBubble?.bIdx === bIdx}
-                onSelect={() => store.setSelection({ kind: "bubble", panelIdx: pIdx, bubbleIdx: bIdx })}
+                scale={scale}
+                interactive={canMoveBubbles}
+                editingText={
+                  tool === "bubble" && editingBubble?.pIdx === pIdx && editingBubble?.bIdx === bIdx
+                }
+                onEditText={() => setEditingBubble({ pIdx, bIdx })}
+                onSelect={() => {
+                  store.setSelection({ kind: "bubble", panelIdx: pIdx, bubbleIdx: bIdx });
+                  if (editingBubble && (editingBubble.pIdx !== pIdx || editingBubble.bIdx !== bIdx)) {
+                    setEditingBubble(null);
+                  }
+                }}
                 onMove={(px, py) => {
                   if (!gestureStarted.current) {
                     store.beginGesture();

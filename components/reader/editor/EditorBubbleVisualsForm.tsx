@@ -52,13 +52,12 @@ export function EditorBubbleVisualsForm({
               onChange={(e) =>
                 handleUpdateBubble(activePanelIdx, activeBubbleIdx, {
                   showSpeakerName: e.target.checked,
-                  offscreen: e.target.checked,
                 })
               }
               className="rounded border-indigo-500/30 bg-zinc-900 text-indigo-500 focus:ring-0 cursor-pointer"
             />
             <span className="text-[11px] font-medium text-indigo-200">
-              Mostrar nombre sobre el globo (Fuera de escena / Radio)
+              Mostrar nombre dentro del texto (Ian: hola), no como título
             </span>
           </label>
         )}
@@ -428,6 +427,8 @@ export function EditorBubbleVisualsForm({
             <option value="bangers">💥 Bangers (Llamativo/Grito)</option>
             <option value="luckiest">🍀 Luckiest (Cómic SFX Blocky)</option>
             <option value="bungee">🧱 Bungee (Gruesa/Moderna)</option>
+            <option value="arcane">✦ Arcana (Magos / grimorio)</option>
+            <option value="diabolic">☠ Diabólica (Demonios / horror)</option>
             <option value="mono">💻 Monospace (Tecnológico)</option>
             <option value="sans">✨ Sans-Serif (Limpio/Moderno)</option>
             <option value="serif">📜 Serif (Clásico/Elegante)</option>

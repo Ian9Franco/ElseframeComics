@@ -16,7 +16,8 @@ import { useReaderLayout } from "./useReaderLayout";
 import { useReaderAudio } from "./useReaderAudio";
 import { MiniMusicPlayer } from "./MiniMusicPlayer";
 import { getComicPageUrl, getPageKeyFromUrl } from "./readerUtils";
-import { Dialogues, PanelStop } from "./audioPlayer";
+import { Dialogues, PanelStop, SceneFadeType } from "./audioPlayer";
+import { sceneFadeDurationMs } from "./sceneFade";
 import { UnlockNotificationModal } from "@/components/UnlockNotificationModal";
 import { markChapterCompletionUnlock } from "@/lib/characterData/completionUnlocks";
 import { isPreviewAuthBypassedClient } from "@/lib/previewAuthClient";
@@ -51,6 +52,16 @@ export function CinematicReader({
   const [pageIdx, setPageIdx] = useState(0);
   const [panelIdx, setPanelIdx] = useState(0);
   const [zoomIdx, setZoomIdx] = useState(0);
+  const [maskRevealPanelIdx, setMaskRevealPanelIdx] = useState(0);
+  const [maskRevealZoomIdx, setMaskRevealZoomIdx] = useState(0);
+  const [stopCover, setStopCover] = useState<{
+    show: boolean;
+    type?: SceneFadeType;
+    durationMs: number;
+    direction: "in" | "out";
+  } | null>(null);
+  const logicPosRef = useRef({ pageIdx: 0, panelIdx: 0, zoomIdx: 0 });
+  const prevPageFadeOutRef = useRef(0);
   const [zoomedOut, setZoomedOut] = useState(false);
   const [showUnlockModal, setShowUnlockModal] = useState(false);
   const [isPagesSidebarOpen, setIsPagesSidebarOpen] = useState(false);
@@ -95,6 +106,7 @@ export function CinematicReader({
   const [authError, setAuthError] = useState(false);
 
   const containerRef = useRef<HTMLDivElement>(null);
+  const previewGuardUntilRef = useRef(0);
   const [activeReadingBubbleIdx, setActiveReadingBubbleIdx] = useState<number>(0);
 
   const {
@@ -345,10 +357,18 @@ export function CinematicReader({
 
     const url = getComicPageUrl(pages[pageIdx]);
     const img = new window.Image();
+    const key = getPageKeyFromUrl(pages[pageIdx]);
+    const fadeIn = key ? localDialogues.pages?.[key]?.fadeIn ?? 0 : 0;
+    const holdMs = fadeIn > 0 ? fadeIn : 150;
 
-    // B6 fix: if already cached, resolve synchronously without showing overlay
     if (img.complete && img.naturalWidth > 0) {
       setImgSize({ w: img.naturalWidth, h: img.naturalHeight });
+      if (fadeIn > 0) {
+        setIsPageChanging(true);
+        const cachedTimer = setTimeout(() => setIsPageChanging(false), fadeIn);
+        img.src = url;
+        return () => clearTimeout(cachedTimer);
+      }
       setIsPageChanging(false);
       img.src = url;
       return;
@@ -360,17 +380,16 @@ export function CinematicReader({
     let timer: NodeJS.Timeout;
     img.onload = () => {
       setImgSize({ w: img.naturalWidth, h: img.naturalHeight });
-      // Reduced from 1000ms to 150ms — overlay fades out fast after load
       timer = setTimeout(() => {
         setIsPageChanging(false);
-      }, 150);
+      }, holdMs);
     };
     img.src = url;
 
     return () => {
       if (timer) clearTimeout(timer);
     };
-  }, [pageIdx, pages]);
+  }, [pageIdx, pages, localDialogues.pages]);
 
   // 5A — Speculative preloading of adjacent pages
   useEffect(() => {
@@ -388,6 +407,9 @@ export function CinematicReader({
     setPageIdx(idx);
     setPanelIdx(0);
     setZoomIdx(0);
+    setMaskRevealPanelIdx(0);
+    setMaskRevealZoomIdx(0);
+    setStopCover(null);
     setZoomedOut(false);
     setShowAllDialogues(false);
     setActivePanelIdx(0);
@@ -436,6 +458,7 @@ export function CinematicReader({
 
       if (e.key === " " || e.key === "ArrowRight") {
         e.preventDefault();
+        if (Date.now() < previewGuardUntilRef.current) return;
         const activePanelStop = currentPanels[panelIdx];
         const rects = activePanelStop?.zoomRects || (activePanelStop?.zoomRect ? [activePanelStop.zoomRect] : []);
         const dialogueCount = activePanelStop?.dialogue?.length || 0;
@@ -443,9 +466,9 @@ export function CinematicReader({
           setShowAllDialogues(false);
         } else if (zoomedOut) {
           if (pageIdx < pages.length - 1) resetPage(pageIdx + 1);
+          else resetPage(0);
         } else if (currentPanels.length === 0) {
-          if (pageIdx < pages.length - 1) resetPage(pageIdx + 1);
-          else setZoomedOut(true);
+          setZoomedOut(true);
         } else if (dialogueCount > 1 && activeReadingBubbleIdx < dialogueCount - 1) {
           dialogueTimersRef.current.forEach((t) => clearTimeout(t));
           dialogueTimersRef.current = [];
@@ -459,7 +482,9 @@ export function CinematicReader({
         }
       } else if (e.key === "ArrowLeft") {
         e.preventDefault();
-        if (panelIdx > 0) {
+        if (zoomedOut) {
+          if (pageIdx > 0) resetPage(pageIdx - 1);
+        } else if (panelIdx > 0) {
           setPanelIdx((prev) => prev - 1);
           setZoomIdx(0);
         } else if (pageIdx > 0) {
@@ -478,6 +503,81 @@ export function CinematicReader({
     ? activePanel.zoomRects || (activePanel.zoomRect ? [activePanel.zoomRect] : [])
     : [];
   const activeZoomRect = activePanelRects[zoomIdx] || null;
+  const sceneTransitionMs = Math.max(
+    currentPageData.fadeIn ?? 0,
+    currentPageData.fadeOut ?? 0,
+    activePanel.fadeIn ?? 0,
+    activePanel.fadeOut ?? 0,
+    0
+  );
+  const cameraTransitionMs =
+    mode === "read" && !zoomedOut ? Math.max(sceneTransitionMs, 720) : sceneTransitionMs;
+
+  useEffect(() => {
+    if (mode !== "read") {
+      setMaskRevealPanelIdx(panelIdx);
+      setMaskRevealZoomIdx(zoomIdx);
+      logicPosRef.current = { pageIdx, panelIdx, zoomIdx };
+      prevPageFadeOutRef.current = currentPageData.fadeOut ?? 0;
+      return;
+    }
+
+    const prev = logicPosRef.current;
+    const advanced =
+      pageIdx > prev.pageIdx ||
+      (pageIdx === prev.pageIdx && panelIdx > prev.panelIdx) ||
+      (pageIdx === prev.pageIdx && panelIdx === prev.panelIdx && zoomIdx > prev.zoomIdx);
+    const pageChanged = pageIdx !== prev.pageIdx;
+    const panelChanged = pageIdx === prev.pageIdx && panelIdx !== prev.panelIdx;
+    const prevPanel = currentPanels[prev.panelIdx];
+    const prevRects = prevPanel?.zoomRects || (prevPanel?.zoomRect ? [prevPanel.zoomRect] : []);
+    const prevMask = prevRects[prev.zoomIdx];
+
+    logicPosRef.current = { pageIdx, panelIdx, zoomIdx };
+
+    if (!advanced || pageChanged) {
+      setMaskRevealPanelIdx(panelIdx);
+      setMaskRevealZoomIdx(zoomIdx);
+      setStopCover(null);
+      prevPageFadeOutRef.current = currentPageData.fadeOut ?? 0;
+      return;
+    }
+
+    const wait = Math.max(
+      sceneFadeDurationMs(currentPageData.fadeOutType, currentPageData.fadeOut ?? 0),
+      sceneFadeDurationMs(prevPanel?.fadeOutType, prevPanel?.fadeOut ?? 0),
+      sceneFadeDurationMs(prevMask?.fadeOutType, prevMask?.fadeOut ?? 0)
+    );
+
+    if (panelChanged && wait > 0) {
+      setStopCover({
+        show: true,
+        type: prevPanel?.fadeOutType ?? "fade",
+        durationMs: wait,
+        direction: "in",
+      });
+    }
+
+    const t = window.setTimeout(() => {
+      setMaskRevealPanelIdx(panelIdx);
+      setMaskRevealZoomIdx(zoomIdx);
+      const inMs = sceneFadeDurationMs(activePanel.fadeInType, activePanel.fadeIn ?? 0);
+      if (panelChanged && inMs > 0) {
+        setStopCover({
+          show: true,
+          type: activePanel.fadeInType ?? "fade",
+          durationMs: inMs,
+          direction: "out",
+        });
+        window.setTimeout(() => setStopCover(null), inMs + 30);
+      } else {
+        setStopCover(null);
+      }
+    }, wait);
+
+    prevPageFadeOutRef.current = currentPageData.fadeOut ?? 0;
+    return () => window.clearTimeout(t);
+  }, [mode, pageIdx, panelIdx, zoomIdx, currentPanels, currentPageData.fadeOut, currentPageData.fadeOutType, activePanel]);
 
   const advanceReaderStep = useCallback(() => {
     const activePanelStop = currentPanels[panelIdx];
@@ -525,10 +625,11 @@ export function CinematicReader({
   }, [panelIdx, pageIdx, mode]);
 
   // Audio Context custom hook
-  const { activeMusicTrack } = useReaderAudio({
+  const { activeMusicTrack, isMusicPaused, pauseActiveMusic, resumeActiveMusic } = useReaderAudio({
     mode,
     panelIdx,
     pageIdx,
+    zoomIdx,
     pages,
     localDialogues,
     activePanel,
@@ -551,6 +652,7 @@ export function CinematicReader({
   });
 
   const handleReaderTap = (e: React.MouseEvent) => {
+    if (Date.now() < previewGuardUntilRef.current) return;
     if (isPanning || totalDragDistRef.current > 6) return;
 
     if (e && e.target) {
@@ -600,11 +702,31 @@ export function CinematicReader({
     }
   };
 
+  const startPreviewCurrentPage = useCallback(() => {
+    setPanelIdx(0);
+    setZoomIdx(0);
+    setMaskRevealPanelIdx(0);
+    setMaskRevealZoomIdx(0);
+    setStopCover(null);
+    setZoomedOut(false);
+    setShowAllDialogues(false);
+    setActiveReadingBubbleIdx(0);
+    setZoomScale(1);
+    setPanOffset({ x: 0, y: 0 });
+    previewGuardUntilRef.current = Date.now() + 500;
+    setMode("read");
+    if (typeof window !== "undefined") sessionStorage.setItem("editor_mode", "read");
+  }, [setZoomScale, setPanOffset]);
+
   const handleToggleMode = () => {
     setPanelIdx(0);
     setZoomIdx(0);
+    setMaskRevealPanelIdx(0);
+    setMaskRevealZoomIdx(0);
+    setStopCover(null);
     setZoomedOut(false);
     if (mode === "edit") {
+      previewGuardUntilRef.current = Date.now() + 500;
       setMode("read");
       if (typeof window !== "undefined") sessionStorage.setItem("editor_mode", "read");
     } else {
@@ -683,6 +805,7 @@ export function CinematicReader({
         handleTailTargetDragEnd={handleTailTargetDragEnd}
         handleReorderBubbles={handleReorderBubbles}
         bubbleOpacity={bubbleOpacity}
+        staggerDelay={autoplay}
       />
     );
   }, [
@@ -752,7 +875,12 @@ export function CinematicReader({
       />
 
       {/* Floating Mini Music Player (appears when a music track plays) */}
-      <MiniMusicPlayer track={activeMusicTrack} />
+      <MiniMusicPlayer
+        track={activeMusicTrack}
+        paused={isMusicPaused}
+        onPause={pauseActiveMusic}
+        onResume={resumeActiveMusic}
+      />
 
       <div className={`flex-1 flex ${mode === "read" ? "flex-row" : "flex-col md:flex-row"} overflow-hidden w-full h-full relative`}>
         {mode === "edit" && editorVersion === "v2" ? (
@@ -768,8 +896,7 @@ export function CinematicReader({
             isSaving={isSaving}
             saveStatus={saveStatus}
             hasUnsavedChanges={hasUnsavedChanges}
-            handleApplyGeneratedDialogues={handleApplyGeneratedDialogues}
-            onPreview={() => setMode("read")}
+            onPreview={startPreviewCurrentPage}
           />
         ) : (
           <>
@@ -821,9 +948,16 @@ export function CinematicReader({
           activeBubbleIdx={activeBubbleIdx}
           panelIdx={panelIdx}
           zoomIdx={zoomIdx}
+          maskRevealPanelIdx={maskRevealPanelIdx}
+          maskRevealZoomIdx={maskRevealZoomIdx}
           zoomedOut={zoomedOut}
           showAllDialogues={showAllDialogues}
           isPageChanging={isPageChanging}
+          sceneTransitionMs={sceneTransitionMs}
+          cameraTransitionMs={cameraTransitionMs}
+          pageFadeInType={currentPageData.fadeInType}
+          pageFadeInMs={currentPageData.fadeIn ?? 0}
+          stopCover={stopCover}
           renderedDialogues={dialoguesNode}
           undoStack={undoStack}
           handleMouseDown={handleMouseDown}

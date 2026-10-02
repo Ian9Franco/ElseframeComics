@@ -14,13 +14,29 @@ export type PanelSound = {
   };
 };
 
+export type SceneFadeType = "fade" | "wipeUp" | "wipeDown" | "wipeLeft" | "wipeRight" | "iris" | "cut";
+
+export type ZoomRect = {
+  x: number;
+  y: number;
+  w: number;
+  h: number;
+  fadeOut?: number;
+  fadeOutType?: SceneFadeType;
+};
+
 export type PanelStop = {
   focusY: number;
   dialogue?: any[]; // DialogueLine[]
-  zoomRect?: { x: number; y: number; w: number; h: number };
-  zoomRects?: { x: number; y: number; w: number; h: number }[];
+  zoomRect?: ZoomRect;
+  zoomRects?: ZoomRect[];
   duration?: number;
   hideUntilReached?: boolean;
+  fadeIn?: number;
+  fadeOut?: number;
+  fadeInType?: SceneFadeType;
+  fadeOutType?: SceneFadeType;
+  audioFade?: boolean;
   sound?: string; // Path to the audio file
   soundStartTime?: number; // in seconds
   soundEndTime?: number; // in seconds
@@ -60,6 +76,8 @@ export type AudioTrack = {
     startTime?: number;    // seek to this offset when starting
     endTime?: number;      // stop at this timestamp (seconds)
   };
+  /** If true, pause (don't kill) this track when a page/stop fade happens. */
+  pauseOnFade?: boolean;
 };
 
 export type ChapterSettings = {
@@ -71,6 +89,11 @@ export type ChapterSettings = {
 
 export type PageData = {
   panels: PanelStop[];
+  fadeIn?: number;
+  fadeOut?: number;
+  fadeInType?: SceneFadeType;
+  fadeOutType?: SceneFadeType;
+  audioFade?: boolean;
 };
 
 export type Dialogues = {
@@ -82,6 +105,8 @@ export type Dialogues = {
 export type AudioPlaybackController = {
   audio: HTMLAudioElement;
   stop: (fadeOutDuration: number) => void;
+  pause: (fadeOutDuration?: number) => void;
+  resume: (fadeInDuration?: number) => void;
   setGainMultiplier: (multiplier: number, transitionDuration?: number) => void;
 };
 
@@ -282,6 +307,29 @@ export function playAudioWithGain(
   return {
     audio,
     setGainMultiplier,
+    pause: (fadeOutDuration = 0) => {
+      clearNativeVolumeInterval();
+      if (fadeOutDuration > 0) {
+        setGainMultiplier(0, fadeOutDuration);
+        setTimeout(() => {
+          audio.pause();
+        }, fadeOutDuration);
+      } else {
+        audio.pause();
+      }
+    },
+    resume: (fadeInDuration = 0) => {
+      if (fadeInDuration > 0) {
+        setGainMultiplier(0);
+      }
+      const playPromise = audio.play();
+      if (playPromise !== undefined) {
+        playPromise.catch((error) => {
+          console.error("[playAudioWithGain] Resume blocked or failed:", error);
+        });
+      }
+      setGainMultiplier(1, fadeInDuration);
+    },
     stop: (fadeOutDuration: number) => {
       if (checkInterval) clearInterval(checkInterval);
       clearNativeVolumeInterval();

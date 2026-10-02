@@ -17,6 +17,7 @@ interface UseReaderAudioProps {
   mode: "read" | "edit";
   panelIdx: number;
   pageIdx: number;
+  zoomIdx?: number;
   pages: string[];
   localDialogues: Dialogues;
   activePanel: PanelStop;
@@ -26,6 +27,7 @@ export function useReaderAudio({
   mode,
   panelIdx,
   pageIdx,
+  zoomIdx = 0,
   pages,
   localDialogues,
   activePanel,
@@ -37,6 +39,8 @@ export function useReaderAudio({
   const duckedTrackIdsRef = useRef<Set<string>>(new Set());
   const updateTrackDuckingRef = useRef<() => void>(() => undefined);
   const [activeMusicTrack, setActiveMusicTrack] = useState<AudioTrack | null>(null);
+  const [isMusicPaused, setIsMusicPaused] = useState(false);
+  const prevPanelAudioRef = useRef<{ audioFade?: boolean; fadeOut?: number } | null>(null);
 
   // Gather and memoize all sounds config for this panel with stable dependencies
   const soundsToPlay = useMemo((): PanelSound[] => {
@@ -84,12 +88,13 @@ export function useReaderAudio({
       if (!soundItem.sound) return;
 
       const config = soundItem.soundConfig || {};
+      const panelFade = activePanel?.audioFade;
       const {
         volume = 1,
         playbackRate = 1,
         loop = false,
-        fadeIn = 0,
-        fadeOut = 0,
+        fadeIn = panelFade ? activePanel.fadeIn ?? 0 : 0,
+        fadeOut = panelFade ? activePanel.fadeOut ?? 0 : 0,
         delay = 0,
       } = config;
       const soundStartTime = soundItem.soundStartTime || 0;
@@ -136,6 +141,15 @@ export function useReaderAudio({
       }
     });
   }, [panelIdx, pageIdx, mode, soundsToPlay]);
+
+  useEffect(() => {
+    const prev = prevPanelAudioRef.current;
+    if (prev?.audioFade) {
+      activePanelAudiosRef.current.forEach((soundObj) => soundObj.stop(prev.fadeOut ?? 0));
+      activePanelAudiosRef.current.clear();
+    }
+    prevPanelAudioRef.current = { audioFade: activePanel?.audioFade, fadeOut: activePanel?.fadeOut };
+  }, [panelIdx, pageIdx, activePanel?.audioFade, activePanel?.fadeOut]);
 
   // ─── Multi-span Audio Track Engine ───────────────────────────────────────
 
@@ -234,7 +248,12 @@ export function useReaderAudio({
       const inRange = isPositionInTrackRange(track, currentPageKey, panelIdx);
       const isPlaying = activeTracks.has(track.id);
 
-      if (inRange && !isPlaying) {
+      if (inRange && isPlaying) {
+        const soundObj = activeTracks.get(track.id);
+        if (soundObj && track.pauseOnFade && soundObj.audio.paused) {
+          soundObj.resume(track.soundConfig?.fadeIn ?? 0);
+        }
+      } else if (inRange && !isPlaying) {
         const config = track.soundConfig || {};
         const {
           volume = 1,
@@ -280,9 +299,13 @@ export function useReaderAudio({
       } else if (!inRange && isPlaying) {
         const soundObj = activeTracks.get(track.id)!;
         const fadeOut = track.soundConfig?.fadeOut ?? 0;
-        soundObj.stop(fadeOut);
-        activeTracks.delete(track.id);
-        duckedTrackIdsRef.current.delete(track.id);
+        if (track.pauseOnFade) {
+          soundObj.pause(fadeOut);
+        } else {
+          soundObj.stop(fadeOut);
+          activeTracks.delete(track.id);
+          duckedTrackIdsRef.current.delete(track.id);
+        }
       }
     });
 
@@ -317,6 +340,47 @@ export function useReaderAudio({
   }, [panelIdx, pageIdx, mode, tracksListString, isPositionInTrackRange, comparePositions, pages]);
 
   useEffect(() => {
+    if (mode !== "read") return;
+    const currentPageKey = getPageKeyFromUrl(pages[pageIdx]) || "";
+    const page = localDialogues.pages?.[currentPageKey];
+    const rects = activePanel?.zoomRects || (activePanel?.zoomRect ? [activePanel.zoomRect] : []);
+    const mask = rects[zoomIdx];
+    const fadeMs = Math.max(page?.fadeOut ?? 0, activePanel?.fadeOut ?? 0, mask?.fadeOut ?? 0, 0);
+    if (fadeMs <= 0) return;
+
+    const timers: NodeJS.Timeout[] = [];
+    const tracks = localDialogues.audioTracks || [];
+    tracks.forEach((track) => {
+      if (!track.pauseOnFade) return;
+      const ctrl = activeTracksRef.current.get(track.id);
+      if (!ctrl) return;
+      ctrl.pause(Math.min(fadeMs, track.soundConfig?.fadeOut ?? fadeMs));
+      setIsMusicPaused(true);
+      timers.push(
+        setTimeout(() => {
+          if (activeTracksRef.current.has(track.id)) {
+            ctrl.resume(track.soundConfig?.fadeIn ?? 0);
+            setIsMusicPaused(false);
+          }
+        }, fadeMs)
+      );
+    });
+    return () => timers.forEach((t) => clearTimeout(t));
+  }, [panelIdx, pageIdx, zoomIdx, mode, pages, localDialogues.pages, localDialogues.audioTracks, activePanel]);
+
+  const pauseActiveMusic = useCallback(() => {
+    if (!activeMusicTrack) return;
+    activeTracksRef.current.get(activeMusicTrack.id)?.pause(activeMusicTrack.soundConfig?.fadeOut ?? 0);
+    setIsMusicPaused(true);
+  }, [activeMusicTrack]);
+
+  const resumeActiveMusic = useCallback(() => {
+    if (!activeMusicTrack) return;
+    activeTracksRef.current.get(activeMusicTrack.id)?.resume(activeMusicTrack.soundConfig?.fadeIn ?? 0);
+    setIsMusicPaused(false);
+  }, [activeMusicTrack]);
+
+  useEffect(() => {
     if (mode === "read") return;
     activeTracksRef.current.forEach((soundObj) => {
       soundObj.stop(0);
@@ -346,5 +410,5 @@ export function useReaderAudio({
     };
   }, []);
 
-  return { activeMusicTrack };
+  return { activeMusicTrack, isMusicPaused, pauseActiveMusic, resumeActiveMusic };
 }

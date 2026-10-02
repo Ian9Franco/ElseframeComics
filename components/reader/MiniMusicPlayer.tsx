@@ -39,6 +39,9 @@ export function parseTrackMeta(track: AudioTrack) {
 
 interface MiniMusicPlayerProps {
   track: AudioTrack | null;
+  paused?: boolean;
+  onPause?: () => void;
+  onResume?: () => void;
 }
 
 /**
@@ -48,7 +51,7 @@ interface MiniMusicPlayerProps {
  * 2. Only stays visible for the first 5 seconds after song start, then slides away.
  * 3. Animated entrance coming from left (x: -150 -> 0), and exit sliding back out to the left (0 -> -150).
  */
-export function MiniMusicPlayer({ track }: MiniMusicPlayerProps) {
+export function MiniMusicPlayer({ track, paused, onPause, onResume }: MiniMusicPlayerProps) {
   const [duration, setDuration] = useState<number | null>(null);
   const [isVisible, setIsVisible] = useState(false);
 
@@ -112,7 +115,7 @@ export function MiniMusicPlayer({ track }: MiniMusicPlayerProps) {
           animate={{ opacity: 1, x: 0 }}
           exit={{ opacity: 0, x: -150 }}
           transition={{ type: "spring", stiffness: 280, damping: 24 }}
-          className="fixed top-16 left-4 sm:left-6 z-[180] pointer-events-none select-none"
+          className="fixed top-16 left-4 sm:left-6 z-[180] select-none"
         >
           <div className="bg-[#0b0b12]/95 backdrop-blur-xl border border-white/15 shadow-[0_8px_30px_rgba(0,0,0,0.75)] rounded-full px-3.5 py-1.5 flex items-center gap-2.5 max-w-[90vw] sm:max-w-md">
             {/* Spinning/Pulsing Vinyl Art Badge with Equalizer */}
@@ -146,6 +149,13 @@ export function MiniMusicPlayer({ track }: MiniMusicPlayerProps) {
                 {parseTrackMeta(track).artist}
               </span>
             </div>
+            <button
+              type="button"
+              onClick={() => (paused ? onResume?.() : onPause?.())}
+              className="ml-1 w-7 h-7 rounded-full bg-white/10 hover:bg-white/20 text-white text-xs font-bold pointer-events-auto"
+            >
+              {paused ? "▶" : "⏸"}
+            </button>
           </div>
         </motion.div>
       )}

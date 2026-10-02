@@ -3,6 +3,18 @@
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
+import {
+  ArrowLeft,
+  BookOpen,
+  ChevronDown,
+  HelpCircle,
+  Minus,
+  Plus,
+  Rocket,
+  RotateCcw,
+  Settings,
+  Wrench,
+} from "lucide-react";
 import { PublishModal } from "./PublishModal";
 import type { EditorVersion } from "@/lib/editorVersion";
 
@@ -141,11 +153,12 @@ export function ReaderTopBar({
               href="/"
               className={
                 isReadMode
-                  ? "font-[var(--font-bangers)] text-xs sm:text-sm px-2.5 py-1.5 border border-white/25 bg-white/10 hover:bg-white/20 text-white transition-all rounded-sm backdrop-blur-sm"
-                  : "btn btn-dark text-xs sm:text-base px-2.5 py-1.5 sm:px-4 sm:py-2"
+                  ? "font-[var(--font-bangers)] text-xs sm:text-sm px-2.5 py-1.5 border border-white/25 bg-white/10 hover:bg-white/20 text-white transition-all rounded-sm backdrop-blur-sm inline-flex items-center gap-1.5"
+                  : "btn btn-dark text-xs sm:text-base px-2.5 py-1.5 sm:px-4 sm:py-2 inline-flex items-center gap-1.5"
               }
             >
-              ← Volver
+              <ArrowLeft className="w-4 h-4 shrink-0" strokeWidth={2.5} />
+              Volver
             </Link>
 
             {isReadMode && (
@@ -182,9 +195,10 @@ export function ReaderTopBar({
                 <button
                   onClick={() => setZoomScale((prev) => Math.max(mobileZoomMin, prev - mobileZoomStep))}
                   disabled={zoomScale <= mobileZoomMin}
-                  className="w-7 h-7 flex items-center justify-center font-bold text-white bg-white/10 hover:bg-white/20 disabled:opacity-30 disabled:pointer-events-none rounded-sm text-sm"
+                  className="w-7 h-7 flex items-center justify-center text-white bg-white/10 hover:bg-white/20 disabled:opacity-30 disabled:pointer-events-none rounded-sm"
+                  title="Alejar"
                 >
-                  －
+                  <Minus className="w-4 h-4" strokeWidth={2.5} />
                 </button>
                 <span className="text-white font-[var(--font-bangers)] text-xs min-w-[20px] text-center select-none leading-none">
                   {zoomScale.toFixed(1)}x
@@ -192,9 +206,10 @@ export function ReaderTopBar({
                 <button
                   onClick={() => setZoomScale((prev) => Math.min(mobileZoomMax, prev + mobileZoomStep))}
                   disabled={zoomScale >= mobileZoomMax}
-                  className="w-7 h-7 flex items-center justify-center font-bold text-white bg-white/10 hover:bg-white/20 disabled:opacity-30 disabled:pointer-events-none rounded-sm text-sm"
+                  className="w-7 h-7 flex items-center justify-center text-white bg-white/10 hover:bg-white/20 disabled:opacity-30 disabled:pointer-events-none rounded-sm"
+                  title="Acercar"
                 >
-                  ＋
+                  <Plus className="w-4 h-4" strokeWidth={2.5} />
                 </button>
                 {(Math.abs(zoomScale - 1) > 0.01 || (panOffset && (panOffset.x !== 0 || panOffset.y !== 0))) && (
                   <button
@@ -202,9 +217,10 @@ export function ReaderTopBar({
                       setZoomScale(1);
                       if (setPanOffset) setPanOffset({ x: 0, y: 0 });
                     }}
-                    className="w-7 h-7 flex items-center justify-center text-xs bg-rose-500 hover:bg-rose-600 text-white rounded-sm"
+                    className="w-7 h-7 flex items-center justify-center bg-rose-500 hover:bg-rose-600 text-white rounded-sm"
+                    title="Restablecer zoom"
                   >
-                    🔄
+                    <RotateCcw className="w-3.5 h-3.5" strokeWidth={2.5} />
                   </button>
                 )}
               </div>
@@ -216,11 +232,11 @@ export function ReaderTopBar({
                 <button
                   onClick={() => setIsSettingsOpen(!isSettingsOpen)}
                   className={`${btnBase} flex items-center gap-1`}
-                  title="Configuración de Lectura"
+                  title="Configuración de lectura"
                 >
-                  <span>⚙️</span>
+                  <Settings className="w-4 h-4" strokeWidth={2.2} />
                   <span className="hidden sm:inline">Ajustes</span>
-                  <span className="text-[8px] opacity-60">▼</span>
+                  <ChevronDown className="w-3 h-3 opacity-60" strokeWidth={2.5} />
                 </button>
 
                 <AnimatePresence>
@@ -368,8 +384,9 @@ export function ReaderTopBar({
               <button
                 onClick={() => setShowPublish(true)}
                 className="font-[var(--font-bangers)] text-xs sm:text-sm px-2 sm:px-4 py-1.5 sm:py-2 border-2 border-[#0a0a0f] transition-all bg-emerald-400 text-[#0a0a0f] shadow-[2px_2px_0_#0a0a0f] hover:translate-x-0.5 hover:translate-y-0.5 hover:shadow-[1px_1px_0_#0a0a0f] flex items-center justify-center gap-1"
+                title="Publicar capítulo"
               >
-                <span>🚀</span>
+                <Rocket className="w-4 h-4 shrink-0" strokeWidth={2.2} />
                 <span className="hidden sm:inline">Publicar</span>
               </button>
             )}
@@ -407,8 +424,13 @@ export function ReaderTopBar({
                   ? "bg-[#f5e642] text-[#0a0a0f] border-2 border-[#0a0a0f] shadow-[2px_2px_0_#0a0a0f]"
                   : "bg-[#0a0a0f] text-white border-2 border-[#0a0a0f] hover:bg-zinc-800"
               }`}
+              title={mode === "edit" ? "Modo lectura" : "Modo editor"}
             >
-              <span>{mode === "edit" ? "🛠️" : "📖"}</span>
+              {mode === "edit" ? (
+                <Wrench className="w-4 h-4 shrink-0" strokeWidth={2.2} />
+              ) : (
+                <BookOpen className="w-4 h-4 shrink-0" strokeWidth={2.2} />
+              )}
               <span className="hidden sm:inline">{mode === "edit" ? "Editor" : "Lectura"}</span>
             </button>
 
@@ -421,9 +443,10 @@ export function ReaderTopBar({
                   ? "border border-white/20 bg-white/10 hover:bg-white/20 text-white rounded-sm"
                   : "bg-white hover:bg-zinc-100 text-[#0a0a0f] border-2 border-[#0a0a0f] shadow-[2px_2px_0_#0a0a0f] active:translate-x-0.5 active:translate-y-0.5 active:shadow-[1px_1px_0_#0a0a0f]"
               }`}
-              title="Ver Guía de Lectura"
+              title="Ver guía de lectura"
+              aria-label="Ayuda"
             >
-              ❓
+              <HelpCircle className="w-4 h-4 sm:w-5 sm:h-5" strokeWidth={2.2} />
             </button>
           </div>
         </div>

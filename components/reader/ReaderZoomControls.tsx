@@ -1,6 +1,7 @@
 "use client";
 
 import React from "react";
+import { Minus, Plus, RotateCcw } from "lucide-react";
 
 interface ReaderZoomControlsProps {
   zoomScale: number;
@@ -36,42 +37,45 @@ export function ReaderZoomControls({
         type="button"
         onClick={() => setZoomScale((prev) => Math.max(0.5, prev - 0.5))}
         disabled={zoomScale <= 0.5}
-        className={`w-9 h-9 flex items-center justify-center border-2 border-[#0a0a0f] font-[var(--font-bangers)] text-lg transition-all ${
+        className={`w-9 h-9 flex items-center justify-center border-2 border-[#0a0a0f] transition-all ${
           zoomScale <= 0.5
             ? "bg-zinc-100 text-zinc-400 border-zinc-200 cursor-not-allowed"
             : "bg-[#0a0a0f] hover:bg-zinc-800 text-white cursor-pointer active:translate-x-0.5 active:translate-y-0.5 active:shadow-[1px_1px_0_#000] shadow-[2px_2px_0_#000]"
         }`}
-        title="Alejar Zoom (Rueda del mouse / Pellizcar)"
+        title="Alejar zoom"
+        aria-label="Alejar zoom"
       >
-        －
+        <Minus className="w-5 h-5" strokeWidth={2.5} />
       </button>
- 
+
       <span className="text-[#0a0a0f] font-[var(--font-bangers)] text-sm px-1 min-w-[36px] text-center select-none">
         {zoomScale.toFixed(1)}x
       </span>
- 
+
       <button
         type="button"
         onClick={() => setZoomScale((prev) => Math.min(4, prev + 0.5))}
         disabled={zoomScale >= 4}
-        className={`w-9 h-9 flex items-center justify-center border-2 border-[#0a0a0f] font-[var(--font-bangers)] text-lg transition-all ${
+        className={`w-9 h-9 flex items-center justify-center border-2 border-[#0a0a0f] transition-all ${
           zoomScale >= 4
             ? "bg-zinc-100 text-zinc-400 border-zinc-200 cursor-not-allowed"
             : "bg-[#0a0a0f] hover:bg-zinc-800 text-white cursor-pointer active:translate-x-0.5 active:translate-y-0.5 active:shadow-[1px_1px_0_#000] shadow-[2px_2px_0_#000]"
         }`}
-        title="Acercar Zoom (Rueda del mouse / Pellizcar)"
+        title="Acercar zoom"
+        aria-label="Acercar zoom"
       >
-        ＋
+        <Plus className="w-5 h-5" strokeWidth={2.5} />
       </button>
- 
+
       {(Math.abs(zoomScale - 1) > 0.01 || panOffset.x !== 0 || panOffset.y !== 0) && (
         <button
           type="button"
           onClick={handleReset}
-          className="w-9 h-9 flex items-center justify-center bg-[#e8185a] hover:bg-[#c21046] text-white border-2 border-[#0a0a0f] font-[var(--font-bangers)] text-xs transition-colors cursor-pointer active:translate-x-0.5 active:translate-y-0.5 shadow-[2px_2px_0_#000]"
-          title="Restablecer Vista (Doble click)"
+          className="w-9 h-9 flex items-center justify-center bg-[#e8185a] hover:bg-[#c21046] text-white border-2 border-[#0a0a0f] transition-colors cursor-pointer active:translate-x-0.5 active:translate-y-0.5 shadow-[2px_2px_0_#000]"
+          title="Restablecer vista"
+          aria-label="Restablecer vista"
         >
-          🔄
+          <RotateCcw className="w-4 h-4" strokeWidth={2.5} />
         </button>
       )}
     </div>

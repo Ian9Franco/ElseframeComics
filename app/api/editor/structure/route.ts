@@ -35,6 +35,7 @@ export async function POST(request: NextRequest) {
         tagline: "",
         description: "",
         color: color || "#0a0a0f",
+        color_secondary: "#e8185a",
         status: "draft",
         cinematic: true,
         order: Number(number)
@@ -72,7 +73,8 @@ export async function POST(request: NextRequest) {
       const chapterJson = {
         title: title || name,
         number: Number(number),
-        status: "draft"
+        status: "draft",
+        cinematic: true
       };
       fs.writeFileSync(path.join(targetPath, "chapter.json"), JSON.stringify(chapterJson, null, 2));
       fs.writeFileSync(path.join(targetPath, "dialogues.json"), JSON.stringify({pages: {}}, null, 2));

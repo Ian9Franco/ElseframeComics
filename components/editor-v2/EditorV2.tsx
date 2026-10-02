@@ -1,9 +1,8 @@
 "use client";
 
-import React, { useCallback, useEffect, useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import type { Dialogues } from "@/components/reader/audioPlayer";
 import { getPageKeyFromUrl } from "@/components/reader/readerUtils";
-import type { AiDialogueProposal } from "@/components/reader/dialogueAi";
 import { useEditorV2Store } from "./useEditorV2Store";
 import { useCanvasTransform } from "./useCanvasTransform";
 import { PageCanvas } from "./canvas/PageCanvas";
@@ -13,7 +12,9 @@ import { PageStrip } from "./ui/PageStrip";
 import { StopsTimeline } from "./ui/StopsTimeline";
 import { FloatingToolbar } from "./ui/FloatingToolbar";
 import { Inspector } from "./ui/Inspector";
-import type { BubbleStylePreset } from "./types";
+import { MetaPanel } from "./ui/MetaPanel";
+import { Settings2 } from "lucide-react";
+import type { BubbleStylePreset, EditorV2Tool } from "./types";
 
 export function EditorV2({
   pages,
@@ -27,21 +28,19 @@ export function EditorV2({
   isSaving,
   saveStatus,
   hasUnsavedChanges,
-  handleApplyGeneratedDialogues,
   onPreview,
 }: {
   pages: string[];
   pageIdx: number;
   resetPage: (idx: number) => void;
   chapter: { id: string; title: string };
-  saga: { title: string };
+  saga: { id: string; title: string };
   localDialogues: Dialogues;
   setLocalDialogues: React.Dispatch<React.SetStateAction<Dialogues>>;
   handleSaveChanges: () => void;
   isSaving: boolean;
   saveStatus: "idle" | "success" | "error";
   hasUnsavedChanges?: boolean;
-  handleApplyGeneratedDialogues: (proposals: AiDialogueProposal[]) => void;
   onPreview: () => void;
 }) {
   const pageKey = getPageKeyFromUrl(pages[pageIdx]) || "";
@@ -50,13 +49,22 @@ export function EditorV2({
   const [dragStyle, setDragStyle] = useState<BubbleStylePreset | null>(null);
   const [guides, setGuides] = useState<{ axis: "x" | "y"; value: number }[]>([]);
   const [activePanelIdx, setActivePanelIdx] = useState(0);
+  const [soundPickerOpen, setSoundPickerOpen] = useState(false);
+  const [metaOpen, setMetaOpen] = useState(false);
+  const setTool = (t: EditorV2Tool) => {
+    store.setActiveTool(t);
+    if (t !== "bubble" && (store.selection.kind === "bubble" || store.selection.kind === "bubbles")) {
+      store.setSelection({ kind: "none" });
+    }
+  };
 
   const pageData = store.getPage();
   const panels = pageData.panels || [];
 
   useEffect(() => {
-    if (store.selection.kind === "bubble") setActivePanelIdx(store.selection.panelIdx);
-    if (store.selection.kind === "stop") setActivePanelIdx(store.selection.panelIdx);
+    if (store.selection.kind === "bubble" || store.selection.kind === "stop" || store.selection.kind === "mask") {
+      setActivePanelIdx(store.selection.panelIdx);
+    }
   }, [store.selection]);
 
   const speakers = useMemo(() => {
@@ -72,12 +80,15 @@ export function EditorV2({
     return panels[store.selection.panelIdx]?.dialogue?.[store.selection.bubbleIdx] ?? null;
   }, [store.selection, panels]);
 
-  const wrapApplyGenerated = useCallback(
-    (proposals: AiDialogueProposal[]) => {
-      handleApplyGeneratedDialogues(proposals);
-    },
-    [handleApplyGeneratedDialogues]
-  );
+  const deleteSelection = () => {
+    const s = store.selection;
+    if (s.kind === "bubble") store.removeBubble(s.panelIdx, s.bubbleIdx);
+    else if (s.kind === "stop") store.removePanel(s.panelIdx);
+    else if (s.kind === "mask") store.removeMaskRect(s.panelIdx, s.rectIdx);
+    else if (s.kind === "bubbles") {
+      [...s.items].reverse().forEach((item) => store.removeBubble(item.panelIdx, item.bubbleIdx));
+    }
+  };
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
@@ -105,20 +116,14 @@ export function EditorV2({
         if (typing) return;
         store.pasteClipboard(activePanelIdx, { posX: 50, posY: 50 });
       }
-      if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === "b" && store.selection.kind === "bubble" && !typing) {
-        e.preventDefault();
-        const { panelIdx, bubbleIdx } = store.selection;
-        const line = panels[panelIdx]?.dialogue?.[bubbleIdx];
-        if (line) store.updateBubble(panelIdx, bubbleIdx, { text: `${line.text}**` });
-      }
-      if (e.key === "Delete" && store.selection.kind === "bubble") {
-        store.removeBubble(store.selection.panelIdx, store.selection.bubbleIdx);
+      if ((e.key === "Delete" || e.key === "Backspace") && !typing) {
+        deleteSelection();
       }
       if (!typing && !e.ctrlKey && !e.metaKey) {
-        if (e.key.toLowerCase() === "v") store.setActiveTool("select");
-        if (e.key.toLowerCase() === "b") store.setActiveTool("bubble");
-        if (e.key.toLowerCase() === "m") store.setActiveTool("stop");
-        if (e.key.toLowerCase() === "h") store.setActiveTool("hand");
+        if (e.key.toLowerCase() === "p") setTool("stops");
+        if (e.key.toLowerCase() === "b") setTool("bubble");
+        if (e.key.toLowerCase() === "m") setTool("mask");
+        if (e.key.toLowerCase() === "h") setTool("hand");
       }
     };
     const onKeyUp = (e: KeyboardEvent) => {
@@ -133,79 +138,68 @@ export function EditorV2({
   }, [canvas, store, activePanelIdx]);
 
   return (
-    <div className="flex-1 flex flex-col min-h-0 bg-[#0a0a0f] text-zinc-200">
-      <div className="shrink-0 flex items-center justify-between gap-2 px-3 py-2 border-b border-white/10 bg-[#12121c]">
+    <div className="flex-1 flex flex-col min-h-0 bg-[#0a0a0f] text-zinc-200 relative">
+      <div className="shrink-0 flex items-center justify-between gap-2 px-4 py-2.5 border-b border-white/10 bg-[#12121c]">
         <div className="flex items-center gap-2">
-          <span className="font-[var(--font-bangers)] text-lg text-white tracking-wide">Editor 2.0</span>
+          <span className="font-[var(--font-bangers)] text-xl text-white tracking-wide">Editor 2.0</span>
           {hasUnsavedChanges && (
-            <span className="text-[10px] font-mono text-amber-300 bg-amber-500/15 px-2 py-0.5 rounded-full">Sin guardar</span>
+            <span className="text-xs font-mono text-amber-300 bg-amber-500/15 px-2 py-0.5 rounded-full">Sin guardar</span>
           )}
         </div>
         <div className="flex items-center gap-2">
           <button
             type="button"
+            onClick={() => setMetaOpen(true)}
+            className="text-sm px-3 py-1.5 rounded bg-zinc-800 hover:bg-zinc-700 font-bold inline-flex items-center gap-1.5"
+          >
+            <Settings2 className="w-4 h-4" />
+            Config
+          </button>
+          <button
+            type="button"
             onClick={() => store.undo()}
             disabled={!store.canUndo}
-            className="text-xs px-2 py-1 rounded bg-zinc-800 disabled:opacity-40"
+            className="text-sm px-3 py-1.5 rounded bg-zinc-800 disabled:opacity-40"
           >
-            ↶ Undo
+            Undo
           </button>
           <button
             type="button"
             onClick={() => store.redo()}
             disabled={!store.canRedo}
-            className="text-xs px-2 py-1 rounded bg-zinc-800 disabled:opacity-40"
+            className="text-sm px-3 py-1.5 rounded bg-zinc-800 disabled:opacity-40"
           >
-            ↷ Redo
+            Redo
           </button>
-          <button type="button" onClick={onPreview} className="text-xs px-3 py-1.5 rounded bg-zinc-700 hover:bg-zinc-600 font-bold">
-            ▶ Probar
+          <button type="button" onClick={onPreview} className="text-sm px-3 py-1.5 rounded bg-zinc-700 hover:bg-zinc-600 font-bold">
+            Probar
           </button>
           <button
             type="button"
             onClick={handleSaveChanges}
             disabled={isSaving}
-            className={`font-[var(--font-bangers)] text-sm px-4 py-1.5 rounded ${
+            className={`font-[var(--font-bangers)] text-base px-4 py-1.5 rounded ${
               saveStatus === "success" ? "bg-green-600" : saveStatus === "error" ? "bg-red-600" : "bg-[#e8185a]"
             } text-white`}
           >
-            {isSaving ? "Guardando…" : saveStatus === "success" ? "Guardado ✓" : "Guardar JSON"}
+            {isSaving ? "Guardando…" : saveStatus === "success" ? "Guardado" : "Guardar JSON"}
           </button>
         </div>
       </div>
 
-      {(store.activeTool === "bubble" || store.activeTool === "select" || dragStyle) && (
-        <BubblePalette
-          activeStyle={store.pendingBubbleStyle}
-          onStyleChange={store.setPendingBubbleStyle}
-          onDragStartStyle={(s, e) => {
-            e.dataTransfer.setData("text/plain", s);
-            setDragStyle(s);
-          }}
-        />
-      )}
-
-      <div className="flex-1 flex min-h-0">
-        <PageStrip pages={pages} pageIdx={pageIdx} onSelect={resetPage} />
-        <ToolRail activeTool={store.activeTool} onToolChange={store.setActiveTool} />
-        <div className="flex-1 flex flex-col min-w-0 relative">
-          <PageCanvas
-            pageUrl={pages[pageIdx]}
-            panels={panels}
-            activePanelIdx={activePanelIdx}
-            store={store}
-            scale={canvas.scale}
-            pan={canvas.pan}
-            spaceHeld={canvas.spaceHeld}
-            onPanChange={canvas.setPan}
-            onWheelZoom={canvas.zoomBy}
-            dragBubbleStyle={dragStyle}
-            onDropBubbleStyle={() => setDragStyle(null)}
-            guides={guides}
-            setGuides={setGuides}
+      {(store.activeTool === "bubble" || dragStyle) && (
+        <div className="shrink-0 border-b border-white/10 bg-[#14141e]">
+          <BubblePalette
+            activeStyle={store.pendingBubbleStyle}
+            onStyleChange={store.setPendingBubbleStyle}
+            onDragStartStyle={(s, e) => {
+              e.dataTransfer.setData("text/plain", s);
+              setDragStyle(s);
+            }}
           />
           {selectedLine && store.selection.kind === "bubble" && (
-            <div className="absolute top-4 left-1/2 -translate-x-1/2 z-[300]">
+            <div className="px-3 pb-3 pt-1 flex items-center gap-3">
+              <span className="text-xs font-bold text-zinc-400 uppercase tracking-wider">Globo</span>
               <FloatingToolbar
                 line={selectedLine}
                 speakers={speakers}
@@ -225,32 +219,73 @@ export function EditorV2({
             </div>
           )}
         </div>
+      )}
+
+      <div className="flex-1 flex min-h-0">
+        <PageStrip pages={pages} pageIdx={pageIdx} onSelect={resetPage} />
+        <ToolRail
+          activeTool={store.activeTool}
+          onToolChange={setTool}
+          onAddStop={() => {
+            store.addPanel();
+            setActivePanelIdx(panels.length);
+          }}
+        />
+        <div className="flex-1 flex flex-col min-w-0 relative">
+          <PageCanvas
+            pageUrl={pages[pageIdx]}
+            panels={panels}
+            activePanelIdx={activePanelIdx}
+            store={store}
+            scale={canvas.scale}
+            pan={canvas.pan}
+            spaceHeld={canvas.spaceHeld}
+            onPanChange={canvas.setPan}
+            onWheelZoom={canvas.zoomBy}
+            dragBubbleStyle={dragStyle}
+            onDropBubbleStyle={() => setDragStyle(null)}
+            guides={guides}
+            setGuides={setGuides}
+          />
+        </div>
         <Inspector
-          chapterId={chapter.id}
-          sagaTitle={saga.title}
-          chapterTitle={chapter.title}
           pageIdx={pageIdx}
           pages={pages}
+          pageData={pageData}
           localDialogues={localDialogues}
           panels={panels}
           activePanelIdx={activePanelIdx}
-          activeBubbleIdx={store.selection.kind === "bubble" ? store.selection.bubbleIdx : null}
+          selection={store.selection}
+          activeTool={store.activeTool}
+          soundPickerOpen={soundPickerOpen}
+          onCloseSoundPicker={() => setSoundPickerOpen(false)}
           onUpdateBubble={store.updateBubble}
           onUpdatePanel={store.updatePanel}
           onUpdateAudioTracks={store.updateAudioTracks}
-          onApplyGenerated={wrapApplyGenerated}
+          onUpdatePage={store.updatePage}
+          onUpdateMask={store.updateMaskRect}
         />
       </div>
 
       <StopsTimeline
         panels={panels}
         activePanelIdx={activePanelIdx}
+        selection={store.selection}
         onSelect={(idx) => {
           setActivePanelIdx(idx);
           store.setSelection({ kind: "stop", panelIdx: idx });
         }}
         onReorder={store.reorderPanels}
+        onAddStop={() => {
+          store.addPanel();
+          setActivePanelIdx(panels.length);
+        }}
+        onDelete={deleteSelection}
+        onPickSound={() => setSoundPickerOpen(true)}
       />
+      {metaOpen && (
+        <MetaPanel sagaId={saga.id} chapterId={chapter.id} onClose={() => setMetaOpen(false)} />
+      )}
     </div>
   );
 }

@@ -12,6 +12,8 @@ export function StopRegionFocusHandle({
   panY,
   onChange,
   onBegin,
+  label,
+  selected,
 }: {
   focusY: number;
   imgLeft: number;
@@ -22,13 +24,15 @@ export function StopRegionFocusHandle({
   panY: number;
   onChange: (focusY: number) => void;
   onBegin: () => void;
+  label?: string;
+  selected?: boolean;
 }) {
   const ref = useRef<{ sy: number; oy: number } | null>(null);
   const top = panY + imgTop + focusY * imgHeight * scale;
 
   return (
     <div
-      className="absolute left-0 right-0 h-6 -mt-3 cursor-ns-resize z-[55] pointer-events-auto touch-none"
+      className="absolute left-0 right-0 h-8 -mt-4 cursor-ns-resize z-[55] pointer-events-auto touch-none"
       style={{ top, marginLeft: imgLeft, width: imgWidth * scale }}
       onPointerDown={(e) => {
         e.stopPropagation();
@@ -45,7 +49,12 @@ export function StopRegionFocusHandle({
         ref.current = null;
       }}
     >
-      <div className="h-0.5 w-full bg-cyan-400 shadow-[0_0_8px_rgba(34,211,238,0.8)]" />
+      <div className={`h-0.5 w-full ${selected ? "bg-cyan-300" : "bg-cyan-400"} shadow-[0_0_8px_rgba(34,211,238,0.8)]`} />
+      {label && (
+        <span className="absolute left-1 -top-4 text-[10px] font-bold bg-black/70 text-cyan-200 px-1.5 rounded">
+          {label}
+        </span>
+      )}
     </div>
   );
 }

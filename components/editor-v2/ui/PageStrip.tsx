@@ -13,7 +13,7 @@ export function PageStrip({
   onSelect: (idx: number) => void;
 }) {
   return (
-    <div className="h-20 shrink-0 bg-[#0e0e14] border-r border-white/10 overflow-y-auto overflow-x-hidden w-20 flex flex-col gap-1 p-1.5">
+    <div className="shrink-0 bg-[#0e0e14] border-r border-white/10 overflow-y-auto overflow-x-hidden w-28 flex flex-col gap-2 p-2">
       {pages.map((p, i) => (
         <button
           key={p}
@@ -24,7 +24,7 @@ export function PageStrip({
           }`}
         >
           <img src={getComicPageUrl(p)} alt="" className="w-full aspect-[2/3] object-cover" />
-          <span className="absolute bottom-0 right-0 bg-black/70 text-[9px] font-mono text-white px-1">{i + 1}</span>
+          <span className="absolute bottom-0 right-0 bg-black/70 text-xs font-mono text-white px-1.5">{i + 1}</span>
         </button>
       ))}
     </div>

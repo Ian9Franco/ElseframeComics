@@ -169,8 +169,8 @@ export function SagaBlock({
   const publishedChapters = getPublishedChapters(saga.chapters);
   const sagaCtaLabel = getSagaCtaLabel(publishedChapters, readChapters, isClient, unlockAll, showChapters);
 
-  const colorPrimary = "#D7263D";
-  const colorSecondary = "#D7263D";
+  const colorPrimary = saga.color || "#D7263D";
+  const colorSecondary = saga.colorSecondary || saga.color || "#D7263D";
 
   const isLightBg = getTextColor(colorPrimary) === "#001419";
   const buttonIconSrc = isLightBg ? "/boom.webp" : "/boom-white.webp";
@@ -366,7 +366,7 @@ export function SagaBlock({
         <div 
           className={`reader-page-drop border-4 border-black relative overflow-hidden rounded-lg transition-all duration-300 hover:scale-[1.008] hover:-translate-y-0.5 flex flex-col animate-fadeIn ${showChapters ? "mobile-chapters-open z-50" : ""}`}
           style={{
-            boxShadow: "12px 12px 0 #001419, 16px 16px 0 #D7263D, 0 30px 60px -15px rgba(215, 38, 61, 0.3)",
+            boxShadow: `12px 12px 0 #001419, 16px 16px 0 ${colorSecondary}, 0 30px 60px -15px ${colorPrimary}4d`,
             background: "linear-gradient(135deg, #ecf7f8 0%, #dbeeed 100%)"
           }}
         >
@@ -380,7 +380,8 @@ export function SagaBlock({
           />
           {/* Horizontal Banner for nuevo - un poco más grande */}
           <div 
-            className="w-full bg-gradient-to-r from-[#ab1b2c] via-[#D7263D] to-[#ab1b2c] text-white border-b-4 border-black py-4 px-4 flex items-center justify-center font-[var(--font-bangers)] text-xl sm:text-2xl tracking-[0.22em] select-none shadow-[inset_0_-4px_0_rgba(0,0,0,0.15)] relative overflow-hidden"
+            className="w-full text-white border-b-4 border-black py-4 px-4 flex items-center justify-center font-[var(--font-bangers)] text-xl sm:text-2xl tracking-[0.22em] select-none shadow-[inset_0_-4px_0_rgba(0,0,0,0.15)] relative overflow-hidden"
+            style={{ background: `linear-gradient(90deg, ${colorPrimary}, ${colorSecondary}, ${colorPrimary})` }}
           >
             <div className="absolute inset-0 opacity-10 bg-[repeating-linear-gradient(45deg,transparent,transparent_10px,#000_10px,#000_20px)] pointer-events-none" />
             <span style={{ textShadow: "2px 2px 0px #000" }}>¡ÚLTIMO LANZAMIENTO!</span>
@@ -1138,7 +1139,7 @@ function ChapterCard({ chapter, sagaId, sagaColor, index, isLocked, guideStatus 
   isSagaProximamente?: boolean;
   compact?: boolean;
 }) {
-  const accent = ACCENTS[index % ACCENTS.length];
+  const accent = sagaColor || ACCENTS[index % ACCENTS.length];
   const [cover, setCover] = useState<string | null>(null);
 
   useEffect(() => {
@@ -1323,6 +1324,20 @@ function ChapterCard({ chapter, sagaId, sagaColor, index, isLocked, guideStatus 
           {/* No-cover placeholder */}
           {!(cover || chapter.cover || sagaCover) && (
             <div className="absolute inset-0 flex items-center justify-center z-10 speed-lines opacity-30" />
+          )}
+
+          {chapter.nuevo && !chapter.draft && (
+            <div
+              className="absolute top-3 right-3 z-30 font-[var(--font-bangers)] text-sm px-2.5 py-0.5 tracking-wider rotate-[6deg]"
+              style={{
+                background: "#f5e642",
+                color: "#001419",
+                border: "2px solid #001419",
+                boxShadow: "3px 3px 0 #001419",
+              }}
+            >
+              Nuevo
+            </div>
           )}
 
           {/* Borrador Badge */}

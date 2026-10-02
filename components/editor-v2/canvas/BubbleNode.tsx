@@ -17,11 +17,14 @@ export function BubbleNode({
   imgTop,
   imgWidth,
   imgHeight,
+  scale = 1,
   onSelect,
   onMove,
   onTailMove,
   onTextChange,
+  onEditText,
   editingText,
+  interactive = true,
   onResizeWidth,
 }: {
   line: DialogueLine;
@@ -34,11 +37,14 @@ export function BubbleNode({
   imgTop: number;
   imgWidth: number;
   imgHeight: number;
+  scale?: number;
   onSelect: () => void;
   onMove: (posX: number, posY: number) => void;
   onTailMove: (tailX: number, tailY: number, linkTo?: number) => void;
   onTextChange: (text: string) => void;
+  onEditText?: () => void;
   editingText: boolean;
+  interactive?: boolean;
   onResizeWidth: (width: number) => void;
 }) {
   const dragRef = useRef<{ startX: number; startY: number; origX: number; origY: number } | null>(null);
@@ -81,36 +87,46 @@ export function BubbleNode({
   }
 
   const handlePointerDown = (e: React.PointerEvent) => {
-    if (editingText) return;
+    if (!interactive || e.button !== 0) return;
+    const tag = (e.target as HTMLElement).closest?.("textarea, input, select, button");
+    if (tag) return;
     e.stopPropagation();
+    e.preventDefault();
     onSelect();
-    (e.target as HTMLElement).setPointerCapture?.(e.pointerId);
-    dragRef.current = { startX: e.clientX, startY: e.clientY, origX: posX, origY: posY };
-  };
-
-  const handlePointerMove = (e: React.PointerEvent) => {
-    if (!dragRef.current) return;
-    const dx = ((e.clientX - dragRef.current.startX) / imgWidth) * 100;
-    const dy = ((e.clientY - dragRef.current.startY) / imgHeight) * 100;
-    onMove(
-      Math.max(-20, Math.min(120, dragRef.current.origX + dx)),
-      Math.max(-20, Math.min(120, dragRef.current.origY + dy))
-    );
-  };
-
-  const handlePointerUp = () => {
-    dragRef.current = null;
+    const startX = e.clientX;
+    const startY = e.clientY;
+    const origX = posX;
+    const origY = posY;
+    const unitW = Math.max(1, imgWidth * scale);
+    const unitH = Math.max(1, imgHeight * scale);
+    dragRef.current = { startX, startY, origX, origY };
+    const move = (ev: PointerEvent) => {
+      if (!dragRef.current) return;
+      const dx = ((ev.clientX - startX) / unitW) * 100;
+      const dy = ((ev.clientY - startY) / unitH) * 100;
+      onMove(Math.max(-20, Math.min(120, origX + dx)), Math.max(-20, Math.min(120, origY + dy)));
+    };
+    const up = () => {
+      dragRef.current = null;
+      window.removeEventListener("pointermove", move);
+      window.removeEventListener("pointerup", up);
+    };
+    window.addEventListener("pointermove", move);
+    window.addEventListener("pointerup", up);
   };
 
   return (
     <>
       <div
-        className={`absolute ${isActive ? "z-[60]" : "z-[40]"}`}
+        className={`absolute ${isActive ? "z-[60]" : "z-[40]"} ${interactive ? "pointer-events-auto cursor-move" : "pointer-events-none"}`}
         style={{ left, top, transform: "translate(-50%, -50%)", touchAction: "none" }}
         onPointerDown={handlePointerDown}
-        onPointerMove={handlePointerMove}
-        onPointerUp={handlePointerUp}
-        onPointerCancel={handlePointerUp}
+        onDoubleClick={(e) => {
+          if (!interactive) return;
+          e.stopPropagation();
+          onSelect();
+          onEditText?.();
+        }}
       >
         <div
           className={`relative ${isSelected ? "outline-dashed outline-2 outline-[#e8185a] outline-offset-2" : ""}`}
@@ -130,7 +146,7 @@ export function BubbleNode({
                 : undefined
             }
           />
-          {isSelected && line.width !== undefined && (
+          {isSelected && interactive && (
             <div
               className="absolute top-1/2 -right-2 w-2 h-8 -translate-y-1/2 bg-[#e8185a] rounded cursor-ew-resize"
               onPointerDown={(e) => {
@@ -153,12 +169,13 @@ export function BubbleNode({
         </div>
       </div>
 
-      {isSelected && line.tail !== "none" && line.tailX !== undefined && line.tailY !== undefined && (
+      {isSelected && interactive && line.tail !== "none" && line.tailX !== undefined && line.tailY !== undefined && (
         <TailHandle
           imgLeft={imgLeft}
           imgTop={imgTop}
           imgWidth={imgWidth}
           imgHeight={imgHeight}
+          scale={scale}
           tailX={line.tailX}
           tailY={line.tailY}
           onMove={(tx, ty, linkTo) => onTailMove(tx, ty, linkTo)}
@@ -173,6 +190,7 @@ function TailHandle({
   imgTop,
   imgWidth,
   imgHeight,
+  scale = 1,
   tailX,
   tailY,
   onMove,
@@ -181,32 +199,37 @@ function TailHandle({
   imgTop: number;
   imgWidth: number;
   imgHeight: number;
+  scale?: number;
   tailX: number;
   tailY: number;
   onMove: (tailX: number, tailY: number, linkTo?: number) => void;
 }) {
-  const ref = useRef<{ sx: number; sy: number; ox: number; oy: number } | null>(null);
   const left = imgLeft + (tailX / 100) * imgWidth;
   const top = imgTop + (tailY / 100) * imgHeight;
   return (
     <div
-      className="absolute z-[70] w-8 h-8 flex items-center justify-center cursor-crosshair"
+      className="absolute z-[70] w-8 h-8 flex items-center justify-center cursor-crosshair pointer-events-auto"
       style={{ left, top, transform: "translate(-50%, -50%)", touchAction: "none" }}
       onPointerDown={(e) => {
         e.stopPropagation();
-        ref.current = { sx: e.clientX, sy: e.clientY, ox: tailX, oy: tailY };
-        (e.target as HTMLElement).setPointerCapture(e.pointerId);
-      }}
-      onPointerMove={(e) => {
-        if (!ref.current) return;
-        const dx = ((e.clientX - ref.current.sx) / imgWidth) * 100;
-        const dy = ((e.clientY - ref.current.sy) / imgHeight) * 100;
-        const tx = Math.max(-20, Math.min(120, ref.current.ox + dx));
-        const ty = Math.max(-20, Math.min(120, ref.current.oy + dy));
-        onMove(tx, ty);
-      }}
-      onPointerUp={() => {
-        ref.current = null;
+        e.preventDefault();
+        const sx = e.clientX;
+        const sy = e.clientY;
+        const ox = tailX;
+        const oy = tailY;
+        const unitW = Math.max(1, imgWidth * scale);
+        const unitH = Math.max(1, imgHeight * scale);
+        const move = (ev: PointerEvent) => {
+          const dx = ((ev.clientX - sx) / unitW) * 100;
+          const dy = ((ev.clientY - sy) / unitH) * 100;
+          onMove(Math.max(-20, Math.min(120, ox + dx)), Math.max(-20, Math.min(120, oy + dy)));
+        };
+        const up = () => {
+          window.removeEventListener("pointermove", move);
+          window.removeEventListener("pointerup", up);
+        };
+        window.addEventListener("pointermove", move);
+        window.addEventListener("pointerup", up);
       }}
     >
       <div className="w-3.5 h-3.5 rounded-full bg-blue-400 border-2 border-white shadow-lg" />

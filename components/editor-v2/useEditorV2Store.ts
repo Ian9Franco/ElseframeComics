@@ -2,7 +2,7 @@
 
 import { useCallback, useRef, useState } from "react";
 import type { DialogueLine } from "@/components/reader/DialogueBubble";
-import type { Dialogues, PageData, PanelStop } from "@/components/reader/audioPlayer";
+import type { Dialogues, PageData, PanelStop, ZoomRect } from "@/components/reader/audioPlayer";
 import { createDialogueLine } from "@/components/reader/dialogueDefaults";
 import { snapMaskRect } from "@/components/reader/readerUtils";
 import type { BubbleStylePreset, Selection } from "./types";
@@ -21,7 +21,7 @@ export function useEditorV2Store(
   const [past, setPast] = useState<Dialogues[]>([]);
   const [future, setFuture] = useState<Dialogues[]>([]);
   const [selection, setSelection] = useState<Selection>({ kind: "none" });
-  const [activeTool, setActiveTool] = useState<import("./types").EditorV2Tool>("select");
+  const [activeTool, setActiveTool] = useState<import("./types").EditorV2Tool>("stops");
   const [pendingBubbleStyle, setPendingBubbleStyle] = useState<BubbleStylePreset>("normal");
   const clipboardRef = useRef<{ panelIdx: number; line: DialogueLine }[]>([]);
 
@@ -83,27 +83,86 @@ export function useEditorV2Store(
     setLocalDialogues(next);
   }, [future, localDialogues, setLocalDialogues]);
 
-  const addPanelWithMask = useCallback(
-    (rect: { x: number; y: number; w: number; h: number }) => {
+  const nextFocusY = (count: number) => {
+    if (count === 0) return 0.2;
+    if (count === 1) return 0.5;
+    if (count === 2) return 0.8;
+    return Math.min(0.95, 0.8 + (count - 2) * 0.08);
+  };
+
+  const addPanel = useCallback(() => {
+    updatePages((page) => {
+      const panels = [...(page.panels || [])];
+      const createdIdx = panels.length;
+      panels.push({ focusY: nextFocusY(panels.length), dialogue: [] });
+      setSelection({ kind: "stop", panelIdx: createdIdx });
+      return { ...page, panels };
+    });
+  }, [updatePages]);
+
+  const addMaskToPanel = useCallback(
+    (panelIdx: number, rect: { x: number; y: number; w: number; h: number }) => {
       updatePages((page) => {
         const panels = [...(page.panels || [])];
-        const count = panels.length;
-        let defaultFocusY = 0.5;
-        if (count === 0) defaultFocusY = 0.2;
-        else if (count === 1) defaultFocusY = 0.5;
-        else if (count === 2) defaultFocusY = 0.8;
-        else defaultFocusY = Math.min(0.95, 0.8 + (count - 2) * 0.08);
-
-        const snapped = snapMaskRect(rect, panels.flatMap((p) => p.zoomRects || (p.zoomRect ? [p.zoomRect] : [])));
-        panels.push({
-          focusY: defaultFocusY,
-          dialogue: [],
-          zoomRects: [snapped],
-        });
+        if (panels.length === 0) {
+          panels.push({ focusY: nextFocusY(0), dialogue: [] });
+        }
+        const pIdx = Math.max(0, Math.min(panelIdx, panels.length - 1));
+        const panel = { ...panels[pIdx] };
+        const rects = panel.zoomRects ? [...panel.zoomRects] : panel.zoomRect ? [{ ...panel.zoomRect }] : [];
+        const snapped = snapMaskRect(rect, rects);
+        rects.push(snapped);
+        panel.zoomRects = rects;
+        panel.zoomRect = undefined;
+        panels[pIdx] = panel;
+        setSelection({ kind: "mask", panelIdx: pIdx, rectIdx: rects.length - 1 });
         return { ...page, panels };
       });
     },
     [updatePages]
+  );
+
+  const removePanel = useCallback(
+    (panelIdx: number) => {
+      updatePages((page) => {
+        const panels = (page.panels || []).filter((_, i) => i !== panelIdx);
+        setSelection(panels.length ? { kind: "stop", panelIdx: Math.max(0, panelIdx - 1) } : { kind: "none" });
+        return { ...page, panels };
+      });
+    },
+    [updatePages]
+  );
+
+  const removeMaskRect = useCallback(
+    (panelIdx: number, rectIdx: number) => {
+      updatePages((page) => {
+        const panels = [...(page.panels || [])];
+        const panel = { ...panels[panelIdx] };
+        const rects = (panel.zoomRects ? [...panel.zoomRects] : panel.zoomRect ? [{ ...panel.zoomRect }] : []).filter(
+          (_, i) => i !== rectIdx
+        );
+        panel.zoomRects = rects;
+        panel.zoomRect = undefined;
+        panels[panelIdx] = panel;
+        setSelection({ kind: "stop", panelIdx });
+        return { ...page, panels };
+      });
+    },
+    [updatePages]
+  );
+
+  const updatePage = useCallback(
+    (updates: Partial<PageData>) => {
+      const current = getPage();
+      commit({
+        ...localDialogues,
+        pages: {
+          ...localDialogues.pages,
+          [pageKey]: { ...current, ...updates, panels: updates.panels ?? current.panels },
+        },
+      });
+    },
+    [commit, getPage, localDialogues, pageKey]
   );
 
   const addBubble = useCallback(
@@ -115,7 +174,7 @@ export function useEditorV2Store(
       updatePages((page) => {
         const panels = [...(page.panels || [])];
         if (panels.length === 0) {
-          panels.push({ focusY: pos.posY / 100, dialogue: [], zoomRects: [{ x: 5, y: 5, w: 90, h: 90 }] });
+          panels.push({ focusY: pos.posY / 100, dialogue: [] });
         }
         const pIdx = Math.min(panelIdx, panels.length - 1);
         const panel = { ...panels[pIdx], dialogue: [...(panels[pIdx].dialogue || [])] };
@@ -223,13 +282,15 @@ export function useEditorV2Store(
   );
 
   const updateMaskRect = useCallback(
-    (panelIdx: number, rectIdx: number, rect: { x: number; y: number; w: number; h: number }) => {
+    (panelIdx: number, rectIdx: number, rect: Partial<ZoomRect> & { x: number; y: number; w: number; h: number }) => {
       updatePages((page) => {
         const panels = [...(page.panels || [])];
         const panel = { ...panels[panelIdx] };
         const rects = panel.zoomRects ? [...panel.zoomRects] : panel.zoomRect ? [{ ...panel.zoomRect }] : [];
+        if (!rects[rectIdx]) return page;
         const others = rects.filter((_, i) => i !== rectIdx);
-        rects[rectIdx] = snapMaskRect(rect, others);
+        const snapped = snapMaskRect({ x: rect.x, y: rect.y, w: rect.w, h: rect.h }, others);
+        rects[rectIdx] = { ...rects[rectIdx], ...rect, ...snapped };
         panel.zoomRects = rects;
         panel.zoomRect = undefined;
         panels[panelIdx] = panel;
@@ -265,7 +326,17 @@ export function useEditorV2Store(
           if (posX >= r.x && posX <= r.x + r.w && posY >= r.y && posY <= r.y + r.h) return i;
         }
       }
-      return panels.length > 0 ? 0 : -1;
+      if (panels.length === 0) return -1;
+      let best = 0;
+      let bestDist = Infinity;
+      panels.forEach((p, i) => {
+        const dist = Math.abs((p.focusY ?? 0.5) * 100 - posY);
+        if (dist < bestDist) {
+          bestDist = dist;
+          best = i;
+        }
+      });
+      return best;
     },
     [getPage]
   );
@@ -291,7 +362,7 @@ export function useEditorV2Store(
       updatePages((page) => {
         const panels = [...(page.panels || [])];
         if (panels.length === 0) {
-          panels.push({ focusY: 0.5, dialogue: [], zoomRects: [{ x: 5, y: 5, w: 90, h: 90 }] });
+          panels.push({ focusY: 0.5, dialogue: [] });
         }
         const pIdx = Math.min(panelIdx >= 0 ? panelIdx : 0, panels.length - 1);
         const panel = { ...panels[pIdx], dialogue: [...(panels[pIdx].dialogue || [])] };
@@ -328,6 +399,38 @@ export function useEditorV2Store(
     [commit, localDialogues]
   );
 
+  const updatePanelLive = useCallback(
+    (panelIdx: number, updates: Partial<PanelStop>) => {
+      patchLive((prev) => {
+        const page = prev.pages?.[pageKey] || { panels: [] };
+        const panels = [...(page.panels || [])];
+        if (!panels[panelIdx]) return prev;
+        panels[panelIdx] = { ...panels[panelIdx], ...updates };
+        return { ...prev, pages: { ...prev.pages, [pageKey]: { ...page, panels } } };
+      });
+    },
+    [pageKey, patchLive]
+  );
+
+  const updateMaskLive = useCallback(
+    (panelIdx: number, rectIdx: number, rect: { x: number; y: number; w: number; h: number }) => {
+      patchLive((prev) => {
+        const page = prev.pages?.[pageKey] || { panels: [] };
+        const panels = [...(page.panels || [])];
+        const panel = { ...panels[panelIdx] };
+        if (!panel) return prev;
+        const rects = panel.zoomRects ? [...panel.zoomRects] : panel.zoomRect ? [{ ...panel.zoomRect }] : [];
+        if (!rects[rectIdx]) return prev;
+        rects[rectIdx] = { ...rects[rectIdx], ...rect };
+        panel.zoomRects = rects;
+        panel.zoomRect = undefined;
+        panels[panelIdx] = panel;
+        return { ...prev, pages: { ...prev.pages, [pageKey]: { ...page, panels } } };
+      });
+    },
+    [pageKey, patchLive]
+  );
+
   const updateBubbleLive = useCallback(
     (panelIdx: number, bubbleIdx: number, fields: Partial<DialogueLine>) => {
       patchLive((prev) => {
@@ -356,7 +459,11 @@ export function useEditorV2Store(
     canUndo: past.length > 0,
     canRedo: future.length > 0,
     getPage,
-    addPanelWithMask,
+    addPanel,
+    addMaskToPanel,
+    removePanel,
+    removeMaskRect,
+    updatePage,
     addBubble,
     updateBubble,
     updateBubbleLive,
@@ -364,7 +471,9 @@ export function useEditorV2Store(
     duplicateBubble,
     reorderPanels,
     updatePanel,
+    updatePanelLive,
     updateMaskRect,
+    updateMaskLive,
     assignBubbleToPanelByPosition,
     findPanelForPoint,
     copySelection,

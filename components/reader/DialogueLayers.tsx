@@ -8,6 +8,62 @@ import {
   findTargetBubble,
   getEffectiveIndexes,
 } from "./readerUtils";
+import type { DialogueLine } from "./DialogueBubble";
+
+function isSpeechBalloon(line: DialogueLine) {
+  const style = line.style ?? "normal";
+  return style === "normal" || style === "whisper";
+}
+
+function SpeechJoins({
+  bubbles,
+}: {
+  bubbles: { key: string; x: number; y: number; line: DialogueLine; active: boolean }[];
+}) {
+  const nodes: React.ReactNode[] = [];
+  for (let i = 0; i < bubbles.length; i++) {
+    for (let j = i + 1; j < bubbles.length; j++) {
+      const a = bubbles[i];
+      const b = bubbles[j];
+      if (!isSpeechBalloon(a.line) || !isSpeechBalloon(b.line)) continue;
+      const sa = estimateBubbleSize(a.line);
+      const sb = estimateBubbleSize(b.line);
+      const dx = b.x - a.x;
+      const dy = b.y - a.y;
+      const len = Math.hypot(dx, dy);
+      if (len < 16) continue;
+      const gapX = Math.abs(dx) - sa.halfW - sb.halfW;
+      const gapY = Math.abs(dy) - sa.halfH - sb.halfH;
+      const stacked = gapY < 28 && -gapX > Math.min(sa.halfW, sb.halfW) * 0.5;
+      const sideBySide = gapX < 28 && -gapY > Math.min(sa.halfH, sb.halfH) * 0.35;
+      if (!stacked && !sideBySide) continue;
+      const { bgColor, borderColor } = getBubbleStyles(a.line);
+      const neck = stacked
+        ? Math.min(sa.halfW, sb.halfW) * 1.2
+        : Math.min(sa.halfH, sb.halfH) * 1.15;
+      const angle = (Math.atan2(dy, dx) * 180) / Math.PI;
+      nodes.push(
+        <div
+          key={`join-${a.key}-${b.key}`}
+          className="absolute pointer-events-none"
+          style={{
+            left: (a.x + b.x) / 2,
+            top: (a.y + b.y) / 2,
+            width: len,
+            height: neck,
+            transform: `translate(-50%, -50%) rotate(${angle}deg)`,
+            background: bgColor,
+            border: `1.85px solid ${borderColor}`,
+            borderRadius: neck / 2,
+            zIndex: 28,
+            opacity: a.active && b.active ? 1 : 0.18,
+          }}
+        />
+      );
+    }
+  }
+  return <>{nodes}</>;
+}
 
 interface DialogueLayersProps {
   mode: "read" | "edit";
@@ -41,6 +97,7 @@ interface DialogueLayersProps {
   handleTailTargetDragEnd: (info: any, pIdx: number, bIdx: number) => void;
   handleReorderBubbles?: (pIdx: number, fromIdx: number, toIdx: number) => void;
   bubbleOpacity?: number;
+  staggerDelay?: boolean;
 }
 
 export function DialogueLayers({
@@ -75,6 +132,7 @@ export function DialogueLayers({
   handleTailTargetDragEnd,
   handleReorderBubbles,
   bubbleOpacity = 0.88,
+  staggerDelay = false,
 }: DialogueLayersProps) {
   const settings = localDialogues.settings || {};
   const clearReadDialogues = settings.clearReadDialogues ?? true;
@@ -104,8 +162,29 @@ export function DialogueLayers({
         {panelsToRender.flatMap((panel: PanelStop, pIndex: number) => {
           const dialogueList = panel.dialogue || [];
           const effectiveIndexes = getEffectiveIndexes(dialogueList, imgWidth, imgHeight, imgLeft, imgTop);
+          const joinBubbles = dialogueList.map((line, i) => {
+            const posX = line.posX ?? 50;
+            const posY = line.posY ?? panel.focusY * 100;
+            const offset = bubbleOffsets[`${pIndex}-${i}`] || { x: 0, y: 0 };
+            const isCurrentPanel = panel === activePanel;
+            const isPastPanel = autoplay && !clearReadDialogues && pIndex < panelIdx;
+            const active =
+              showAllDialogues ||
+              zoomedOut ||
+              isPastPanel ||
+              (isCurrentPanel && (autoplay ? i <= activeReadingBubbleIdx : i === activeReadingBubbleIdx));
+            return {
+              key: `${pIndex}-${i}`,
+              x: imgLeft + (posX / 100) * imgWidth + parallaxX + offset.x,
+              y: imgTop + (posY / 100) * imgHeight + parallaxY + offset.y,
+              line,
+              active,
+            };
+          });
 
-          return dialogueList.map((line, i) => {
+          return [
+            <SpeechJoins key={`joins-${pIndex}`} bubbles={joinBubbles} />,
+            ...dialogueList.map((line, i) => {
             const posX = line.posX ?? 50;
             const posY = line.posY ?? panel.focusY * 100;
 
@@ -197,7 +276,7 @@ export function DialogueLayers({
                       top: "50%",
                       zIndex: 0,
                       opacity: isBubbleActive ? 1.0 : 0.18,
-                      transition: "opacity 400ms cubic-bezier(0.25, 1, 0.5, 1)",
+                      transition: "opacity 520ms cubic-bezier(0.22, 1, 0.36, 1)",
                     }}
                   >
                     <path d={d} fill={bgColor} stroke="none" strokeWidth={0} />
@@ -226,7 +305,7 @@ export function DialogueLayers({
                   zIndex: draggedBubbleKey === bubbleKey ? 100 : isTargetOfAny ? 29 : 30,
                   transition:
                     !isPageChanging && draggedBubbleKey !== bubbleKey
-                      ? "opacity 400ms cubic-bezier(0.25, 1, 0.5, 1), left 400ms cubic-bezier(0.25, 1, 0.5, 1), top 400ms cubic-bezier(0.25, 1, 0.5, 1)"
+                      ? `opacity 520ms cubic-bezier(0.22, 1, 0.36, 1), left 520ms cubic-bezier(0.22, 1, 0.36, 1), top 520ms cubic-bezier(0.22, 1, 0.36, 1)`
                       : "none",
                   touchAction: "none",
                   opacity: isBubbleActive ? 1.0 : 0.18,
@@ -244,10 +323,12 @@ export function DialogueLayers({
                   textScale={textScale}
                   speedMultiplier={speedMultiplier}
                   bubbleOpacity={bubbleOpacity}
+                  staggerDelay={staggerDelay}
                 />
               </div>
             );
-          });
+          }),
+          ];
         })}
       </>
     );
@@ -259,7 +340,21 @@ export function DialogueLayers({
         const dialogueList = panel.dialogue || [];
         const isCurrentPanel = activePanelIdx === pIdx;
 
-        return dialogueList.map((line, bIdx) => {
+        const joinBubbles = dialogueList.map((line, bIdx) => {
+          const posX = line.posX ?? 50;
+          const posY = line.posY ?? panel.focusY * 100;
+          return {
+            key: `${pIdx}-${bIdx}`,
+            x: imgLeft + (posX / 100) * imgWidth,
+            y: imgTop + (posY / 100) * imgHeight,
+            line,
+            active: true,
+          };
+        });
+
+        return [
+          <SpeechJoins key={`joins-edit-${pIdx}`} bubbles={joinBubbles} />,
+          ...dialogueList.map((line, bIdx) => {
           const isActive = isCurrentPanel && activeBubbleIdx === bIdx;
           const posX = line.posX ?? 50;
           const posY = line.posY ?? panel.focusY * 100;
@@ -482,7 +577,8 @@ export function DialogueLayers({
               })()}
             </React.Fragment>
           );
-        });
+        }),
+        ];
       })}
     </>
   );

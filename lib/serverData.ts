@@ -14,6 +14,8 @@ export type Chapter = {
   date?: string;         // development start date
   releaseDate?: string;  // actual launch/publish date
   estimatedTime?: string;
+  nuevo?: boolean;
+  proximamente?: boolean;
 };
 
 export type Saga = {
@@ -22,6 +24,7 @@ export type Saga = {
   tagline: string;
   description: string;
   color: string;
+  colorSecondary?: string;
   chapters: Chapter[];
   order: number;
   status?: string;
@@ -85,6 +88,7 @@ export function getDynamicSagas(): Saga[] {
       description = "El caos total. Preparate porque acá se rompen las reglas y saltamos a dimensiones re flasheras.";
     }
     let color = POP_ART_COLORS[idx % POP_ART_COLORS.length];
+    let colorSecondary: string | undefined = undefined;
     let order = folderOrder !== null ? folderOrder : idx + 1;
     let sagaStatus = "published";
     let sagaPassword = undefined;
@@ -104,6 +108,7 @@ export function getDynamicSagas(): Saga[] {
         if (meta.tagline) tagline = meta.tagline;
         if (meta.description) description = meta.description;
         if (meta.color) color = meta.color;
+        if (meta.color_secondary) colorSecondary = meta.color_secondary;
         if (meta.order !== undefined) order = meta.order;
         if (meta.status) sagaStatus = meta.status;
         if (meta.password) sagaPassword = meta.password;
@@ -149,6 +154,8 @@ export function getDynamicSagas(): Saga[] {
       let chDate: string | undefined = undefined;
       let chReleaseDate: string | undefined = undefined;
       let chEstimatedTime: string | undefined = undefined;
+      let chNuevo = false;
+      let chProximamente = false;
 
       // Load chapter.json if exists
       const chJsonPath = path.join(chPath, "chapter.json");
@@ -162,6 +169,8 @@ export function getDynamicSagas(): Saga[] {
           if (chMeta.date) chDate = chMeta.date;
           if (chMeta.releaseDate) chReleaseDate = chMeta.releaseDate;
           if (chMeta.estimatedTime) chEstimatedTime = chMeta.estimatedTime;
+          if (chMeta.nuevo !== undefined) chNuevo = !!chMeta.nuevo;
+          if (chMeta.proximamente !== undefined) chProximamente = !!chMeta.proximamente;
         } catch (err) {
           console.error(`Error parsing chapter.json in ${folder}/${chFolder}:`, err);
         }
@@ -194,6 +203,8 @@ export function getDynamicSagas(): Saga[] {
         date: chDate,
         releaseDate: chReleaseDate,
         estimatedTime: chEstimatedTime,
+        nuevo: chNuevo,
+        proximamente: chProximamente,
       });
     });
 
@@ -206,6 +217,7 @@ export function getDynamicSagas(): Saga[] {
       tagline,
       description,
       color,
+      colorSecondary,
       chapters,
       order,
       status: sagaStatus,
@@ -307,6 +319,21 @@ function resolveSiblingAssetsSubdir(subdir: "comics" | "sounds"): string {
     }
   } catch (e) {}
   return path.join(process.cwd(), "..", "the-boyz-comic", subdir);
+}
+
+export function getPublicComicsDir(): string {
+  return path.join(process.cwd(), "public", "comics");
+}
+
+export function findChildDirById(parentDir: string, id: string): string | null {
+  if (!fs.existsSync(parentDir)) return null;
+  const found = fs.readdirSync(parentDir).find((entry) => {
+    const full = path.join(parentDir, entry);
+    if (!fs.statSync(full).isDirectory()) return false;
+    const match = entry.match(/^(?:#)?(\d+)[-_. ]+(.*)$/);
+    return (match ? match[2] : entry) === id;
+  });
+  return found ?? null;
 }
 
 export function getAssetsComicsDir(): string {

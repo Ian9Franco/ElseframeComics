@@ -1,6 +1,6 @@
 import type { DialogueLine } from "@/components/reader/DialogueBubble";
 
-export type EditorV2Tool = "select" | "bubble" | "stop" | "hand";
+export type EditorV2Tool = "stops" | "bubble" | "mask" | "hand";
 
 export type BubbleStylePreset = NonNullable<DialogueLine["style"]>;
 

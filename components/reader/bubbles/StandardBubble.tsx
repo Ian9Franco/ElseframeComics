@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useLayoutEffect, useRef, useState } from "react";
 import { motion } from "framer-motion";
 import type { DialogueLine } from "../DialogueBubble";
 import {
@@ -11,10 +11,15 @@ import {
   buildAnimVariants,
   buildExitVariant,
   buildAnimTransition,
+  buildComicBalloonPath,
+  comicBalloonSeed,
+  comicTextContainment,
   computeBubbleDelay,
   resolveBgColor,
   getSfxGradient,
   renderStyledText,
+  lineShowsSpeaker,
+  InlineSpeakerLabel,
 } from "./bubbleHelpers";
 import { BubbleInlineEditor } from "./BubbleInlineEditor";
 import type { InlineTextEditProps } from "../DialogueBubble";
@@ -30,6 +35,7 @@ interface StandardBubbleProps {
   textScale?: number;
   speedMultiplier?: number;
   bubbleOpacity?: number;
+  staggerDelay?: boolean;
 }
 
 // ─── Triangle Tail Helpers ─────────────────────────────────────────────────────
@@ -175,6 +181,7 @@ export function StandardBubble({
   textScale = 1.0,
   speedMultiplier = 1.0,
   bubbleOpacity,
+  staggerDelay = true,
   inlineTextEdit,
 }: StandardBubbleProps & { inlineTextEdit?: InlineTextEditProps }) {
   const style   = line.style ?? "normal";
@@ -198,10 +205,10 @@ export function StandardBubble({
   const customDropShadow = `drop-shadow(0px ${shadowOffsetY}px ${shadowBlur}px rgba(0, 0, 0, ${shadowAlpha}))`;
 
   // ── Animation ──
-  const delay      = computeBubbleDelay(index, line, instant ?? false, speedMultiplier);
+  const delay      = computeBubbleDelay(index, line, instant ?? false, speedMultiplier, staggerDelay);
   const animVars   = buildAnimVariants(appearanceAnimation);
   const exitVar    = buildExitVariant(fadeOutAnimation);
-  const transition = buildAnimTransition(appearanceAnimation, delay, instant ?? false);
+  const transition = buildAnimTransition(appearanceAnimation, delay, instant ?? false, staggerDelay);
 
   // ── Font ──
   const customFontFamily = resolveFontFamily(line, style);
@@ -268,16 +275,23 @@ export function StandardBubble({
   }
 
   const hasElasticTail = line.tail !== "none" && line.tailX !== undefined && line.tailY !== undefined;
+  const organicBalloon = style === "normal" || style === "whisper";
+  const bodyRef = useRef<HTMLDivElement>(null);
+  const [balloonBox, setBalloonBox] = useState({ w: 0, h: 0 });
 
 
   const wrapperStyles: React.CSSProperties = { pointerEvents: "none" };
   if (line.width) wrapperStyles.maxWidth = `${line.width}px`;
 
   const bubbleStyles: React.CSSProperties = {
-    backgroundColor: bgColor,
-    border: borderStyle,
-    boxShadow: shadowStyle,
-    borderRadius: line.borderRadius !== undefined ? `${line.borderRadius}px` : undefined,
+    backgroundColor: organicBalloon ? "transparent" : bgColor,
+    border: organicBalloon ? "none" : borderStyle,
+    boxShadow: organicBalloon ? "none" : shadowStyle,
+    borderRadius: organicBalloon
+      ? undefined
+      : line.borderRadius !== undefined
+        ? `${line.borderRadius}px`
+        : undefined,
   };
 
   // ── Font size scaling ──
@@ -289,6 +303,37 @@ export function StandardBubble({
   }
   const minFont = style === "sfx" ? 10 : (isMobile ? 8 : 10);
   const finalFontSize = Math.max(minFont, baseFontSize * textScale);
+  useLayoutEffect(() => {
+    if (!organicBalloon) return;
+    const el = bodyRef.current;
+    if (!el) return;
+    const measure = () => setBalloonBox({ w: el.offsetWidth, h: el.offsetHeight });
+    measure();
+    const ro = new ResizeObserver(measure);
+    ro.observe(el);
+    return () => ro.disconnect();
+  }, [organicBalloon, line.text, line.width, finalFontSize, textScale]);
+
+  const balloonBleed = 16;
+  const balloonW = balloonBox.w + balloonBleed * 2;
+  const balloonH = balloonBox.h + balloonBleed * 2;
+  const balloonPath =
+    organicBalloon && balloonBox.w > 0
+      ? buildComicBalloonPath(
+          comicBalloonSeed(index, line.text || ""),
+          hasElasticTail ? "none" : tailDir,
+          balloonW,
+          balloonH,
+          style === "whisper" ? "scallop" : "smooth"
+        )
+      : "";
+  const balloonFill = bgColor.replace(
+    /rgba\(\s*([\d.]+)\s*,\s*([\d.]+)\s*,\s*([\d.]+)\s*,\s*[\d.]+\s*\)/,
+    "rgb($1, $2, $3)"
+  );
+  if (style !== "sfx") {
+    Object.assign(bubbleStyles, comicTextContainment(finalFontSize, organicBalloon ? finalFontSize * 0.35 : 0));
+  }
   bubbleStyles.fontSize = `${finalFontSize}px`;
   if (line.width)     bubbleStyles.maxWidth  = `${line.width}px`;
   if (line.textColor) bubbleStyles.color     = line.textColor;
@@ -321,7 +366,7 @@ export function StandardBubble({
       className="relative max-w-sm font-sans"
       style={{
         ...wrapperStyles,
-        filter: customDropShadow,
+        filter: organicBalloon ? "none" : customDropShadow,
         overflow: "visible",
       }}
     >
@@ -358,8 +403,28 @@ export function StandardBubble({
       {/* SVG Elastic Tail */}
       {hasElasticTail && elasticTailNode}
 
-      {/* Traditional Triangle Tail */}
-      {!hasElasticTail && style !== "sfx" && style !== "caption" && (
+      {organicBalloon && balloonPath && (
+        <svg
+          className="absolute pointer-events-none"
+          viewBox={`0 0 ${balloonW} ${balloonH}`}
+          width={balloonW}
+          height={balloonH}
+          overflow="visible"
+          style={{ zIndex: 0, left: -balloonBleed, top: -balloonBleed }}
+        >
+          <path
+            d={balloonPath}
+            fill={balloonFill}
+            stroke={borderColor}
+            strokeWidth={style === "whisper" ? 2.75 : 2.15}
+            strokeLinejoin="round"
+            strokeLinecap="round"
+          />
+        </svg>
+      )}
+
+      {/* Traditional Triangle Tail — scream/electronic only; speech balloons carry the tail in the outline */}
+      {!organicBalloon && !hasElasticTail && style !== "sfx" && style !== "caption" && (
         <TriangleTail
           direction={tailDir}
           bgColor={bgColor}
@@ -370,18 +435,10 @@ export function StandardBubble({
 
       {/* Inner Bubble Body & Text */}
       <div
+        ref={bodyRef}
         className={`${bubbleClass} ${sizeClass} relative z-10`}
-        style={{ ...bubbleStyles, ...backdropBlurStyles }}
+        style={{ ...bubbleStyles, ...(organicBalloon ? {} : backdropBlurStyles) }}
       >
-        {line.speaker && (line.showSpeakerName || line.offscreen) && style !== "sfx" && (
-          <span
-            className="font-[var(--font-bangers)] text-xs tracking-wider block mb-1 uppercase"
-            style={{ color: speakerColor }}
-          >
-            {line.speaker}:
-          </span>
-        )}
-
         {style === "sfx" ? (
           <div className="flex flex-col gap-1.5 items-center justify-center">
             {paragraphs.map((p, pIdx) => {
@@ -485,15 +542,21 @@ export function StandardBubble({
             })}
           </div>
         ) : inlineTextEdit ? (
-          <BubbleInlineEditor inlineTextEdit={inlineTextEdit} className={bubbleClass} style={{ color: line.textColor }} />
+          <div>
+            {lineShowsSpeaker(line) && line.speaker && (
+              <InlineSpeakerLabel name={line.speaker} color={speakerColor} />
+            )}
+            <BubbleInlineEditor inlineTextEdit={inlineTextEdit} className={bubbleClass} style={{ color: line.textColor }} />
+          </div>
         ) : (
           <div className="flex flex-col gap-1.5">
             {paragraphs.map((p, i) => (
               <div key={i}>
+                {i === 0 && lineShowsSpeaker(line) && line.speaker && (
+                  <InlineSpeakerLabel name={line.speaker} color={speakerColor} />
+                )}
                 {p.speaker && (!line.speaker || p.speaker.toUpperCase().trim() !== line.speaker.toUpperCase().trim()) && (
-                  <strong className="font-[var(--font-bangers)] font-bold mr-1 tracking-wide" style={{ color: getSpeakerColor(p.speaker, "#000000"), fontWeight: "bold" }}>
-                    {p.speaker}:{" "}
-                  </strong>
+                  <InlineSpeakerLabel name={p.speaker} color={getSpeakerColor(p.speaker, "#000000")} />
                 )}
                 <span>{renderStyledText(p.text)}</span>
               </div>

@@ -24,6 +24,7 @@ interface CinematicTextBubbleProps {
   depth?: number;
   textScale?: number;
   speedMultiplier?: number;
+  staggerDelay?: boolean;
   inlineTextEdit?: import("../DialogueBubble").InlineTextEditProps;
 }
 
@@ -65,6 +66,7 @@ export function CinematicTextBubble({
   depth,
   textScale = 1.0,
   speedMultiplier = 1.0,
+  staggerDelay = true,
   inlineTextEdit,
 }: CinematicTextBubbleProps) {
   const paragraphs = parseParagraphs(line.text);
@@ -78,10 +80,10 @@ export function CinematicTextBubble({
   const fontFamily = resolveFontFamily(line, "cinematic");
   const fontClass = resolveFontClass(line, "cinematic");
 
-  const delay = computeBubbleDelay(index, line, instant ?? false, speedMultiplier);
+  const delay = computeBubbleDelay(index, line, instant ?? false, speedMultiplier, staggerDelay);
   const animVars = buildAnimVariants(appearanceAnimation);
   const exitVar = buildExitVariant(fadeOutAnimation);
-  const transition = buildAnimTransition(appearanceAnimation, delay, instant ?? false);
+  const transition = buildAnimTransition(appearanceAnimation, delay, instant ?? false, staggerDelay);
 
   const fillColor = variant === "translucent" ? colorWithAlpha(textColor, 0.48) : textColor;
   const strokeColor = variant === "outline" ? textColor : colorWithAlpha(depthColor, 0.2);

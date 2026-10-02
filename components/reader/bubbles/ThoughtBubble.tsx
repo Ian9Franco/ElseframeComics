@@ -12,8 +12,11 @@ import {
   buildExitVariant,
   buildAnimTransition,
   computeBubbleDelay,
+  comicTextContainment,
   resolveBgColor,
   renderStyledText,
+  lineShowsSpeaker,
+  InlineSpeakerLabel,
 } from "./bubbleHelpers";
 import { BubbleInlineEditor } from "./BubbleInlineEditor";
 
@@ -28,6 +31,7 @@ interface ThoughtBubbleProps {
   textScale?: number;
   speedMultiplier?: number;
   bubbleOpacity?: number;
+  staggerDelay?: boolean;
   inlineTextEdit?: import("../DialogueBubble").InlineTextEditProps;
 }
 
@@ -41,6 +45,7 @@ export function ThoughtBubble({
   textScale = 1.0,
   speedMultiplier = 1.0,
   bubbleOpacity,
+  staggerDelay = true,
   inlineTextEdit,
 }: ThoughtBubbleProps) {
   const [isMobile, setIsMobile] = React.useState(false);
@@ -55,17 +60,11 @@ export function ThoughtBubble({
   const size       = line.size ?? "medium";
 
   // ── Dynamic shadow ──
-  const depthVal      = depth ?? 2;
-  const shadowOffsetY = 2 + depthVal * 1.5;
-  const shadowBlur    = 4 + depthVal * 2.5;
-  const shadowAlpha   = 0.15 + depthVal * 0.05;
-  const customDropShadow = `drop-shadow(0px ${shadowOffsetY}px ${shadowBlur}px rgba(0, 0, 0, ${shadowAlpha}))`;
-
   // ── Animation ──
-  const delay      = computeBubbleDelay(index, line, instant ?? false, speedMultiplier);
+  const delay      = computeBubbleDelay(index, line, instant ?? false, speedMultiplier, staggerDelay);
   const animVars   = buildAnimVariants(appearanceAnimation);
   const exitVar    = buildExitVariant(fadeOutAnimation);
-  const transition = buildAnimTransition(appearanceAnimation, delay, instant ?? false);
+  const transition = buildAnimTransition(appearanceAnimation, delay, instant ?? false, staggerDelay);
 
   // ── Font ──
   const customFontFamily   = resolveFontFamily(line, "thought");
@@ -92,8 +91,9 @@ export function ThoughtBubble({
     backgroundColor: resolveBgColor(thoughtBg, "#000000", bubbleOpacity),
     color: thoughtTextColor,
     border: `2px solid ${thoughtBorderColor}`,
-    borderRadius: line.borderRadius !== undefined ? `${line.borderRadius}px` : "0px",
+    borderRadius: 0,
     fontSize: `${finalFontSize}px`,
+    ...comicTextContainment(finalFontSize),
   };
 
   if (line.width)       thoughtStyles.maxWidth   = `${line.width}px`;
@@ -114,29 +114,20 @@ export function ThoughtBubble({
       style={{
         ...wrapperStyles,
         pointerEvents: "none",
-        filter: customDropShadow,
       }}
     >
-      {/* Rectangular Box Container (Fondo Negro, Letras Blancas, Bordes Rectos) */}
       <div
-        className={`${fontClass} ${thoughtSizeClass} relative z-10 shadow-lg`}
+        className={`${fontClass} ${thoughtSizeClass} relative z-10`}
         style={thoughtStyles}
       >
-        {line.speaker && (line.showSpeakerName || line.offscreen) && (
-          <span
-            className="font-[var(--font-bangers)] text-xs tracking-wider block mb-1 uppercase font-bold"
-            style={{ color: thoughtSpeakerColor }}
-          >
-            {line.speaker}
-          </span>
-        )}
         <div className="flex flex-col gap-2">
           {paragraphs.map((p, i) => (
             <div key={i}>
+              {i === 0 && lineShowsSpeaker(line) && line.speaker && (
+                <InlineSpeakerLabel name={line.speaker} color={thoughtSpeakerColor} />
+              )}
               {p.speaker && (!line.speaker || p.speaker.toUpperCase().trim() !== line.speaker.toUpperCase().trim()) && (
-                <strong className="font-[var(--font-bangers)] font-bold mr-1 tracking-wide" style={{ color: getSpeakerColor(p.speaker, "#ffffff"), fontWeight: "bold" }}>
-                  {p.speaker}:{" "}
-                </strong>
+                <InlineSpeakerLabel name={p.speaker} color={getSpeakerColor(p.speaker, "#ffffff")} />
               )}
               <span>
                 {inlineTextEdit ? <BubbleInlineEditor inlineTextEdit={inlineTextEdit} /> : renderStyledText(p.text)}
