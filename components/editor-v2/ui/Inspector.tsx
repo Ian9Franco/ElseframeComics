@@ -10,6 +10,7 @@ import { SoundFolderPicker } from "./SoundFolderPicker";
 import type { EditorV2Tool, Selection } from "../types";
 import { getPageKeyFromUrl } from "@/components/reader/readerUtils";
 import { SCENE_FADE_OPTIONS } from "@/components/reader/sceneFade";
+import { isReaderSystemSound } from "@/lib/readerSystemSounds";
 
 export type InspectorViewMode = "full" | "stops" | "bubble" | "mask" | "page" | "audio";
 
@@ -161,7 +162,7 @@ export function Inspector({
   const tracks = localDialogues.audioTracks ?? [];
 
   const addSfx = (path: string) => {
-    if (!panel) return;
+    if (!panel || isReaderSystemSound(path)) return;
     const existing = panel.sounds || (panel.sound ? [{ sound: panel.sound, soundConfig: panel.soundConfig }] : []);
     onUpdatePanel(activePanelIdx, {
       sound: undefined,
@@ -170,6 +171,7 @@ export function Inspector({
   };
 
   const addTrack = (path: string) => {
+    if (isReaderSystemSound(path)) return;
     const track: AudioTrack = {
       id: `track-${Date.now()}`,
       layer: trackLayer,
@@ -214,7 +216,9 @@ export function Inspector({
           onChange={(u) => onUpdatePanel(activePanelIdx, u)}
         />
         <div className="space-y-1">
-          {(panel.sounds || (panel.sound ? [{ sound: panel.sound }] : [])).map((s, i) => (
+          {(panel.sounds || (panel.sound ? [{ sound: panel.sound }] : []))
+            .filter((s) => !isReaderSystemSound(s.sound))
+            .map((s, i) => (
             <div key={`${s.sound}-${i}`} className="flex items-center gap-2 text-sm">
               <span className="truncate flex-1 text-zinc-400">{s.sound.split("/").pop()}</span>
               <button

@@ -6,6 +6,7 @@ import type { Dialogues, PageData, PanelStop as PanelConfig, ChapterSettings, Au
 import type { AiDialogueProposal } from "./dialogueAi";
 import { createDialogueLine } from "./dialogueDefaults";
 import { snapMaskRect } from "./readerUtils";
+import { stripReaderSystemSoundsFromDialogues } from "@/lib/readerSystemSounds";
 
 interface UseDialogueEditorProps {
   dialogues: Dialogues | null;
@@ -562,7 +563,10 @@ export function useDialogueEditor({
           "Content-Type": "application/json",
           "x-editor-password": savedPass,
         },
-        body: JSON.stringify({ dialogues: localDialoguesRef.current, sha: workspaceShaRef.current }),
+        body: JSON.stringify({
+          dialogues: stripReaderSystemSoundsFromDialogues(localDialoguesRef.current),
+          sha: workspaceShaRef.current,
+        }),
       });
       const payload = await res.json().catch(() => ({} as { error?: string; sha?: string }));
 

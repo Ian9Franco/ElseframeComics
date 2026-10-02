@@ -1,6 +1,7 @@
 "use client";
 
 import { Howl } from "howler";
+import { PAGE_FLIP_SOUND_PATH, readPageFlipSoundEnabled } from "@/lib/readerSystemSounds";
 
 let flipHowl: Howl | null = null;
 
@@ -8,7 +9,7 @@ function getFlipHowl(): Howl | null {
   if (typeof window === "undefined") return null;
   if (!flipHowl) {
     flipHowl = new Howl({
-      src: ["/sounds/sfx/page-flip.mp3"],
+      src: [PAGE_FLIP_SOUND_PATH],
       volume: 0.55,
       preload: true,
       onloaderror: (_id, error) => {
@@ -24,6 +25,7 @@ export function preloadPageFlipSound() {
 }
 
 export function playPageFlipSound(direction: "next" | "prev") {
+  if (!readPageFlipSoundEnabled()) return;
   const howl = getFlipHowl();
   if (!howl) return;
   const id = howl.play();

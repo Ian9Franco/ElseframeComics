@@ -55,6 +55,8 @@ interface ReaderTopBarProps {
   setPanOffset?: (val: { x: number; y: number }) => void;
   bubbleOpacity?: number;
   setBubbleOpacity?: (val: number) => void;
+  pageFlipSoundEnabled?: boolean;
+  setPageFlipSoundEnabled?: (value: boolean) => void;
   editorVersion?: EditorVersion;
   setEditorVersion?: (v: EditorVersion) => void;
 }
@@ -88,6 +90,8 @@ export function ReaderTopBar({
   setPanOffset,
   bubbleOpacity = 0.90,
   setBubbleOpacity,
+  pageFlipSoundEnabled = true,
+  setPageFlipSoundEnabled,
   editorVersion = "v1",
   setEditorVersion,
 }: ReaderTopBarProps) {
@@ -339,6 +343,24 @@ export function ReaderTopBar({
                               {autoplay ? "ON" : "OFF"}
                           </button>
                         </div>
+
+                        {setPageFlipSoundEnabled && (
+                          <div className={`flex items-center justify-between pt-2 ${isReadMode ? "border-t border-white/10" : "border-t border-zinc-100"}`}>
+                            <span className={`font-[var(--font-bangers)] text-[10px] uppercase tracking-wider ${isReadMode ? "text-zinc-400" : "text-zinc-500"}`}>
+                              Sonido pasar página:
+                            </span>
+                            <button
+                              onClick={() => setPageFlipSoundEnabled(!pageFlipSoundEnabled)}
+                              className={`font-[var(--font-bangers)] text-xs px-2.5 py-1 border transition-all rounded-sm ${
+                                pageFlipSoundEnabled
+                                  ? "bg-emerald-500 border-emerald-400 text-white"
+                                  : "bg-rose-500 border-rose-400 text-white"
+                              }`}
+                            >
+                              {pageFlipSoundEnabled ? "ON" : "OFF"}
+                            </button>
+                          </div>
+                        )}
 
                         {/* Focus */}
                         {setFocusEnabled && (
