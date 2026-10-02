@@ -22,11 +22,14 @@ interface GithubContentItem {
 }
 
 /**
- * Arma los headers de autenticación para la GitHub API.
- * Usa GITHUB_TOKEN si está disponible (evita rate-limit de 60 req/h).
+ * Token solo para lectura pública del repo de assets (listado de páginas).
+ * No usar GITHUB_EDITOR_TOKEN acá: un PAT inválido o sin permiso rompe el lector con 401.
  */
-function buildGithubHeaders(): HeadersInit {
-  const token = process.env.GITHUB_EDITOR_TOKEN || process.env.GITHUB_TOKEN;
+function getGithubReadToken(): string | undefined {
+  return process.env.GITHUB_TOKEN || undefined;
+}
+
+function buildGithubHeaders(token?: string): HeadersInit {
   const headers: HeadersInit = {
     Accept: "application/vnd.github.v3+json",
   };
@@ -53,13 +56,26 @@ async function fetchGithubContents(
   const url = `https://api.github.com/repos/${GITHUB_OWNER}/${GITHUB_REPO}/contents/${encodedPath}?ref=${encodeURIComponent(ref)}`;
 
   try {
-    const res = await fetch(url, {
-      headers: buildGithubHeaders(),
-      // Cacheo de 60 segundos en el edge para evitar martillar la API
+    const readToken = getGithubReadToken();
+    let res = await fetch(url, {
+      headers: buildGithubHeaders(readToken),
       next: { revalidate: 60 },
     });
 
-    if (!res.ok) return null;
+    // PAT inválido o sin acceso: reintentar sin auth (repo público)
+    if ((res.status === 401 || res.status === 403) && readToken) {
+      res = await fetch(url, {
+        headers: buildGithubHeaders(),
+        next: { revalidate: 60 },
+      });
+    }
+
+    if (!res.ok) {
+      console.error(
+        `[githubComics] GitHub contents API ${res.status} for ${repoPath} (ref=${ref})`
+      );
+      return null;
+    }
 
     const data = await res.json();
     // La API devuelve un array para directorios, un objeto para archivos
