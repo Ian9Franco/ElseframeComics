@@ -75,7 +75,7 @@ export function CinematicTextBubble({
   const variant = line.cinematicVariant ?? "translucent";
   const hasDepth = line.cinematic3d ?? true;
   const size = line.size ?? "large";
-  const width = (line.width ?? (size === "small" ? 420 : size === "large" ? 960 : 720)) * bubbleLayoutScale;
+  const width = (line.width ?? (size === "small" ? 420 : size === "large" ? 960 : 720)) * bubbleLayoutScale * textScale;
   const baseFontSize = line.fontSize ?? (size === "small" ? 42 : size === "large" ? 86 : 64);
   const textColor = line.textColor || (variant === "translucent" ? "#0a0a0f" : "#ffffff");
   const depthColor = line.customColor || "#0a0a0f";
@@ -91,8 +91,8 @@ export function CinematicTextBubble({
   const strokeColor = variant === "outline" ? textColor : colorWithAlpha(depthColor, 0.2);
   const strokeWidth = variant === "outline" ? "2.5px" : variant === "translucent" ? "0.4px" : "0px";
   const depthOpacity = variant === "translucent" ? 0.34 : 0.72;
-  const fontLayoutScale = Math.max(bubbleLayoutScale, 0.88);
-  const fontSize = Math.max(18 * fontLayoutScale, baseFontSize * textScale * fontLayoutScale);
+  const fontLayoutScale = bubbleLayoutScale;
+  const fontSize = Math.max(18 * fontLayoutScale * textScale, baseFontSize * textScale * fontLayoutScale);
 
   const textShadow = hasDepth
     ? `2px 2px 0 ${colorWithAlpha(depthColor, depthOpacity)}, 5px 5px 0 ${colorWithAlpha(depthColor, depthOpacity * 0.55)}, -2px 0 0 rgba(0, 240, 255, 0.18), 2px 0 0 rgba(232, 24, 90, 0.2), 0 10px 24px rgba(0, 0, 0, 0.35)`

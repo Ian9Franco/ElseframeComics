@@ -207,11 +207,7 @@ export function CinematicReader({
         setTextScale(parseFloat(saved));
       } else {
         const isMobile = window.innerWidth < 768;
-        if (isMobile) {
-          setTextScale(0.85); // A- Chico
-        } else {
-          setTextScale(1.4);  // A++ X-Grande
-        }
+        setTextScale(isMobile ? 0.85 : 1.0);
       }
       const savedAutoplay = localStorage.getItem("reader_autoplay");
       if (savedAutoplay !== null) {
@@ -460,6 +456,7 @@ export function CinematicReader({
       setShowAllDialogues(false);
       setActivePanelIdx(0);
       setActiveBubbleIdx(null);
+      setActiveReadingBubbleIdx(0);
       setBubbleOffsets({});
 
       if (fromPageFlip) {
@@ -474,6 +471,8 @@ export function CinematicReader({
         if (shouldSoftFocus) {
           setHoldSheetLayout(true);
           setZoomedOut(true);
+          setZoomScale(1);
+          setPanOffset({ x: 0, y: 0 });
           setPageLandCameraMs(PAGE_LAND_EASE_MS);
           pageLandTimerRef.current = window.setTimeout(() => {
             pageLandTimerRef.current = null;
@@ -487,6 +486,8 @@ export function CinematicReader({
           setHoldSheetLayout(false);
           setZoomedOut(true);
           setPageLandCameraMs(0);
+          setZoomScale(1);
+          setPanOffset({ x: 0, y: 0 });
         }
         return;
       }
@@ -533,15 +534,6 @@ export function CinematicReader({
       return computeSpoilerMasks(panels, 0, 0);
     };
     return { prev: [] as ReturnType<typeof initialMasksFor>, next: initialMasksFor(pageIdx + 1) };
-  }, [pages, pageIdx, localDialogues.pages]);
-
-  const prevPanels = useMemo(() => {
-    const src = pages[pageIdx - 1];
-    if (!src) return [];
-    return getReadPanels(localDialogues.pages?.[getPageKeyFromUrl(src)]?.panels).map((panel) => ({
-      focusY: panel.focusY,
-      dialogue: panel.dialogue,
-    }));
   }, [pages, pageIdx, localDialogues.pages]);
 
   useEffect(() => {
@@ -754,7 +746,7 @@ export function CinematicReader({
   });
 
   const pageFlip = usePageFlipGesture({
-    enabled: mode === "read" && zoomScale <= 1.01,
+    enabled: mode === "read",
     canNext: pageIdx < pages.length - 1,
     canPrev: pageIdx > 0,
     pageWidth: imgWidth > 0 ? imgWidth : containerSize.w,
@@ -1150,8 +1142,6 @@ export function CinematicReader({
           pageFlip={mode === "read" ? pageFlip : undefined}
           viewportSize={containerSize}
           neighborMasks={neighborMasks}
-          prevPanels={prevPanels}
-          bubbleLayoutScale={bubbleLayoutScale}
           pageLoading={pageLoading}
           pageSheetLayout={pageSheetLayout}
         />

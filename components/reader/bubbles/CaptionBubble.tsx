@@ -119,11 +119,11 @@ export function CaptionBubble({
     baseFontSize = size === "small" ? 12 : size === "large" ? 18 : 14;
   }
   const minFont = isMobile ? 6 : 10;
-  const fontLayoutScale = Math.max(bubbleLayoutScale, 0.88);
-  const finalFontSize = Math.max(minFont, baseFontSize * textScale * fontLayoutScale);
+  const fontLayoutScale = bubbleLayoutScale;
+  const finalFontSize = Math.max(minFont * textScale, baseFontSize * textScale * fontLayoutScale);
   Object.assign(captionStyles, comicTextContainment(finalFontSize, 0, { mobile: isMobile }));
   captionStyles.fontSize = `${finalFontSize}px`;
-  const layoutWidth = line.width ? line.width * bubbleLayoutScale : undefined;
+  const layoutWidth = line.width ? line.width * bubbleLayoutScale * textScale : undefined;
   if (layoutWidth)    captionStyles.maxWidth = `${layoutWidth}px`;
   if (line.textColor) captionStyles.color    = line.textColor;
 

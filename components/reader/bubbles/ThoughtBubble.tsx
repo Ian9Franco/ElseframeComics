@@ -87,8 +87,8 @@ export function ThoughtBubble({
     baseFontSize = size === "small" ? 12 : size === "large" ? 18 : 14;
   }
   const minFont = isMobile ? 6 : 10;
-  const fontLayoutScale = Math.max(bubbleLayoutScale, 0.88);
-  const finalFontSize = Math.max(minFont, baseFontSize * textScale * fontLayoutScale);
+  const fontLayoutScale = bubbleLayoutScale;
+  const finalFontSize = Math.max(minFont * textScale, baseFontSize * textScale * fontLayoutScale);
 
   const thoughtStyles: React.CSSProperties = {
     backgroundColor: resolveBgColor(thoughtBg, "#000000", bubbleOpacity),
@@ -99,7 +99,7 @@ export function ThoughtBubble({
     ...comicTextContainment(finalFontSize, 0, { mobile: isMobile }),
   };
 
-  const layoutWidth = line.width ? line.width * bubbleLayoutScale : undefined;
+  const layoutWidth = line.width ? line.width * bubbleLayoutScale * textScale : undefined;
   if (layoutWidth)       thoughtStyles.maxWidth   = `${layoutWidth}px`;
   if (customFontFamily) thoughtStyles.fontFamily = customFontFamily;
 

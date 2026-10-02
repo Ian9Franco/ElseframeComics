@@ -70,10 +70,7 @@ function renderSpeechFusion(
     if (!path) return null;
     for (const b of group) rendered.add(b.key);
     const { bgColor, borderColor } = getBubbleStyles(group[0].line, bubbleOpacity);
-    const fill = bgColor.replace(
-      /rgba\(\s*([\d.]+)\s*,\s*([\d.]+)\s*,\s*([\d.]+)\s*,\s*[\d.]+\s*\)/,
-      "rgb($1, $2, $3)"
-    );
+    const fill = bgColor;
     const w = Math.max(1, maxX - minX);
     const h = Math.max(1, maxY - minY);
     const anyActive = group.some((b) => b.active);

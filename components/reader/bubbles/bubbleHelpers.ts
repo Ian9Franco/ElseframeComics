@@ -123,9 +123,35 @@ export function getSpeakerColor(
   return SPEAKER_COLORS[key] || SPEAKER_COLORS[rawKey] || defaultColor;
 }
 
+/** Applies reader bubble opacity to hex / rgb / rgba fills. Leaves transparent unchanged. */
+export function colorWithOpacity(color: string, opacity: number): string {
+  if (!color || color === "transparent") return color;
+  const a = Math.max(0, Math.min(1, opacity));
+  const lower = color.toLowerCase().trim();
+  const rgbaMatch = lower.match(/^rgba\(\s*([\d.]+)\s*,\s*([\d.]+)\s*,\s*([\d.]+)\s*,\s*[\d.]+\s*\)$/);
+  if (rgbaMatch) {
+    return `rgba(${rgbaMatch[1]}, ${rgbaMatch[2]}, ${rgbaMatch[3]}, ${a})`;
+  }
+  const rgbMatch = lower.match(/^rgb\(\s*([\d.]+)\s*,\s*([\d.]+)\s*,\s*([\d.]+)\s*\)$/);
+  if (rgbMatch) {
+    return `rgba(${rgbMatch[1]}, ${rgbMatch[2]}, ${rgbMatch[3]}, ${a})`;
+  }
+  let hex = lower.startsWith("#") ? lower.slice(1) : "";
+  if (hex.length === 3) hex = hex.split("").map((c) => c + c).join("");
+  if (hex.length === 8) hex = hex.slice(0, 6);
+  if (hex.length === 6) {
+    const r = parseInt(hex.slice(0, 2), 16);
+    const g = parseInt(hex.slice(2, 4), 16);
+    const b = parseInt(hex.slice(4, 6), 16);
+    if (Number.isFinite(r) && Number.isFinite(g) && Number.isFinite(b)) {
+      return `rgba(${r}, ${g}, ${b}, ${a})`;
+    }
+  }
+  return color;
+}
+
 /**
- * Resolves the background color for a bubble. If the background is white
- * (either default or set to #ffffff), it returns a translucent white.
+ * Resolves the background color for a bubble and tints it with the reader opacity slider.
  */
 export function resolveBgColor(
   customBg: string | undefined,
@@ -133,11 +159,7 @@ export function resolveBgColor(
   bubbleOpacity: number = 0.88
 ): string {
   const bg = customBg || defaultBg;
-  const lower = bg.toLowerCase().trim();
-  if (lower === "#ffffff" || lower === "#fff" || lower === "rgb(255,255,255)" || lower === "rgb(255, 255, 255)") {
-    return `rgba(255, 255, 255, ${bubbleOpacity})`;
-  }
-  return bg;
+  return colorWithOpacity(bg, bubbleOpacity);
 }
 
 /**

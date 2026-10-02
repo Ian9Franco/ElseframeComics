@@ -237,7 +237,7 @@ export function StandardBubble({
 
   // ── Style-specific overrides ──
   if (style === "scream") {
-    bgColor      = line.customBg    || "#f5e642";
+    bgColor      = resolveBgColor(line.customBg, "#f5e642", bubbleOpacity);
     borderColor  = line.customColor || "#0a0a0f";
     borderStyle  = `2.5px solid ${borderColor}`;
     shadowStyle  = `4px 4px 0 ${line.customColor || "#e8185a"}`;
@@ -258,7 +258,7 @@ export function StandardBubble({
 
   } else if (style === "electronic") {
     // ── Premium glassmorphism for electronic bubbles ──
-    bgColor      = line.customBg    || "rgba(10, 20, 32, 0.82)";
+    bgColor      = resolveBgColor(line.customBg, "rgba(10, 20, 32, 0.82)", bubbleOpacity);
     borderColor  = line.customColor || "#00f0ff";
     borderStyle  = `1px solid rgba(0, 240, 255, 0.55)`;
     shadowStyle  = `0 0 18px rgba(0, 240, 255, 0.25), inset 0 0 12px rgba(0, 240, 255, 0.08)`;
@@ -306,7 +306,7 @@ export function StandardBubble({
 
 
   const wrapperStyles: React.CSSProperties = { pointerEvents: "none" };
-  const layoutWidth = line.width ? line.width * bubbleLayoutScale : undefined;
+  const layoutWidth = line.width ? line.width * bubbleLayoutScale * textScale : undefined;
   if (layoutWidth) wrapperStyles.maxWidth = `${layoutWidth}px`;
 
   const bubbleStyles: React.CSSProperties = {
@@ -328,8 +328,8 @@ export function StandardBubble({
       : (size === "small" ? 12 : size === "large" ? 18 : 14);
   }
   const minFont = style === "sfx" ? 10 : isMobile ? 6 : 10;
-  const fontLayoutScale = Math.max(bubbleLayoutScale, 0.88);
-  const finalFontSize = Math.max(minFont, baseFontSize * textScale * fontLayoutScale);
+  const fontLayoutScale = bubbleLayoutScale;
+  const finalFontSize = Math.max(minFont * textScale, baseFontSize * textScale * fontLayoutScale);
   useLayoutEffect(() => {
     if (!organicBalloon) return;
     const el = bodyRef.current;
@@ -358,10 +358,7 @@ export function StandardBubble({
           style === "whisper" ? "scallop" : "smooth"
         )
       : "";
-  const balloonFill = bgColor.replace(
-    /rgba\(\s*([\d.]+)\s*,\s*([\d.]+)\s*,\s*([\d.]+)\s*,\s*[\d.]+\s*\)/,
-    "rgb($1, $2, $3)"
-  );
+  const balloonFill = bgColor;
   if (style !== "sfx") {
     Object.assign(
       bubbleStyles,

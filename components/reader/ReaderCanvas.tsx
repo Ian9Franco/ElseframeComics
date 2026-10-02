@@ -10,7 +10,7 @@ import { SceneFadeLayer } from "./SceneFadeLayer";
 import { sceneFadeDurationMs, sceneFadeExit, sceneFadeOrigin } from "./sceneFade";
 
 import { PageEndGesture } from "./PageEndGesture";
-import { MaskedPageImage, NeighborPages, type GhostPanel } from "./pageFlip/NeighborPages";
+import { MaskedPageImage, NeighborPages } from "./pageFlip/NeighborPages";
 import { measureVisiblePageRect, type PageRect } from "./pageFlip/useFlipExpand";
 import type { PageFlipController } from "./pageFlip/usePageFlipGesture";
 
@@ -83,8 +83,6 @@ interface ReaderCanvasProps {
   pageFlip?: PageFlipController;
   viewportSize?: { w: number; h: number };
   neighborMasks?: { prev: SpoilerMask[]; next: SpoilerMask[] };
-  prevPanels?: GhostPanel[];
-  bubbleLayoutScale?: number;
   pageLoading?: boolean;
   pageSheetLayout?: {
     imgWidth: number;
@@ -153,8 +151,6 @@ export function ReaderCanvas({
   pageFlip,
   viewportSize,
   neighborMasks,
-  prevPanels,
-  bubbleLayoutScale = 1,
   pageLoading = false,
   pageSheetLayout,
 }: ReaderCanvasProps) {
@@ -176,6 +172,12 @@ export function ReaderCanvas({
       if (!frame) return null;
       const r = frame.getBoundingClientRect();
       if (clientY < r.top || clientY > r.bottom) return null;
+      // With zoom, the current page is for pan; only the neighbor peeks turn the page.
+      if (zoomScale > 1.01) {
+        if (clientX < r.left && clientX >= r.left - r.width) return "prev";
+        if (clientX > r.right && clientX <= r.right + r.width) return "next";
+        return null;
+      }
       const edge = Math.max(36, Math.min(96, r.width * 0.18));
       if (clientX >= r.left && clientX <= r.left + edge) return "prev";
       if (clientX >= r.right - edge && clientX <= r.right) return "next";
@@ -183,7 +185,7 @@ export function ReaderCanvas({
       if (clientX > r.right && clientX <= r.right + r.width) return "next";
       return null;
     },
-    [imgRef]
+    [imgRef, zoomScale]
   );
   React.useLayoutEffect(() => {
     if (!flipDir) {
@@ -202,7 +204,6 @@ export function ReaderCanvas({
         imgHeight: flipRect.height,
       }
     : { imgLeft, imgTop, imgWidth, imgHeight };
-  const showPrevGhostDialogues = !!flipDir || zoomedOut;
   const flipSheetMasks = React.useMemo(() => {
     if (flipDir === "prev") return neighborMasks?.prev ?? [];
     if (zoomedOut) return [];
@@ -222,7 +223,14 @@ export function ReaderCanvas({
   const onFlipMouseMove = (e: React.MouseEvent) => {
     const hadDir = !!flipDir;
     if (pageFlip?.onPointerMove(e.clientX, e.clientY)) {
-      if (!hadDir) lockVisiblePage();
+      if (!hadDir) {
+        if (zoomScale > 1.01) {
+          setZoomScale(1);
+          setPanOffset({ x: 0, y: 0 });
+        } else {
+          lockVisiblePage();
+        }
+      }
       takeOverFromPan();
       return;
     }
@@ -247,7 +255,14 @@ export function ReaderCanvas({
     const t = e.touches[0];
     const hadDir = !!flipDir;
     if (e.touches.length === 1 && t && pageFlip?.onPointerMove(t.clientX, t.clientY)) {
-      if (!hadDir) lockVisiblePage();
+      if (!hadDir) {
+        if (zoomScale > 1.01) {
+          setZoomScale(1);
+          setPanOffset({ x: 0, y: 0 });
+        } else {
+          lockVisiblePage();
+        }
+      }
       takeOverFromPan();
       return;
     }
@@ -350,15 +365,12 @@ export function ReaderCanvas({
           <NeighborPages
             prevSrc={pageIdx > 0 ? pages[pageIdx - 1] : undefined}
             nextSrc={pages[pageIdx + 1]}
-            prevMasks={neighborMasks?.prev}
+            prevMasks={undefined}
             nextMasks={neighborMasks?.next}
-            prevPanels={prevPanels}
-            bubbleLayoutScale={bubbleLayoutScale}
             imgLeft={neighborFrame.imgLeft}
             imgTop={neighborFrame.imgTop}
             imgWidth={neighborFrame.imgWidth}
             imgHeight={neighborFrame.imgHeight}
-            showPrevGhostDialogues={showPrevGhostDialogues}
             transition={sheetActive ? "none" : comicPanTransition}
             zIndex={sheetActive ? 27 : undefined}
           />

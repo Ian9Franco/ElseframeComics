@@ -55,14 +55,14 @@ export function getBubbleStyles(line: DialogueLine, bubbleOpacity?: number) {
   let strokeWidth  = 1.5;
 
   if (style === "scream") {
-    bgColor     = line.customBg    || "#f5e642";
+    bgColor     = resolveBgColor(line.customBg, "#f5e642", bubbleOpacity);
     borderColor = line.customColor || "#0a0a0f";
     strokeWidth = 2.5;
   } else if (style === "whisper") {
     bgColor     = resolveBgColor(line.customBg, "#ffffff", bubbleOpacity);
     borderColor = line.customColor || "#a1a1aa";
   } else if (style === "electronic") {
-    bgColor     = line.customBg    || "rgba(10, 20, 32, 0.82)";
+    bgColor     = resolveBgColor(line.customBg, "rgba(10, 20, 32, 0.82)", bubbleOpacity);
     borderColor = line.customColor || "#00f0ff";
   } else if (style === "caption") {
     bgColor     = resolveBgColor(line.customBg, "#f5e642", bubbleOpacity);

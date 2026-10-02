@@ -260,19 +260,35 @@ export function ReaderTopBar({
                       >
 
                         {/* Font size */}
-                        <div>
-                          <span className={`block font-[var(--font-bangers)] text-[10px] uppercase tracking-wider mb-1.5 ${isReadMode ? "text-zinc-400" : "text-zinc-500"}`}>
-                            Tamaño de letra:
-                          </span>
+                        <div className="flex flex-col gap-1.5">
+                          <div className="flex items-center justify-between">
+                            <span className={`font-[var(--font-bangers)] text-[10px] uppercase tracking-wider ${isReadMode ? "text-zinc-400" : "text-zinc-500"}`}>
+                              Tamaño de letra:
+                            </span>
+                            <span className={`font-mono text-[10px] font-bold ${isReadMode ? "text-zinc-300" : "text-[#0a0a0f]"}`}>
+                              {Math.round(textScale * 100)}%
+                            </span>
+                          </div>
+                          <input
+                            type="range"
+                            min="0.50"
+                            max="1.80"
+                            step="0.05"
+                            value={textScale}
+                            onChange={(e) => setTextScale(parseFloat(e.target.value))}
+                            className="w-full h-1 bg-zinc-700 rounded-lg appearance-none cursor-pointer accent-[#e8185a] transition-all hover:accent-pink-500"
+                          />
                           <div className={`flex gap-1 p-0.5 rounded ${isReadMode ? "bg-white/10" : "border border-[#0a0a0f] bg-zinc-50"}`}>
-                            {[0.85, 1.0, 1.2, 1.4].map((scale) => {
-                              const label = scale === 0.85 ? "A-" : scale === 1.0 ? "A" : scale === 1.2 ? "A+" : "A++";
+                            {[0.7, 0.85, 1.0, 1.2, 1.4].map((scale) => {
+                              const label = scale === 0.7 ? "A--" : scale === 0.85 ? "A-" : scale === 1.0 ? "A" : scale === 1.2 ? "A+" : "A++";
+                              const active = Math.abs(textScale - scale) < 0.03;
                               return (
                                 <button
                                   key={scale}
+                                  type="button"
                                   onClick={() => setTextScale(scale)}
                                   className={`flex-1 h-6 flex items-center justify-center text-xs font-bold transition-all rounded font-mono ${
-                                    textScale === scale
+                                    active
                                       ? (isReadMode ? "bg-white text-[#0a0a0f]" : "bg-[#0a0a0f] text-white")
                                       : (isReadMode ? "text-white/70 hover:bg-white/15" : "hover:bg-zinc-200 text-[#0a0a0f]")
                                   }`}

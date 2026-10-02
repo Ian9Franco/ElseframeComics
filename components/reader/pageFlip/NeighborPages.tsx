@@ -1,47 +1,9 @@
 "use client";
 
 import React from "react";
-import { DialogueBubble, type DialogueLine } from "../DialogueBubble";
 import { getComicPageUrl, type SpoilerMask } from "../readerUtils";
 
 const NEXT_FILTER = "blur(3px) brightness(0.42) saturate(0.7)";
-
-export type GhostPanel = { focusY?: number; dialogue?: DialogueLine[] };
-
-function GhostDialogues({
-  panels,
-  bubbleLayoutScale,
-}: {
-  panels: GhostPanel[];
-  bubbleLayoutScale: number;
-}) {
-  return (
-    <>
-      {panels.flatMap((panel, pIdx) =>
-        (panel.dialogue || []).map((line, i) => (
-          <div
-            key={`${pIdx}-${i}`}
-            className="absolute pointer-events-none"
-            style={{
-              left: `${line.posX ?? 50}%`,
-              top: `${line.posY ?? (panel.focusY ?? 0.5) * 100}%`,
-              transform: "translate(-50%, -50%)",
-              zIndex: 2,
-            }}
-          >
-            <DialogueBubble
-              line={line}
-              index={i}
-              instant
-              staggerDelay={false}
-              bubbleLayoutScale={bubbleLayoutScale}
-            />
-          </div>
-        ))
-      )}
-    </>
-  );
-}
 
 export function StaticSpoilerMasks({ masks }: { masks?: SpoilerMask[] }) {
   if (!masks?.length) return null;
@@ -100,23 +62,17 @@ export function NeighborPages({
   nextSrc,
   prevMasks,
   nextMasks,
-  prevPanels,
-  bubbleLayoutScale = 1,
   imgLeft,
   imgTop,
   imgWidth,
   imgHeight,
   transition,
-  showPrevGhostDialogues = true,
   zIndex,
 }: {
   prevSrc?: string;
   nextSrc?: string;
   prevMasks?: SpoilerMask[];
   nextMasks?: SpoilerMask[];
-  prevPanels?: GhostPanel[];
-  bubbleLayoutScale?: number;
-  showPrevGhostDialogues?: boolean;
   imgLeft: number;
   imgTop: number;
   imgWidth: number;
@@ -157,13 +113,10 @@ export function NeighborPages({
         >
           <MaskedPageImage
             src={src}
-            masks={masks}
+            masks={side === "prev" ? undefined : masks}
             filter={side === "next" ? NEXT_FILTER : undefined}
             opacity={side === "next" ? 0.75 : 1}
           />
-          {side === "prev" && showPrevGhostDialogues && prevPanels && prevPanels.length > 0 && (
-            <GhostDialogues panels={prevPanels} bubbleLayoutScale={bubbleLayoutScale} />
-          )}
         </div>
         {side === "next" && (
           <div
