@@ -2,7 +2,7 @@ const { execSync, spawnSync } = require("child_process");
 const path = require("path");
 const fs = require("fs");
 
-const projectRoot = path.join(__dirname, "..", "..");
+const projectRoot = process.env.PUBLISH_PROJECT_ROOT || path.join(__dirname, "..", "..");
 
 function getSiblingRoot(root) {
   const possibleNames = ["the-boyz-comic", "theboyz-comic-v1", "theboyz-comic"];
@@ -27,23 +27,43 @@ function getSiblingRoot(root) {
   return path.join(root, "..", "the-boyz-comic");
 }
 
-const siblingRoot = getSiblingRoot(projectRoot);
+const siblingRoot = process.env.PUBLISH_ASSETS_ROOT || getSiblingRoot(projectRoot);
+const skipAssetsPush = process.env.PUBLISH_SKIP_ASSETS_PUSH === "1";
 
 const commitMsg = process.argv[2] || "chore: sync y actualizaciones de diálogos/cómics";
 
 console.log("🚀 Iniciando flujo de publicación unificado...\n");
 console.log(`Mensaje de commit: "\x1b[32m${commitMsg}\x1b[0m"\n`);
 
+// ── 0. Integrar main antes de tocar archivos (el merge necesita working tree limpio) ──
+if (process.env.PUBLISH_TARGET_BRANCH) {
+  try {
+    console.log("--- 🔀 Integrando rama destino antes de sincronizar ---");
+    mergeTargetBranchBeforePublish(projectRoot, process.env.PUBLISH_TARGET_BRANCH);
+    if (!skipAssetsPush) {
+      mergeTargetBranchBeforePublish(siblingRoot, process.env.PUBLISH_TARGET_BRANCH);
+    }
+    console.log();
+  } catch (error) {
+    reportError(error.message);
+    process.exit(1);
+  }
+}
+
 // ── 1. Optimizar y sincronizar assets (Imágenes y Audios) ──────────────────
 const skipOptimize = process.env.PUBLISH_SKIP_OPTIMIZE === "1";
 console.log("--- 🎨 Preparando Assets ---");
 if (skipOptimize) {
   console.log("⏭️ PUBLISH_SKIP_OPTIMIZE=1: omitiendo convert/compress (típico en GitHub Actions).");
-  try {
-    console.log("⏳ Sincronizando marcadores (sync en the-boyz-comic)...");
-    execSync("npm run sync", { cwd: siblingRoot, stdio: "inherit" });
-  } catch (error) {
-    console.error("⚠️ Error en sync. Continuando con git push...", error.message);
+  console.log("⏳ Sincronizando marcadores...");
+  const syncResult = spawnSync(process.execPath, [path.join(__dirname, "sync-placeholders.js")], {
+    cwd: projectRoot,
+    stdio: "inherit",
+    env: { ...process.env, PUBLISH_PROJECT_ROOT: projectRoot, PUBLISH_ASSETS_ROOT: siblingRoot },
+  });
+  if (syncResult.status !== 0) {
+    reportError("Falló la sincronización de marcadores entre assets y la app.");
+    process.exit(1);
   }
 } else {
   try {
@@ -164,10 +184,8 @@ function generateCommitMessage(statusText, baseMsg) {
   return `editor [${timeStr}] - ${changeSummary}${context} (${baseMsg})`;
 }
 
-const ALLOWED_PUBLISH_BRANCHES = new Set(["main", "editor-workspace"]);
-
 function assertAllowedPublishBranch(branch) {
-  if (!branch || !ALLOWED_PUBLISH_BRANCHES.has(branch)) {
+  if (branch !== "main" && branch !== "editor-workspace") {
     throw new Error(`Rama de publicación no permitida: ${branch}`);
   }
 }
@@ -251,7 +269,23 @@ function pushToPublishTargets(dir, publishTarget) {
     mergeTargetBranchBeforePublish(dir, publishTarget);
     pushHeadToBranch(dir, publishTarget);
   }
-  gitSpawn(["push", "origin", "HEAD:editor-workspace", "--force-with-lease"], dir, true);
+  try {
+    gitSpawn(["push", "origin", "HEAD:editor-workspace", "--force-with-lease"], dir, true);
+  } catch (error) {
+    // Un guardado durante la publicación mueve editor-workspace; main ya quedó publicado
+    // y el próximo Publicar integra lo nuevo.
+    reportWarning(`No se actualizó editor-workspace tras publicar: ${error.message}`);
+  }
+}
+
+function reportError(message) {
+  console.error(`❌ ${message}`);
+  if (process.env.GITHUB_ACTIONS) console.log(`::error::${message.replace(/\r?\n/g, " ")}`);
+}
+
+function reportWarning(message) {
+  console.warn(`⚠️ ${message}`);
+  if (process.env.GITHUB_ACTIONS) console.log(`::warning::${message.replace(/\r?\n/g, " ")}`);
 }
 
 // Helper para publicar un repositorio. Devuelve { pushed, error }.
@@ -307,7 +341,7 @@ function publishRepo(name, dir) {
 
     return { pushed, error: false };
   } catch (error) {
-    console.error(`❌ Error al publicar ${name}:`, error.message);
+    reportError(`Error al publicar ${name}: ${error.message}`);
     console.log();
     return { pushed: false, error: true };
   }
@@ -317,11 +351,14 @@ function publishRepo(name, dir) {
 let hadError = false;
 let mainAppPushed = false;
 
-if (process.env.PUBLISH_SKIP_ASSETS_PUSH === "1") {
+if (skipAssetsPush) {
   console.log("⏭️ PUBLISH_SKIP_ASSETS_PUSH=1: omitiendo push del repo de assets (PAT inválido en CI).\n");
 } else {
   const assetsResult = publishRepo("the-boyz-comic (Assets)", siblingRoot);
-  if (assetsResult.error) hadError = true;
+  if (assetsResult.error) {
+    reportError("No se publica la app porque falló el repo de assets (páginas y diálogos quedarían desalineados).");
+    process.exit(1);
+  }
 }
 
 const appResult = publishRepo("the-boys (Main App)", projectRoot);

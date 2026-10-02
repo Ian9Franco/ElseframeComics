@@ -26,9 +26,31 @@ function getSiblingRoot(root) {
   return path.join(root, "..", "the-boyz-comic");
 }
 
-const siblingRoot = getSiblingRoot(projectRoot);
+const appRoot = process.env.PUBLISH_PROJECT_ROOT || projectRoot;
+const siblingRoot = process.env.PUBLISH_ASSETS_ROOT || getSiblingRoot(appRoot);
 const SOURCE_DIR = path.join(siblingRoot, 'comics');
-const DEST_DIR = path.join(projectRoot, 'public', 'comics');
+const DEST_DIR = path.join(appRoot, 'public', 'comics');
+
+// En CI los dos repos se clonan con segundos de diferencia: comparar mtimes copiaría
+// JSON viejo de assets encima de lo guardado por el editor. Con "web", la app manda.
+const WEB_IS_JSON_SOURCE = process.env.SYNC_JSON_SOURCE === 'web';
+
+function sameFileContent(a, b) {
+  const sa = fs.statSync(a);
+  const sb = fs.statSync(b);
+  if (sa.size !== sb.size) return false;
+  return fs.readFileSync(a).equals(fs.readFileSync(b));
+}
+
+function dirContainsJson(dir) {
+  for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
+    const full = path.join(dir, entry.name);
+    if (entry.isDirectory() ? dirContainsJson(full) : entry.name.toLowerCase().endsWith('.json')) {
+      return true;
+    }
+  }
+  return false;
+}
 
 if (!fs.existsSync(SOURCE_DIR)) {
   console.error(`❌ El repositorio de assets no existe en: ${SOURCE_DIR}`);
@@ -120,7 +142,15 @@ function syncDirectories(srcDir, destDir, depth = 0) {
         const destExists = fs.existsSync(destPath);
         const destMtime = destExists ? fs.statSync(destPath).mtimeMs : 0;
 
-        if (!destExists || srcMtime > destMtime + 1000) { // Add 1s buffer for FS precision
+        if (WEB_IS_JSON_SOURCE) {
+          if (!destExists) {
+            fs.copyFileSync(srcPath, destPath);
+            console.log(`📝 JSON nuevo desde Assets: ${path.relative(DEST_DIR, destPath)}`);
+          } else if (!sameFileContent(srcPath, destPath)) {
+            fs.copyFileSync(destPath, srcPath);
+            console.log(`🔄 JSON de la Web → Assets: ${path.relative(DEST_DIR, destPath)}`);
+          }
+        } else if (!destExists || srcMtime > destMtime + 1000) { // Add 1s buffer for FS precision
           fs.copyFileSync(srcPath, destPath);
           console.log(`📝 Copiado JSON a Web (Origen es más nuevo): ${path.relative(DEST_DIR, destPath)}`);
         } else if (destMtime > srcMtime + 1000) {
@@ -134,7 +164,12 @@ function syncDirectories(srcDir, destDir, depth = 0) {
           const destExists = fs.existsSync(destPath);
           const destMtime = destExists ? fs.statSync(destPath).mtimeMs : 0;
 
-          if (!destExists || srcMtime > destMtime + 1000) {
+          if (WEB_IS_JSON_SOURCE) {
+            if (!destExists || !sameFileContent(srcPath, destPath)) {
+              fs.copyFileSync(srcPath, destPath);
+              console.log(`🖼️ Portada desde Assets: ${path.relative(DEST_DIR, destPath)}`);
+            }
+          } else if (!destExists || srcMtime > destMtime + 1000) {
             fs.copyFileSync(srcPath, destPath);
             console.log(`🖼️ Copiada portada real a Web: ${path.relative(DEST_DIR, destPath)}`);
           } else if (destMtime > srcMtime + 1000) {
@@ -162,6 +197,10 @@ function syncDirectories(srcDir, destDir, depth = 0) {
     if (!fs.existsSync(srcPath)) {
       const stat = fs.statSync(destPath);
       if (stat.isDirectory()) {
+        if (WEB_IS_JSON_SOURCE && dirContainsJson(destPath)) {
+          console.warn(`⚠️ Carpeta solo en la Web (con JSON), no se elimina: ${path.relative(DEST_DIR, destPath)}`);
+          continue;
+        }
         fs.rmSync(destPath, { recursive: true, force: true });
         console.log(`🗑️ Eliminado directorio huérfano: ${path.relative(DEST_DIR, destPath)}`);
       } else {
