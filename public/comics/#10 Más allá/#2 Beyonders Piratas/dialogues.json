@@ -3,7 +3,7 @@
     "1": {
       "panels": [
         {
-          "focusY": 0.29080839561382016,
+          "focusY": 0.21396866080804713,
           "dialogue": [
             { "text": "La fuente de su poder era ", "size": "small", "posX": -20, "posY": 17.374689140646588, "tailX": 19.85009671179884, "tailY": 21.049092751220414, "tailWidth": 6, "tailCurvature": -22, "width": 205, "fontSize": 8, "borderRadius": 18, "fontFamily": "arcane" },
             { "text": "hola", "size": "small", "posX": 42.1840354767184, "posY": 30.488716956802058, "tailX": 23.863636363636363, "tailY": 21.06060606060606, "tailWidth": 6, "tailCurvature": -22, "width": 205, "fontSize": 8, "borderRadius": 18, "fontFamily": "arcane", "style": "thought" },
