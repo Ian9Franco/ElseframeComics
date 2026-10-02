@@ -161,6 +161,7 @@ export function CinematicReader({
     undoStack,
     isSaving,
     saveStatus,
+    saveMessage,
     showGrid,
     setShowGrid,
     snapToGrid,
@@ -1094,6 +1095,7 @@ export function CinematicReader({
             handleSaveChanges={handleSaveChanges}
             isSaving={isSaving}
             saveStatus={saveStatus}
+            saveMessage={saveMessage}
             hasUnsavedChanges={hasUnsavedChanges}
             onPreview={startPreviewCurrentPage}
           />

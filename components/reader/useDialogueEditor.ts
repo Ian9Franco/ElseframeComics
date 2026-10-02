@@ -38,6 +38,7 @@ export function useDialogueEditor({
   const [undoStack, setUndoStack] = useState<Dialogues[]>([]);
   const [isSaving, setIsSaving] = useState(false);
   const [saveStatus, setSaveStatus] = useState<"idle" | "success" | "error" | "conflict">("idle");
+  const [saveMessage, setSaveMessage] = useState<string | null>(null);
 
   // Grid and Snapping States
   const [showGrid, setShowGrid] = useState(true);
@@ -100,6 +101,8 @@ export function useDialogueEditor({
     if (typeof window === "undefined" || !chapterId) return;
 
     setHasUnsavedChanges(true);
+    setSaveStatus("idle");
+    setSaveMessage(null);
 
     const backupKey = `dialogues_backup_${chapterId}`;
     const timer = setTimeout(() => {
@@ -550,7 +553,7 @@ export function useDialogueEditor({
   const handleSaveChanges = useCallback(async () => {
     if (isSavingRef.current) return;
     setIsSaving(true);
-    setSaveStatus("idle");
+    setSaveMessage(null);
     try {
       const savedPass = typeof window !== "undefined" ? sessionStorage.getItem("editor_password") || "" : "";
       const res = await fetch(`/api/chapters/${chapterId}/dialogues`, {
@@ -561,12 +564,18 @@ export function useDialogueEditor({
         },
         body: JSON.stringify({ dialogues: localDialoguesRef.current, sha: workspaceShaRef.current }),
       });
+      const payload = await res.json().catch(() => ({} as { error?: string; sha?: string }));
+
       if (res.status === 409) {
         setSaveStatus("conflict");
+        setSaveMessage(
+          typeof payload.error === "string"
+            ? payload.error
+            : "Hay una versión más nueva en GitHub. Recargá el capítulo."
+        );
         return;
       }
       if (res.ok) {
-        const payload = await res.json().catch(() => ({}));
         if (payload.sha) setWorkspaceSha(payload.sha);
         setSaveStatus("success");
         setHasUnsavedChanges(false);
@@ -575,15 +584,19 @@ export function useDialogueEditor({
         if (typeof window !== "undefined") {
           localStorage.removeItem(`dialogues_backup_${chapterId}`);
         }
+        window.setTimeout(() => {
+          setSaveStatus((current) => (current === "success" ? "idle" : current));
+        }, 5000);
       } else {
         setSaveStatus("error");
+        setSaveMessage(payload.error || `No se pudo guardar (${res.status})`);
       }
     } catch (e) {
       console.error(e);
       setSaveStatus("error");
+      setSaveMessage("Error de red al guardar");
     } finally {
       setIsSaving(false);
-      setTimeout(() => setSaveStatus("idle"), 3000);
     }
   }, [chapterId]);
 
@@ -806,6 +819,7 @@ export function useDialogueEditor({
     undoStack,
     isSaving,
     saveStatus,
+    saveMessage,
     showGrid,
     setShowGrid,
     snapToGrid,

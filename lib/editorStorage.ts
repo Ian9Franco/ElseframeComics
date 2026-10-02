@@ -1,6 +1,8 @@
 import fs from "fs";
 import path from "path";
 import { findLocalChapter } from "@/lib/chapterFiles";
+import { getDynamicSagas } from "@/lib/serverData";
+import { fetchChapterFolders, fetchSagaFolders, resolveFolderName } from "@/lib/githubComics";
 import {
   GITHUB_ASSETS_REPO,
   GITHUB_EDITOR_BRANCH,
@@ -90,7 +92,34 @@ export async function resolveChapterFolders(chapterId: string): Promise<{
       chapterPath: local.chapterPath,
     };
   }
-  return null;
+
+  const sagas = getDynamicSagas();
+  let foundSaga: { id: string } | null = null;
+  let foundChapter: { id: string } | null = null;
+  for (const saga of sagas) {
+    const ch = saga.chapters.find((c) => c.id === chapterId);
+    if (ch) {
+      foundSaga = saga;
+      foundChapter = ch;
+      break;
+    }
+  }
+  if (!foundSaga || !foundChapter) return null;
+
+  try {
+    const sagaFolders = await fetchSagaFolders();
+    const sagaFolder = resolveFolderName(sagaFolders, foundSaga.id) ?? foundSaga.id;
+    const chapterFolders = await fetchChapterFolders(sagaFolder);
+    const chapterFolder = resolveFolderName(chapterFolders, foundChapter.id) ?? foundChapter.id;
+    return {
+      sagaFolder,
+      chapterFolder,
+      chapterPath: path.join(process.cwd(), "public", "comics", sagaFolder, chapterFolder),
+    };
+  } catch (error) {
+    console.error("[editorStorage] resolveChapterFolders GitHub fallback failed:", error);
+    return null;
+  }
 }
 
 export { GithubConflictError, GITHUB_ASSETS_REPO };

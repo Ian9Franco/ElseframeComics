@@ -7,6 +7,7 @@ import {
   resolveChapterFolders,
   saveEditorTextFile,
 } from "@/lib/editorStorage";
+import { formatGithubApiAuthError } from "@/lib/githubEditor";
 
 export const dynamic = "force-dynamic";
 
@@ -162,6 +163,9 @@ export async function POST(
     }
   } catch (error: any) {
     console.error("Error saving dialogues:", error);
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    return NextResponse.json(
+      { error: formatGithubApiAuthError(error?.message || "Error al guardar") },
+      { status: 500 }
+    );
   }
 }

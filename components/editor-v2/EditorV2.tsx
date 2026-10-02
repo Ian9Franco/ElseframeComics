@@ -28,6 +28,7 @@ export function EditorV2({
   handleSaveChanges,
   isSaving,
   saveStatus,
+  saveMessage,
   hasUnsavedChanges,
   onPreview,
 }: {
@@ -41,6 +42,7 @@ export function EditorV2({
   handleSaveChanges: () => void;
   isSaving: boolean;
   saveStatus: "idle" | "success" | "error" | "conflict";
+  saveMessage?: string | null;
   hasUnsavedChanges?: boolean;
   onPreview: () => void;
 }) {
@@ -145,8 +147,23 @@ export function EditorV2({
       <div className="shrink-0 flex items-center justify-between gap-2 px-3 py-2.5 border-b border-white/10 bg-[#12121c] pt-[max(0.6rem,env(safe-area-inset-top))]">
         <div className="flex items-center gap-2 min-w-0">
           <span className="font-[var(--font-bangers)] text-xl text-white tracking-wide">Editor 2.0</span>
-          {hasUnsavedChanges && (
-            <span className="text-xs font-mono text-amber-300 bg-amber-500/15 px-2 py-0.5 rounded-full">Sin guardar</span>
+          {hasUnsavedChanges ? (
+            <span className="text-xs font-mono text-amber-300 bg-amber-500/15 px-2 py-0.5 rounded-full shrink-0">
+              Sin guardar
+            </span>
+          ) : saveStatus === "success" ? (
+            <span className="text-xs font-mono text-green-300 bg-green-500/15 px-2 py-0.5 rounded-full shrink-0">
+              ✓ Guardado
+            </span>
+          ) : saveStatus !== "error" ? (
+            <span className="text-xs font-mono text-zinc-400 bg-zinc-500/10 px-2 py-0.5 rounded-full shrink-0">
+              ✓ En servidor
+            </span>
+          ) : null}
+          {saveStatus === "error" && saveMessage && (
+            <span className="text-[10px] text-red-300 max-w-[min(14rem,40vw)] truncate" title={saveMessage}>
+              {saveMessage}
+            </span>
           )}
         </div>
         <div className="flex items-center gap-2 overflow-x-auto">
@@ -287,8 +304,15 @@ export function EditorV2({
         <button type="button" className="flex-1 min-h-11 bg-zinc-800 rounded font-bold" onClick={() => setInspectorOpen(true)}>
           Inspector
         </button>
-        <button type="button" className="flex-1 min-h-11 bg-[#e8185a] rounded font-bold" onClick={handleSaveChanges}>
-          Guardar
+        <button
+          type="button"
+          className={`flex-1 min-h-11 rounded font-bold ${
+            saveStatus === "success" ? "bg-green-600" : saveStatus === "error" ? "bg-red-600" : "bg-[#e8185a]"
+          }`}
+          onClick={handleSaveChanges}
+          disabled={isSaving}
+        >
+          {isSaving ? "…" : saveStatus === "success" ? "Guardado" : "Guardar"}
         </button>
       </div>
 

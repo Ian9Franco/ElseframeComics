@@ -1,7 +1,13 @@
 import { NextRequest, NextResponse } from "next/server";
 import { exec, ChildProcess } from "child_process";
 import { validateMasterEditorAccess } from "@/lib/editorAccess";
-import { dispatchWorkflow, getEditorToken, getWorkflowRun } from "@/lib/githubEditor";
+import {
+  assertEditorGithubAuth,
+  dispatchWorkflow,
+  formatGithubApiAuthError,
+  getEditorToken,
+  getWorkflowRun,
+} from "@/lib/githubEditor";
 
 export const dynamic = "force-dynamic";
 
@@ -66,6 +72,7 @@ export async function POST(request: NextRequest) {
 
   if (useRemotePublish()) {
     try {
+      await assertEditorGithubAuth();
       const dispatched = await dispatchWorkflow({
         workflowId: "publish-editor.yml",
         ref: "main",
@@ -77,7 +84,8 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ success: true, runId: dispatched.runId });
     } catch (error: any) {
       publishStatus = "error";
-      return NextResponse.json({ error: error.message }, { status: 500 });
+      const message = formatGithubApiAuthError(error?.message || "No se pudo publicar");
+      return NextResponse.json({ error: message }, { status: 500 });
     }
   }
 

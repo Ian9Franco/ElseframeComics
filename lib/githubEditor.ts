@@ -17,8 +17,47 @@ export class GithubConflictError extends Error {
   }
 }
 
+/** PAT fine-grained solo para escritura del editor y Actions (no usar GITHUB_TOKEN de lectura). */
 export function getEditorToken(): string | undefined {
-  return process.env.GITHUB_EDITOR_TOKEN || process.env.GITHUB_TOKEN || undefined;
+  const raw = process.env.GITHUB_EDITOR_TOKEN?.trim();
+  return raw || undefined;
+}
+
+export function editorTokenMissingMessage(): string {
+  return "GITHUB_EDITOR_TOKEN no está configurado en el servidor (Vercel → Environment Variables).";
+}
+
+export function formatGithubApiAuthError(message: string): string {
+  if (message === "Bad credentials" || /bad credentials/i.test(message)) {
+    return "GITHUB_EDITOR_TOKEN inválido o expirado. Usá un PAT fine-grained con Contents (read/write) y Actions (read/write) en el repo ElseframeComics.";
+  }
+  return message;
+}
+
+/** Valida el PAT antes de workflow_dispatch o escrituras críticas. */
+export async function assertEditorGithubAuth(): Promise<void> {
+  const token = getEditorToken();
+  if (!token) throw new Error(editorTokenMissingMessage());
+
+  const res = await fetch("https://api.github.com/user", {
+    headers: {
+      Authorization: `Bearer ${token}`,
+      Accept: "application/vnd.github+json",
+      "X-GitHub-Api-Version": "2022-11-28",
+    },
+    cache: "no-store",
+  });
+
+  if (!res.ok) {
+    let message = `GitHub auth failed (${res.status})`;
+    try {
+      const data = (await res.json()) as { message?: string };
+      if (data.message) message = data.message;
+    } catch {
+      /* ignore */
+    }
+    throw new Error(formatGithubApiAuthError(message));
+  }
 }
 
 function buildHeaders(json = true): HeadersInit {

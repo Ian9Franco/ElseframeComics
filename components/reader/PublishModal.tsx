@@ -45,7 +45,11 @@ export function PublishModal({ isOpen, onClose }: PublishModalProps) {
     if (data.runId) setRunId(data.runId);
     if (!res.ok) {
       setStatus("error");
-      setLog([data.error || "No se pudo disparar la publicación"]);
+      const err = data.error || "No se pudo disparar la publicación";
+      setLog([
+        err,
+        "\n\nSi dice «Bad credentials» o token inválido: en Vercel → Settings → Environment Variables, revisá GITHUB_EDITOR_TOKEN (PAT fine-grained, Contents + Actions en ElseframeComics). No uses un token viejo ni el secret de Actions (ELSEFRAME_PUBLISH_TOKEN) en Vercel.",
+      ]);
     }
   };
 
