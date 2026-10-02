@@ -1,8 +1,12 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getDynamicSagas } from "@/lib/serverData";
 import { validateEditorAccess } from "@/lib/editorAccess";
-import fs from "fs";
-import path from "path";
+import { formatDialoguesJson } from "@/lib/formatDialoguesJson";
+import {
+  GithubConflictError,
+  dialoguesRepoPath,
+  resolveChapterFolders,
+  saveEditorTextFile,
+} from "@/lib/editorStorage";
 
 export const dynamic = "force-dynamic";
 
@@ -19,46 +23,17 @@ export async function POST(
     }
 
     const body = await request.json();
-    const { dialogues } = body;
+    const { dialogues, sha } = body;
 
     if (!dialogues) {
       return NextResponse.json({ error: "Missing dialogues data" }, { status: 400 });
     }
 
-    // Find the chapter folder
-    const sagas = getDynamicSagas();
-    let chapterFolder = "";
-    let sagaFolder = "";
-
-    // We search the public/comics directory for folders
-    const comicsDir = path.join(process.cwd(), "public", "comics");
-    const sagaDirs = fs.readdirSync(comicsDir).filter(f => fs.statSync(path.join(comicsDir, f)).isDirectory());
-
-    for (const sDir of sagaDirs) {
-      const sPath = path.join(comicsDir, sDir);
-      const chDirs = fs.readdirSync(sPath).filter(f => fs.statSync(path.join(sPath, f)).isDirectory());
-      
-      // Clean prefix to match ID
-      const sClean = sDir.replace(/^\#\d+\s+/, "");
-      
-      const foundChDir = chDirs.find(cDir => {
-        const cClean = cDir.replace(/^\#\d+\s+/, "");
-        return cClean === id;
-      });
-
-      if (foundChDir) {
-        sagaFolder = sDir;
-        chapterFolder = foundChDir;
-        break;
-      }
-    }
-
-    if (!chapterFolder || !sagaFolder) {
+    const found = await resolveChapterFolders(id);
+    if (!found) {
       return NextResponse.json({ error: "Chapter directory not found" }, { status: 404 });
     }
-
-    const chapterPath = path.join(comicsDir, sagaFolder, chapterFolder);
-    const dialoguesFilePath = path.join(chapterPath, "dialogues.json");
+    const { sagaFolder, chapterFolder } = found;
 
     // Clean up dialogues: remove pages that have no dialogues and only default panels
     const cleanedDialogues = JSON.parse(JSON.stringify(dialogues));
@@ -164,67 +139,29 @@ export async function POST(
 
     const compactJson = formatDialoguesJson(cleanedDialogues);
 
-    // Save dialogues JSON to disk
-    fs.writeFileSync(dialoguesFilePath, compactJson, "utf-8");
-
-    return NextResponse.json({ success: true });
+    try {
+      const saved = await saveEditorTextFile({
+        relativePath: dialoguesRepoPath(sagaFolder, chapterFolder),
+        content: compactJson.endsWith("\n") ? compactJson : `${compactJson}\n`,
+        sha: typeof sha === "string" ? sha : null,
+        message: `editor: save dialogues for ${id}`,
+      });
+      return NextResponse.json({ success: true, sha: saved.sha });
+    } catch (error) {
+      if (error instanceof GithubConflictError) {
+        return NextResponse.json(
+          {
+            error: "Hay una versión más nueva en GitHub. Recargá antes de sobrescribir.",
+            conflict: true,
+            sha: error.currentSha ?? null,
+          },
+          { status: 409 }
+        );
+      }
+      throw error;
+    }
   } catch (error: any) {
     console.error("Error saving dialogues:", error);
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
-}
-
-// ─── JSON Compact Formatting Helpers ─────────────────────────────────────────
-
-function stringifyDialogueCompact(obj: any): string {
-  const parts = Object.entries(obj).map(([k, v]) => {
-    return `${JSON.stringify(k)}: ${JSON.stringify(v)}`;
-  });
-  return `{ ${parts.join(", ")} }`;
-}
-
-function stringifyZoomRectCompact(obj: any): string {
-  return `{ "x": ${obj.x}, "y": ${obj.y}, "w": ${obj.w}, "h": ${obj.h} }`;
-}
-
-function formatDialoguesJson(val: any, indent = ""): string {
-  if (val === null) return "null";
-  if (typeof val === "undefined") return "undefined";
-  if (typeof val === "string") return JSON.stringify(val);
-  if (typeof val === "number" || typeof val === "boolean") return String(val);
-
-  const nextIndent = indent + "  ";
-
-  if (Array.isArray(val)) {
-    if (val.length === 0) return "[]";
-    
-    const isDialogueArray = val.every(item => item && typeof item === "object" && "text" in item);
-    const isZoomRectArray = val.every(item => item && typeof item === "object" && "x" in item && "w" in item);
-
-    if (isDialogueArray) {
-      const items = val.map(item => nextIndent + stringifyDialogueCompact(item));
-      return "[\n" + items.join(",\n") + "\n" + indent + "]";
-    }
-    
-    if (isZoomRectArray) {
-      const items = val.map(item => nextIndent + stringifyZoomRectCompact(item));
-      return "[\n" + items.join(",\n") + "\n" + indent + "]";
-    }
-
-    const items = val.map(item => formatDialoguesJson(item, nextIndent));
-    return "[\n" + items.map(item => nextIndent + item).join(",\n") + "\n" + indent + "]";
-  }
-
-  if (typeof val === "object") {
-    const keys = Object.keys(val);
-    if (keys.length === 0) return "{}";
-
-    const parts = keys.map(k => {
-      const valueStr = formatDialoguesJson(val[k], nextIndent);
-      return nextIndent + JSON.stringify(k) + ": " + valueStr;
-    });
-    return "{\n" + parts.join(",\n") + "\n" + indent + "}";
-  }
-
-  return JSON.stringify(val);
 }

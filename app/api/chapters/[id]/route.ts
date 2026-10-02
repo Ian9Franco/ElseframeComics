@@ -17,6 +17,9 @@ import {
   fetchComicPages,
   resolveFolderName,
 } from "@/lib/githubComics";
+import { validateEditorAccess } from "@/lib/editorAccess";
+import { dialoguesRepoPath, loadEditorTextFile, resolveChapterFolders } from "@/lib/editorStorage";
+import { GITHUB_EDITOR_BRANCH } from "@/lib/githubEditor";
 import fs from "fs";
 import path from "path";
 
@@ -27,6 +30,10 @@ export async function GET(
   { params }: { params: Promise<{ id: string }> }
 ) {
   const { id } = await params;
+  const editorSource = request.nextUrl.searchParams.get("source") === "editor";
+  if (editorSource && !validateEditorAccess(request, id)) {
+    return NextResponse.json({ error: "Unauthorized: Invalid editor password" }, { status: 401 });
+  }
 
   // ── 1. Buscar el capítulo en la estructura de sagas ──────────────────────
   const sagas = getDynamicSagas();
@@ -132,7 +139,11 @@ export async function GET(
       const chapterFolders    = await fetchChapterFolders(sagaFolderName);
       const chapterFolderName = resolveFolderName(chapterFolders, foundChapter.id) ?? foundChapter.id;
 
-      const githubRes = await fetchComicPages(sagaFolderName, chapterFolderName);
+      const githubRes = await fetchComicPages(
+        sagaFolderName,
+        chapterFolderName,
+        editorSource ? GITHUB_EDITOR_BRANCH : "main"
+      );
       pages = githubRes.pages;
       cover = githubRes.cover;
     } catch (err) {
@@ -140,10 +151,20 @@ export async function GET(
     }
   }
 
-  // ── 4. Leer dialogues.json desde el filesystem local (repo principal) ────
-  // Los diálogos SÍ están en el repo the-boys, por eso siguen usando fs.
-  const dialogues = (() => {
+  // ── 4. Leer dialogues.json ────────────────────────────────────────────────
+  let dialoguesSha: string | null = null;
+  const dialogues = await (async () => {
     try {
+      const location = await resolveChapterFolders(foundChapter.id);
+      if (editorSource && location) {
+        const loaded = await loadEditorTextFile(
+          dialoguesRepoPath(location.sagaFolder, location.chapterFolder)
+        );
+        dialoguesSha = loaded.sha;
+        if (!loaded.content.trim()) return { pages: {} };
+        return JSON.parse(loaded.content);
+      }
+
       const comicsDir  = path.join(process.cwd(), "public", "comics");
       const sagaFolders = fs.readdirSync(comicsDir);
       const actualSagaFolder = sagaFolders.find((f) => {
@@ -216,6 +237,7 @@ export async function GET(
     nextChapter,
     cinematic: true,
     dialogues,
+    dialoguesSha,
   }, {
     headers: {
       "Cache-Control": "no-store, max-age=0, must-revalidate",

@@ -47,11 +47,15 @@ export function CinematicReader({
 }) {
   const [mode, setMode] = useState<"read" | "edit">("read");
   const [editorVersion, setEditorVersionState] = useState<EditorVersion>("v1");
+  const [workspaceDialogues, setWorkspaceDialogues] = useState<Dialogues | null>(null);
+  const [workspaceSha, setWorkspaceSha] = useState<string | null>(null);
+  const [workspacePageUrls, setWorkspacePageUrls] = useState<string[] | null>(null);
 
   const pages = React.useMemo(() => {
-    const hasExplicitCover = cover && cover !== rawPages[0];
-    return (mode === "read" && hasExplicitCover) ? [cover, ...rawPages] : rawPages;
-  }, [mode, cover, rawPages]);
+    const sourcePages = workspacePageUrls ?? rawPages;
+    const hasExplicitCover = cover && cover !== sourcePages[0];
+    return (mode === "read" && hasExplicitCover) ? [cover, ...sourcePages] : sourcePages;
+  }, [mode, cover, rawPages, workspacePageUrls]);
 
   const [pageIdx, setPageIdx] = useState(0);
   const [panelIdx, setPanelIdx] = useState(0);
@@ -190,7 +194,13 @@ export function CinematicReader({
     backupTimestamp,
     restoreLocalBackup,
     discardLocalBackup,
-  } = useDialogueEditor({ dialogues, chapterId: chapter.id, pageKey: getPageKeyFromUrl(pages[pageIdx]), imgRef });
+  } = useDialogueEditor({
+    dialogues: workspaceDialogues ?? dialogues,
+    dialoguesSha: workspaceSha,
+    chapterId: chapter.id,
+    pageKey: getPageKeyFromUrl(pages[pageIdx]),
+    imgRef,
+  });
 
   const [textScale, setTextScale] = useState<number>(1.0);
   const [showInstructions, setShowInstructions] = useState(false);
@@ -300,6 +310,38 @@ export function CinematicReader({
       }
     }
   }, []);
+
+  useEffect(() => {
+    if (!isAuthorized) return;
+    const pass = typeof window !== "undefined" ? sessionStorage.getItem("editor_password") || "" : "";
+    fetch(`/api/chapters/${encodeURIComponent(chapter.id)}?source=editor`, {
+      headers: { "x-editor-password": pass },
+    })
+      .then((r) => (r.ok ? r.json() : null))
+      .then((data) => {
+        if (!data) return;
+        if (data.dialogues) setWorkspaceDialogues(data.dialogues);
+        if (data.dialoguesSha !== undefined) setWorkspaceSha(data.dialoguesSha ?? null);
+        if (Array.isArray(data.pages) && data.pages.length > 0) setWorkspacePageUrls(data.pages);
+      })
+      .catch(() => {});
+  }, [isAuthorized, chapter.id]);
+
+  useEffect(() => {
+    if (!isAuthorized) return;
+    const pass = typeof window !== "undefined" ? sessionStorage.getItem("editor_password") || "" : "";
+    fetch(`/api/chapters/${encodeURIComponent(chapter.id)}?source=editor`, {
+      headers: { "x-editor-password": pass },
+    })
+      .then((r) => (r.ok ? r.json() : null))
+      .then((data) => {
+        if (!data) return;
+        if (data.dialogues) setWorkspaceDialogues(data.dialogues);
+        if (data.dialoguesSha !== undefined) setWorkspaceSha(data.dialoguesSha ?? null);
+        if (Array.isArray(data.pages) && data.pages.length > 0) setWorkspacePageUrls(data.pages);
+      })
+      .catch(() => {});
+  }, [isAuthorized, chapter.id]);
 
   const prevModeRef = useRef(mode);
   useEffect(() => {

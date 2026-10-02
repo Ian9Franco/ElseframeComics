@@ -2,8 +2,14 @@ import fs from "fs";
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 import { findLocalChapter } from "@/lib/chapterFiles";
-import { DIALOGUE_DOCUMENT_ROLES } from "@/lib/dialogueContext";
+import { DIALOGUE_DOCUMENT_ROLES, createEmptyDialogueContext } from "@/lib/dialogueContext";
 import { validateEditorAccess } from "@/lib/editorAccess";
+import {
+  contextRepoPath,
+  loadEditorTextFile,
+  saveEditorTextFile,
+  useGithubEditorStorage,
+} from "@/lib/editorStorage";
 import {
   loadDialogueContext,
   resolveDocumentPath,
@@ -45,6 +51,28 @@ export async function GET(
     return NextResponse.json({ error: "Chapter not found" }, { status: 404 });
   }
 
+  if (useGithubEditorStorage()) {
+    const loaded = await loadEditorTextFile(
+      contextRepoPath(chapterLocation.sagaFolder, chapterLocation.chapterFolder)
+    );
+    if (!loaded.content.trim()) {
+      return NextResponse.json({ context: createEmptyDialogueContext(), sha: loaded.sha });
+    }
+    try {
+      const parsed = JSON.parse(loaded.content);
+      return NextResponse.json({
+        context: {
+          version: 1,
+          documents: Array.isArray(parsed.documents) ? parsed.documents : [],
+          pages: parsed.pages && typeof parsed.pages === "object" ? parsed.pages : {},
+        },
+        sha: loaded.sha,
+      });
+    } catch {
+      return NextResponse.json({ context: createEmptyDialogueContext(), sha: loaded.sha });
+    }
+  }
+
   return NextResponse.json({ context: loadDialogueContext(chapterLocation.chapterPath) });
 }
 
@@ -80,6 +108,15 @@ export async function PUT(
   });
   if (!documentsAreValid) {
     return NextResponse.json({ error: "One or more documents are invalid" }, { status: 400 });
+  }
+
+  if (useGithubEditorStorage()) {
+    await saveEditorTextFile({
+      relativePath: contextRepoPath(chapterLocation.sagaFolder, chapterLocation.chapterFolder),
+      content: `${JSON.stringify(parsed.data, null, 2)}\n`,
+      message: `editor: save ai-context for ${id}`,
+    });
+    return NextResponse.json({ success: true, context: parsed.data });
   }
 
   saveDialogueContext(chapterLocation.chapterPath, parsed.data);

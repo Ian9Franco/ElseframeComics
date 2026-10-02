@@ -176,7 +176,13 @@ function publishRepo(name, dir) {
     }
 
     console.log("Haciendo git push...");
-    execSync("git push", { cwd: dir, stdio: "inherit" });
+    const publishTarget = process.env.PUBLISH_TARGET_BRANCH;
+    if (publishTarget) {
+      execSync(`git push origin HEAD:${publishTarget}`, { cwd: dir, stdio: "inherit" });
+      execSync("git push origin HEAD:editor-workspace --force-with-lease", { cwd: dir, stdio: "inherit" });
+    } else {
+      execSync("git push", { cwd: dir, stdio: "inherit" });
+    }
 
     console.log(`🎉 ¡${name} publicado con éxito!\n`);
   } catch (error) {

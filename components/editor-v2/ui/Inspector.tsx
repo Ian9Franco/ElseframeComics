@@ -176,7 +176,7 @@ export function Inspector({
   };
 
   return (
-    <div className="w-[360px] shrink-0 bg-[#0e0e14] border-l border-white/10 overflow-y-auto flex flex-col text-zinc-200">
+    <div className="w-full lg:w-[360px] shrink-0 bg-[#0e0e14] border-l border-white/10 overflow-y-auto flex flex-col text-zinc-200">
       <div className="p-4 border-b border-white/10 font-[var(--font-bangers)] text-xl text-white">Inspector</div>
 
       <div className="p-4 border-b border-white/10 space-y-2">

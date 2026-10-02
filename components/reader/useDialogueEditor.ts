@@ -9,6 +9,7 @@ import { snapMaskRect } from "./readerUtils";
 
 interface UseDialogueEditorProps {
   dialogues: Dialogues | null;
+  dialoguesSha?: string | null;
   chapterId: string;
   pageKey: string;
   imgRef: React.RefObject<HTMLImageElement | null>;
@@ -22,6 +23,7 @@ interface UseDialogueEditorProps {
  */
 export function useDialogueEditor({
   dialogues,
+  dialoguesSha = null,
   chapterId,
   pageKey,
   imgRef,
@@ -35,7 +37,7 @@ export function useDialogueEditor({
   const [activeBubbleIdx, setActiveBubbleIdx] = useState<number | null>(null);
   const [undoStack, setUndoStack] = useState<Dialogues[]>([]);
   const [isSaving, setIsSaving] = useState(false);
-  const [saveStatus, setSaveStatus] = useState<"idle" | "success" | "error">("idle");
+  const [saveStatus, setSaveStatus] = useState<"idle" | "success" | "error" | "conflict">("idle");
 
   // Grid and Snapping States
   const [showGrid, setShowGrid] = useState(true);
@@ -49,8 +51,13 @@ export function useDialogueEditor({
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
   const [hasLocalBackup, setHasLocalBackup] = useState(false);
   const [backupTimestamp, setBackupTimestamp] = useState<number | null>(null);
+  const [workspaceSha, setWorkspaceSha] = useState<string | null>(dialoguesSha ?? null);
 
   const isInitialLoadRef = React.useRef(true);
+
+  useEffect(() => {
+    setWorkspaceSha(dialoguesSha ?? null);
+  }, [dialoguesSha, chapterId]);
 
   // Initialize dialogues copy & check for existing localStorage backup
   useEffect(() => {
@@ -537,6 +544,8 @@ export function useDialogueEditor({
   hasUnsavedChangesRef.current = hasUnsavedChanges;
   const isSavingRef = useRef(isSaving);
   isSavingRef.current = isSaving;
+  const workspaceShaRef = useRef(workspaceSha);
+  workspaceShaRef.current = workspaceSha;
 
   const handleSaveChanges = useCallback(async () => {
     if (isSavingRef.current) return;
@@ -550,9 +559,15 @@ export function useDialogueEditor({
           "Content-Type": "application/json",
           "x-editor-password": savedPass,
         },
-        body: JSON.stringify({ dialogues: localDialoguesRef.current }),
+        body: JSON.stringify({ dialogues: localDialoguesRef.current, sha: workspaceShaRef.current }),
       });
+      if (res.status === 409) {
+        setSaveStatus("conflict");
+        return;
+      }
       if (res.ok) {
+        const payload = await res.json().catch(() => ({}));
+        if (payload.sha) setWorkspaceSha(payload.sha);
         setSaveStatus("success");
         setHasUnsavedChanges(false);
         setHasLocalBackup(false);

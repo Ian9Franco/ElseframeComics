@@ -1,17 +1,52 @@
 import { NextRequest, NextResponse } from "next/server";
 import { exec, ChildProcess } from "child_process";
-import path from "path";
 import { validateMasterEditorAccess } from "@/lib/editorAccess";
+import { dispatchWorkflow, getEditorToken, getWorkflowRun } from "@/lib/githubEditor";
 
 export const dynamic = "force-dynamic";
 
 let currentProcess: ChildProcess | null = null;
 let publishLog: string[] = [];
 let publishStatus: "idle" | "running" | "success" | "error" = "idle";
+let lastRunId: number | null = null;
+
+function mapGithubStatus(run: { status: string; conclusion: string | null }): "idle" | "running" | "success" | "error" {
+  if (run.status === "queued" || run.status === "in_progress" || run.status === "pending" || run.status === "waiting") {
+    return "running";
+  }
+  if (run.status === "completed" && run.conclusion === "success") return "success";
+  if (run.status === "completed") return "error";
+  return "running";
+}
+
+function useRemotePublish() {
+  return Boolean(getEditorToken()) && process.env.NODE_ENV !== "development";
+}
 
 export async function GET(request: NextRequest) {
   if (!validateMasterEditorAccess(request)) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  return NextResponse.json({ status: publishStatus, log: publishLog });
+
+  const runIdParam = request.nextUrl.searchParams.get("runId");
+  const runId = runIdParam ? Number(runIdParam) : lastRunId;
+
+  if (useRemotePublish() && runId) {
+    try {
+      const run = await getWorkflowRun(runId);
+      const status = mapGithubStatus(run);
+      const log = [
+        `GitHub Actions ${run.status}${run.conclusion ? ` / ${run.conclusion}` : ""}\n`,
+        run.html_url ? `${run.html_url}\n` : "",
+      ];
+      if (status === "running") log.unshift("Publicando en GitHub Actions...\n");
+      if (status === "success") log.push("Listo.\n");
+      if (status === "error") log.push("Falló la publicación.\n");
+      return NextResponse.json({ status, log, runId });
+    } catch (error: any) {
+      return NextResponse.json({ status: "error", log: [error.message], runId });
+    }
+  }
+
+  return NextResponse.json({ status: publishStatus, log: publishLog, runId: lastRunId });
 }
 
 export async function POST(request: NextRequest) {
@@ -25,13 +60,31 @@ export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
     if (body.message) message = body.message;
-  } catch(e) {}
+  } catch {
+    // keep default
+  }
+
+  if (useRemotePublish()) {
+    try {
+      const dispatched = await dispatchWorkflow({
+        workflowId: "publish-editor.yml",
+        ref: "main",
+        inputs: { message },
+      });
+      lastRunId = dispatched.runId;
+      publishStatus = "running";
+      publishLog = ["Disparando GitHub Actions...", dispatched.runId ? `run ${dispatched.runId}` : "esperando run id..."];
+      return NextResponse.json({ success: true, runId: dispatched.runId });
+    } catch (error: any) {
+      publishStatus = "error";
+      return NextResponse.json({ error: error.message }, { status: 500 });
+    }
+  }
 
   publishStatus = "running";
-  publishLog = ["Iniciando publicación..."];
+  publishLog = ["Iniciando publicación local..."];
 
   const cmd = `npm run publish:all "${message.replace(/"/g, '\\"')}"`;
-  
   currentProcess = exec(cmd, { cwd: process.cwd() });
 
   currentProcess.stdout?.on("data", (data) => {

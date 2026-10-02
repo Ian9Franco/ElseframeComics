@@ -56,7 +56,7 @@ export interface DialogueEditorPanelProps {
   /** Full localDialogues for audio track panel counts */
   localDialogues: Dialogues;
   isSaving: boolean;
-  saveStatus: "success" | "error" | "idle" | null;
+  saveStatus: "success" | "error" | "idle" | "conflict" | null;
   showGrid: boolean;
   snapToGrid: boolean;
   gridSize: number;
@@ -304,12 +304,20 @@ export function DialogueEditorPanel({
             className={`font-[var(--font-bangers)] text-sm px-4 py-2 border border-white/20 shadow-[2px_2px_0_rgba(0,0,0,0.3)] transition-all active:translate-x-0.5 active:translate-y-0.5 active:shadow-[1px_1px_0_rgba(0,0,0,0.3)] rounded cursor-pointer ${
               saveStatus === "success"
                 ? "bg-green-600 text-white"
+                : saveStatus === "conflict"
+                ? "bg-amber-500 text-black"
                 : saveStatus === "error"
                 ? "bg-red-600 text-white"
                 : "bg-[#e8185a] text-white hover:bg-rose-700"
             }`}
           >
-            {isSaving ? "Guardando..." : saveStatus === "success" ? "Guardado ✓" : "Guardar JSON"}
+            {isSaving
+              ? "Guardando..."
+              : saveStatus === "success"
+                ? "Guardado ✓"
+                : saveStatus === "conflict"
+                  ? "Conflicto — recargar"
+                  : "Guardar JSON"}
           </button>
           <button
             type="button"

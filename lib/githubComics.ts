@@ -8,8 +8,8 @@
  * no depende del filesystem sino de solicitudes HTTP autenticadas.
  */
 
-const GITHUB_OWNER = "Ian9Franco";
-const GITHUB_REPO  = "theboyz-comic-v1";
+const GITHUB_OWNER = process.env.GITHUB_OWNER || "Ian9Franco";
+const GITHUB_REPO  = process.env.GITHUB_ASSETS_REPO || "theboyz-comic-v1";
 const GITHUB_BRANCH = "main";
 const SUPPORTED_FORMATS = [".jpg", ".jpeg", ".png", ".webp", ".gif"];
 
@@ -26,7 +26,7 @@ interface GithubContentItem {
  * Usa GITHUB_TOKEN si está disponible (evita rate-limit de 60 req/h).
  */
 function buildGithubHeaders(): HeadersInit {
-  const token = process.env.GITHUB_TOKEN;
+  const token = process.env.GITHUB_EDITOR_TOKEN || process.env.GITHUB_TOKEN;
   const headers: HeadersInit = {
     Accept: "application/vnd.github.v3+json",
   };
@@ -42,14 +42,15 @@ function buildGithubHeaders(): HeadersInit {
  * Retorna null si el path no existe o hay un error de red.
  */
 async function fetchGithubContents(
-  repoPath: string
+  repoPath: string,
+  ref: string = GITHUB_BRANCH
 ): Promise<GithubContentItem[] | null> {
   const encodedPath = repoPath
     .split("/")
     .map(encodeURIComponent)
     .join("/");
 
-  const url = `https://api.github.com/repos/${GITHUB_OWNER}/${GITHUB_REPO}/contents/${encodedPath}?ref=${GITHUB_BRANCH}`;
+  const url = `https://api.github.com/repos/${GITHUB_OWNER}/${GITHUB_REPO}/contents/${encodedPath}?ref=${encodeURIComponent(ref)}`;
 
   try {
     const res = await fetch(url, {
@@ -79,20 +80,22 @@ async function fetchGithubContents(
  */
 function buildAssetUrl(
   githubPath: string,
-  downloadUrl: string | null
+  downloadUrl: string | null,
+  ref: string = GITHUB_BRANCH
 ): string {
   const baseUrl = process.env.NEXT_PUBLIC_ASSETS_BASE_URL?.replace(/\/$/, "");
 
-  if (baseUrl) {
-    // githubPath ya viene como "comics/saga/chapter/file.jpg"
+  if (ref === GITHUB_BRANCH && baseUrl) {
     return `${baseUrl}/${githubPath
       .split("/")
       .map(encodeURIComponent)
       .join("/")}`;
   }
 
-  // Fallback: URL raw directa provista por la API
-  return downloadUrl ?? "";
+  return downloadUrl ?? `https://raw.githubusercontent.com/${GITHUB_OWNER}/${GITHUB_REPO}/${encodeURIComponent(ref)}/${githubPath
+    .split("/")
+    .map(encodeURIComponent)
+    .join("/")}`;
 }
 
 /** Verifica si un nombre de archivo es una imagen de cómic soportada */
@@ -150,8 +153,8 @@ export function parseFolderPrefix(name: string): {
  * Obtiene la lista de carpetas de sagas disponibles en el repo de cómics.
  * Llama a: GET /repos/.../contents/comics
  */
-export async function fetchSagaFolders(): Promise<SagaFolderInfo[]> {
-  const items = await fetchGithubContents("comics");
+export async function fetchSagaFolders(ref: string = GITHUB_BRANCH): Promise<SagaFolderInfo[]> {
+  const items = await fetchGithubContents("comics", ref);
   if (!items) return [];
 
   return items
@@ -168,9 +171,10 @@ export async function fetchSagaFolders(): Promise<SagaFolderInfo[]> {
  * Llama a: GET /repos/.../contents/comics/{sagaFolder}
  */
 export async function fetchChapterFolders(
-  sagaFolder: string
+  sagaFolder: string,
+  ref: string = GITHUB_BRANCH
 ): Promise<ChapterFolderInfo[]> {
-  const items = await fetchGithubContents(`comics/${sagaFolder}`);
+  const items = await fetchGithubContents(`comics/${sagaFolder}`, ref);
   if (!items) return [];
 
   return items
@@ -190,10 +194,11 @@ export async function fetchChapterFolders(
  */
 export async function fetchComicPages(
   sagaFolder: string,
-  chapterFolder: string
+  chapterFolder: string,
+  ref: string = GITHUB_BRANCH
 ): Promise<ComicPagesResult> {
   const repoPath = `comics/${sagaFolder}/${chapterFolder}`;
-  const items = await fetchGithubContents(repoPath);
+  const items = await fetchGithubContents(repoPath, ref);
 
   if (!items) return { pages: [], cover: null };
 
@@ -206,7 +211,7 @@ export async function fetchComicPages(
 
   for (const file of imageFiles) {
     const baseName = file.name.slice(0, file.name.lastIndexOf(".")).toLowerCase();
-    const assetUrl = buildAssetUrl(file.path, file.download_url);
+    const assetUrl = buildAssetUrl(file.path, file.download_url, ref);
 
     if (baseName === "portada") {
       coverUrl = assetUrl;
@@ -225,7 +230,7 @@ export async function fetchComicPages(
         sensitivity: "base",
       });
     })
-    .map((f) => buildAssetUrl(f.path, f.download_url));
+    .map((f) => buildAssetUrl(f.path, f.download_url, ref));
 
   // Si no hay portada explícita, usar la primera página
   const finalCover = coverUrl ?? (sortedPages.length > 0 ? sortedPages[0] : null);

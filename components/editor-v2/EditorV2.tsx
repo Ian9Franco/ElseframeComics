@@ -13,7 +13,8 @@ import { StopsTimeline } from "./ui/StopsTimeline";
 import { FloatingToolbar } from "./ui/FloatingToolbar";
 import { Inspector } from "./ui/Inspector";
 import { MetaPanel } from "./ui/MetaPanel";
-import { Settings2 } from "lucide-react";
+import { PageManager } from "./PageManager";
+import { Settings2, Images } from "lucide-react";
 import type { BubbleStylePreset, EditorV2Tool } from "./types";
 
 export function EditorV2({
@@ -39,7 +40,7 @@ export function EditorV2({
   setLocalDialogues: React.Dispatch<React.SetStateAction<Dialogues>>;
   handleSaveChanges: () => void;
   isSaving: boolean;
-  saveStatus: "idle" | "success" | "error";
+  saveStatus: "idle" | "success" | "error" | "conflict";
   hasUnsavedChanges?: boolean;
   onPreview: () => void;
 }) {
@@ -51,6 +52,8 @@ export function EditorV2({
   const [activePanelIdx, setActivePanelIdx] = useState(0);
   const [soundPickerOpen, setSoundPickerOpen] = useState(false);
   const [metaOpen, setMetaOpen] = useState(false);
+  const [pagesOpen, setPagesOpen] = useState(false);
+  const [inspectorOpen, setInspectorOpen] = useState(false);
   const setTool = (t: EditorV2Tool) => {
     store.setActiveTool(t);
     if (t !== "bubble" && (store.selection.kind === "bubble" || store.selection.kind === "bubbles")) {
@@ -138,19 +141,27 @@ export function EditorV2({
   }, [canvas, store, activePanelIdx]);
 
   return (
-    <div className="flex-1 flex flex-col min-h-0 bg-[#0a0a0f] text-zinc-200 relative">
-      <div className="shrink-0 flex items-center justify-between gap-2 px-4 py-2.5 border-b border-white/10 bg-[#12121c]">
-        <div className="flex items-center gap-2">
+    <div className="flex-1 flex flex-col min-h-0 bg-[#0a0a0f] text-zinc-200 relative pb-[env(safe-area-inset-bottom)]">
+      <div className="shrink-0 flex items-center justify-between gap-2 px-3 py-2.5 border-b border-white/10 bg-[#12121c] pt-[max(0.6rem,env(safe-area-inset-top))]">
+        <div className="flex items-center gap-2 min-w-0">
           <span className="font-[var(--font-bangers)] text-xl text-white tracking-wide">Editor 2.0</span>
           {hasUnsavedChanges && (
             <span className="text-xs font-mono text-amber-300 bg-amber-500/15 px-2 py-0.5 rounded-full">Sin guardar</span>
           )}
         </div>
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 overflow-x-auto">
+          <button
+            type="button"
+            onClick={() => setPagesOpen(true)}
+            className="text-sm px-3 py-1.5 rounded bg-zinc-800 hover:bg-zinc-700 font-bold inline-flex items-center gap-1.5 min-h-11"
+          >
+            <Images className="w-4 h-4" />
+            Páginas
+          </button>
           <button
             type="button"
             onClick={() => setMetaOpen(true)}
-            className="text-sm px-3 py-1.5 rounded bg-zinc-800 hover:bg-zinc-700 font-bold inline-flex items-center gap-1.5"
+            className="text-sm px-3 py-1.5 rounded bg-zinc-800 hover:bg-zinc-700 font-bold inline-flex items-center gap-1.5 min-h-11"
           >
             <Settings2 className="w-4 h-4" />
             Config
@@ -159,7 +170,7 @@ export function EditorV2({
             type="button"
             onClick={() => store.undo()}
             disabled={!store.canUndo}
-            className="text-sm px-3 py-1.5 rounded bg-zinc-800 disabled:opacity-40"
+            className="text-sm px-3 py-1.5 rounded bg-zinc-800 disabled:opacity-40 min-h-11"
           >
             Undo
           </button>
@@ -167,22 +178,22 @@ export function EditorV2({
             type="button"
             onClick={() => store.redo()}
             disabled={!store.canRedo}
-            className="text-sm px-3 py-1.5 rounded bg-zinc-800 disabled:opacity-40"
+            className="text-sm px-3 py-1.5 rounded bg-zinc-800 disabled:opacity-40 min-h-11"
           >
             Redo
           </button>
-          <button type="button" onClick={onPreview} className="text-sm px-3 py-1.5 rounded bg-zinc-700 hover:bg-zinc-600 font-bold">
+          <button type="button" onClick={onPreview} className="text-sm px-3 py-1.5 rounded bg-zinc-700 hover:bg-zinc-600 font-bold min-h-11">
             Probar
           </button>
           <button
             type="button"
             onClick={handleSaveChanges}
             disabled={isSaving}
-            className={`font-[var(--font-bangers)] text-base px-4 py-1.5 rounded ${
-              saveStatus === "success" ? "bg-green-600" : saveStatus === "error" ? "bg-red-600" : "bg-[#e8185a]"
+            className={`font-[var(--font-bangers)] text-base px-4 py-1.5 rounded min-h-11 ${
+              saveStatus === "success" ? "bg-green-600" : saveStatus === "conflict" ? "bg-amber-500 text-black" : saveStatus === "error" ? "bg-red-600" : "bg-[#e8185a]"
             } text-white`}
           >
-            {isSaving ? "Guardando…" : saveStatus === "success" ? "Guardado" : "Guardar JSON"}
+            {isSaving ? "Guardando…" : saveStatus === "success" ? "Guardado" : saveStatus === "conflict" ? "Conflicto" : "Guardar JSON"}
           </button>
         </div>
       </div>
@@ -248,6 +259,7 @@ export function EditorV2({
             setGuides={setGuides}
           />
         </div>
+        <div className="hidden lg:contents">
         <Inspector
           pageIdx={pageIdx}
           pages={pages}
@@ -265,6 +277,19 @@ export function EditorV2({
           onUpdatePage={store.updatePage}
           onUpdateMask={store.updateMaskRect}
         />
+        </div>
+      </div>
+
+      <div className="lg:hidden shrink-0 flex items-center gap-2 px-3 py-2 border-t border-white/10 bg-[#12121c]">
+        <button type="button" className="flex-1 min-h-11 bg-zinc-800 rounded font-bold" onClick={() => setPagesOpen(true)}>
+          Páginas
+        </button>
+        <button type="button" className="flex-1 min-h-11 bg-zinc-800 rounded font-bold" onClick={() => setInspectorOpen(true)}>
+          Inspector
+        </button>
+        <button type="button" className="flex-1 min-h-11 bg-[#e8185a] rounded font-bold" onClick={handleSaveChanges}>
+          Guardar
+        </button>
       </div>
 
       <StopsTimeline
@@ -285,6 +310,45 @@ export function EditorV2({
       />
       {metaOpen && (
         <MetaPanel sagaId={saga.id} chapterId={chapter.id} onClose={() => setMetaOpen(false)} />
+      )}
+      {pagesOpen && (
+        <PageManager
+          pages={pages}
+          pageIdx={pageIdx}
+          chapterId={chapter.id}
+          localDialogues={localDialogues}
+          onClose={() => setPagesOpen(false)}
+          onApplied={() => window.location.reload()}
+        />
+      )}
+      {inspectorOpen && (
+        <div className="lg:hidden fixed inset-0 z-[160] bg-black/60 flex items-end">
+          <div className="w-full max-h-[85vh] bg-[#12121c] rounded-t-2xl overflow-y-auto pb-[env(safe-area-inset-bottom)]">
+            <div className="flex justify-between items-center px-4 py-3 border-b border-white/10">
+              <span className="font-bold">Inspector</span>
+              <button type="button" className="min-h-11 min-w-11 text-2xl" onClick={() => setInspectorOpen(false)}>
+                ×
+              </button>
+            </div>
+            <Inspector
+              pageIdx={pageIdx}
+              pages={pages}
+              pageData={pageData}
+              localDialogues={localDialogues}
+              panels={panels}
+              activePanelIdx={activePanelIdx}
+              selection={store.selection}
+              activeTool={store.activeTool}
+              soundPickerOpen={soundPickerOpen}
+              onCloseSoundPicker={() => setSoundPickerOpen(false)}
+              onUpdateBubble={store.updateBubble}
+              onUpdatePanel={store.updatePanel}
+              onUpdateAudioTracks={store.updateAudioTracks}
+              onUpdatePage={store.updatePage}
+              onUpdateMask={store.updateMaskRect}
+            />
+          </div>
+        </div>
       )}
     </div>
   );

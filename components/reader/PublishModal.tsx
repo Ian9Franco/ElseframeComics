@@ -12,32 +12,41 @@ export function PublishModal({ isOpen, onClose }: PublishModalProps) {
   const [message, setMessage] = useState("chore: sync y actualizaciones de diálogos/cómics");
   const [status, setStatus] = useState<"idle" | "running" | "success" | "error">("idle");
   const [log, setLog] = useState<string[]>([]);
+  const [runId, setRunId] = useState<number | null>(null);
 
   useEffect(() => {
-    let interval: any;
+    let interval: ReturnType<typeof setInterval>;
     if (isOpen && status === "running") {
       interval = setInterval(() => {
         const savedPass = typeof window !== "undefined" ? sessionStorage.getItem("editor_password") || "" : "";
-        fetch("/api/editor/publish", { headers: { "x-editor-password": savedPass } })
-          .then(r => r.json())
-          .then(d => {
+        const qs = runId ? `?runId=${runId}` : "";
+        fetch(`/api/editor/publish${qs}`, { headers: { "x-editor-password": savedPass } })
+          .then((r) => r.json())
+          .then((d) => {
             if (d.status) setStatus(d.status);
             if (d.log) setLog(d.log);
+            if (d.runId) setRunId(d.runId);
           });
       }, 2000);
     }
     return () => clearInterval(interval);
-  }, [isOpen, status]);
+  }, [isOpen, status, runId]);
 
   const handlePublish = async () => {
     setStatus("running");
     setLog(["Iniciando..."]);
     const savedPass = typeof window !== "undefined" ? sessionStorage.getItem("editor_password") || "" : "";
-    await fetch("/api/editor/publish", {
+    const res = await fetch("/api/editor/publish", {
       method: "POST",
       headers: { "Content-Type": "application/json", "x-editor-password": savedPass },
-      body: JSON.stringify({ message })
+      body: JSON.stringify({ message }),
     });
+    const data = await res.json().catch(() => ({}));
+    if (data.runId) setRunId(data.runId);
+    if (!res.ok) {
+      setStatus("error");
+      setLog([data.error || "No se pudo disparar la publicación"]);
+    }
   };
 
   if (!isOpen) return null;
@@ -60,7 +69,7 @@ export function PublishModal({ isOpen, onClose }: PublishModalProps) {
         {status === "idle" && (
           <>
             <p className="text-sm text-zinc-600">
-              Esto ejecutará <code className="bg-zinc-100 px-1 rounded border border-zinc-300">npm run publish:all</code> en el servidor, que optimiza assets, sincroniza marcadores y hace git push en ambos repositorios.
+              Esto publica el workspace del editor. En local corre <code className="bg-zinc-100 px-1 rounded border border-zinc-300">npm run publish:all</code>. En producción dispara GitHub Actions (WebP, audio, sync, commit y push a main).
             </p>
             <div className="flex flex-col gap-1">
               <label className="text-xs font-bold text-zinc-700">Mensaje de Commit</label>
