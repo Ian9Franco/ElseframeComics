@@ -10,7 +10,7 @@
             { "text": "hola", "size": "small", "posX": 81.98051948051949, "posY": 17.374689140646588, "tailX": 23.863636363636363, "tailY": 21.06060606060606, "tailWidth": 6, "tailCurvature": -22, "width": 205, "fontSize": 8, "borderRadius": 18, "fontFamily": "arcane", "style": "caption" },
             { "text": "La fuente de su poder era ", "size": "small", "posX": -7.21585152436216, "posY": 30.488716956802058, "tailX": -10.714285714285708, "tailY": 17.705627705627705, "tailWidth": 6, "tailCurvature": -22, "width": 205, "fontSize": 8, "borderRadius": 18, "fontFamily": "arcane" },
             { "text": "Era una muy loca\n", "size": "small", "posX": -20, "posY": 6.745187436676799, "tailX": 2.597402597402601, "tailY": 16.19047619047619, "tailWidth": 6, "tailCurvature": -22, "width": 228, "fontSize": 8, "borderRadius": 18, "style": "whisper" },
-            { "text": "asdasdasdasd", "style": "whisper", "size": "small", "posX": 52.94658172016662, "posY": 42.1840354767184, "tailX": 44.48664543004165, "tailY": 69.80982755452095, "tailWidth": 6, "tailCurvature": -22, "width": 231, "fontSize": 8, "borderRadius": 18 }
+            { "text": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", "style": "electronic", "size": "small", "posX": 70, "posY": 40, "tailX": 44.48664543004165, "tailY": 69.80982755452095, "tailWidth": 6, "tailCurvature": -22, "width": 231, "fontSize": 8, "borderRadius": 18 }
           ],
           "zoomRects": [
             { "x": 18.98738054398431, "y": 50.981109103160996, "w": 29.864003920607697, "h": 8.576329331046303 }
