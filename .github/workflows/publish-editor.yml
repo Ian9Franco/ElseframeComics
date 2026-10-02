@@ -20,36 +20,58 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Require ELSEFRAME_PUBLISH_TOKEN for assets repo
+      - name: Validate ELSEFRAME_PUBLISH_TOKEN (repo ElseframeComics)
         env:
           PUBLISH_TOKEN: ${{ secrets.ELSEFRAME_PUBLISH_TOKEN }}
         run: |
+          set -euo pipefail
           if [ -z "$PUBLISH_TOKEN" ]; then
-            echo "::error::Falta el secret ELSEFRAME_PUBLISH_TOKEN en este repo (Settings → Secrets and variables → Actions). Usá el mismo PAT que GITHUB_EDITOR_TOKEN en Vercel."
+            echo "::error::Falta ELSEFRAME_PUBLISH_TOKEN en ElseframeComics → Settings → Secrets → Actions (no en theboyz-comic-v1)."
+            exit 1
+          fi
+          code=$(curl -s -o /dev/null -w "%{http_code}" \
+            -H "Authorization: Bearer ${PUBLISH_TOKEN}" \
+            -H "Accept: application/vnd.github+json" \
+            "https://api.github.com/repos/Ian9Franco/theboyz-comic-v1")
+          if [ "$code" != "200" ]; then
+            echo "::error::El PAT no accede a theboyz-comic-v1 (HTTP ${code}). En el fine-grained token incluí ambos repos con Contents read/write."
             exit 1
           fi
 
-      # Mismo repo que el workflow: usa GITHUB_TOKEN (no hace falta el PAT en este paso).
+      # Mismo repo que el workflow: usa GITHUB_TOKEN del runner.
       - name: Checkout main app workspace
         uses: actions/checkout@v4
         with:
           ref: editor-workspace
           path: the-boys
-          fetch-depth: 0
+          fetch-depth: 1
 
+      # actions/checkout a veces no autentica el 2º repo; clone explícito con PAT.
       - name: Checkout assets workspace
-        uses: actions/checkout@v4
-        with:
-          repository: Ian9Franco/theboyz-comic-v1
-          ref: editor-workspace
-          path: theboyz-comic-v1
-          token: ${{ secrets.ELSEFRAME_PUBLISH_TOKEN }}
-          fetch-depth: 0
+        env:
+          GH_TOKEN: ${{ secrets.ELSEFRAME_PUBLISH_TOKEN }}
+        run: |
+          set -euo pipefail
+          API="https://api.github.com/repos/Ian9Franco/theboyz-comic-v1"
+          if curl -fsSL -H "Authorization: Bearer ${GH_TOKEN}" -H "Accept: application/vnd.github+json" \
+            "${API}/branches/editor-workspace" >/dev/null 2>&1; then
+            BRANCH=editor-workspace
+          else
+            echo "Rama editor-workspace no existe en assets; clonando main."
+            BRANCH=main
+          fi
+          git clone --depth 1 --branch "$BRANCH" \
+            "https://x-access-token:${GH_TOKEN}@github.com/Ian9Franco/theboyz-comic-v1.git" \
+            theboyz-comic-v1
+          git -C theboyz-comic-v1 remote set-url origin \
+            "https://x-access-token:${GH_TOKEN}@github.com/Ian9Franco/theboyz-comic-v1.git"
 
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
           node-version: 20
+          cache: npm
+          cache-dependency-path: the-boys/package-lock.json
 
       - name: Install app dependencies
         working-directory: the-boys
@@ -68,4 +90,10 @@ jobs:
         working-directory: the-boys
         env:
           PUBLISH_TARGET_BRANCH: main
-        run: npm run publish:all "${{ inputs.message }}"
+          # En CI omitimos convert/compress (lento); optimizá assets en local si hace falta.
+          PUBLISH_SKIP_OPTIMIZE: "1"
+          GH_TOKEN: ${{ secrets.ELSEFRAME_PUBLISH_TOKEN }}
+        run: |
+          git -C ../theboyz-comic-v1 remote set-url origin \
+            "https://x-access-token:${GH_TOKEN}@github.com/Ian9Franco/theboyz-comic-v1.git"
+          npm run publish:all "${{ inputs.message }}"
