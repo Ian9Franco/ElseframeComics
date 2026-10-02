@@ -44,7 +44,9 @@ export async function GET(request: NextRequest) {
         run.html_url ? `${run.html_url}\n` : "",
       ];
       if (status === "running") log.unshift("Publicando en GitHub Actions...\n");
-      if (status === "success") log.push("Listo.\n");
+      if (status === "success") {
+        log.push("Listo. Esperá el deploy de Vercel (1–3 min) y probá en otro navegador.\n");
+      }
       if (status === "error") log.push("Falló la publicación.\n");
       return NextResponse.json({ status, log, runId });
     } catch (error: any) {

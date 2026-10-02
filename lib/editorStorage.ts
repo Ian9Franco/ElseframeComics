@@ -29,15 +29,37 @@ export function contextRepoPath(sagaFolder: string, chapterFolder: string) {
   return `public/comics/${sagaFolder}/${chapterFolder}/ai-context.json`;
 }
 
-export async function loadEditorTextFile(relativePath: string): Promise<{
+/** Lectura de dialogues.json en la rama `main` (lector público; también dev sin PAT). */
+export async function loadMainBranchTextFile(chapterId: string): Promise<string | null> {
+  const location = await resolveChapterFolders(chapterId);
+  if (!location) return null;
+  const repoPath = dialoguesRepoPath(location.sagaFolder, location.chapterFolder);
+
+  try {
+    const main = await getFile(GITHUB_MAIN_REPO, repoPath, "main");
+    return main?.content ?? null;
+  } catch (error) {
+    console.error("[editorStorage] loadMainBranchTextFile failed:", error);
+    return null;
+  }
+}
+
+export async function loadEditorTextFile(
+  relativePath: string,
+  _chapterId?: string
+): Promise<{
   content: string;
   sha: string | null;
   source: "workspace" | "main" | "filesystem";
 }> {
   if (!useGithubEditorStorage()) {
-    const full = path.join(process.cwd(), relativePath);
-    if (!fs.existsSync(full)) return { content: "", sha: null, source: "filesystem" };
-    return { content: fs.readFileSync(full, "utf-8"), sha: null, source: "filesystem" };
+    try {
+      const main = await getFile(GITHUB_MAIN_REPO, relativePath, "main");
+      if (main) return { content: main.content, sha: null, source: "main" };
+    } catch (error) {
+      console.error("[editorStorage] loadEditorTextFile (main via API) failed:", error);
+    }
+    return { content: "", sha: null, source: "filesystem" };
   }
 
   await ensureEditorBranch(GITHUB_MAIN_REPO);

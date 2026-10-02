@@ -164,50 +164,143 @@ function generateCommitMessage(statusText, baseMsg) {
   return `editor [${timeStr}] - ${changeSummary}${context} (${baseMsg})`;
 }
 
-// Helper para publicar un repositorio
+const ALLOWED_PUBLISH_BRANCHES = new Set(["main", "editor-workspace"]);
+
+function assertAllowedPublishBranch(branch) {
+  if (!branch || !ALLOWED_PUBLISH_BRANCHES.has(branch)) {
+    throw new Error(`Rama de publicación no permitida: ${branch}`);
+  }
+}
+
+function gitSpawn(args, dir, inherit = false) {
+  const result = spawnSync("git", args, {
+    cwd: dir,
+    encoding: "utf-8",
+    stdio: inherit ? "inherit" : "pipe",
+  });
+  if (result.status !== 0) {
+    const detail = result.stderr?.trim() || result.stdout?.trim() || `git ${args.join(" ")}`;
+    throw new Error(detail);
+  }
+  return (result.stdout || "").trim();
+}
+
+function revCount(range, dir) {
+  try {
+    const out = gitSpawn(["rev-list", "--count", range], dir);
+    const n = parseInt(out, 10);
+    return Number.isFinite(n) ? n : 0;
+  } catch {
+    return 0;
+  }
+}
+
+function mergeTargetBranchBeforePublish(dir, publishTarget) {
+  assertAllowedPublishBranch(publishTarget);
+  const remoteRef = `origin/${publishTarget}`;
+  try {
+    gitSpawn(["fetch", "origin", publishTarget], dir, true);
+  } catch (error) {
+    throw new Error(`No se pudo hacer fetch de origin/${publishTarget}: ${error.message}`);
+  }
+
+  const behind = revCount(`HEAD..${remoteRef}`, dir);
+  if (behind > 0) {
+    console.log(`Integrando ${behind} commit(s) de ${remoteRef} antes de publicar...`);
+    const mergeResult = spawnSync(
+      "git",
+      ["merge", remoteRef, "-m", `merge ${publishTarget} into workspace before publish`],
+      { cwd: dir, stdio: "inherit" }
+    );
+    if (mergeResult.status !== 0) {
+      throw new Error(
+        `Merge con ${remoteRef} falló. Resolvé conflictos en editor-workspace antes de publicar.`
+      );
+    }
+  }
+}
+
+// Helper para publicar un repositorio. Devuelve { pushed, error }.
 function publishRepo(name, dir) {
   console.log(`--- 📤 Publicando repo: ${name} ---`);
+  const publishTarget = process.env.PUBLISH_TARGET_BRANCH;
+  let pushed = false;
+
   try {
+    if (publishTarget) {
+      mergeTargetBranchBeforePublish(dir, publishTarget);
+    }
+
     console.log("Staging de archivos...");
     execSync("git add .", { cwd: dir, stdio: "inherit" });
 
-    const status = execSync("git status --porcelain", { cwd: dir }).toString().trim();
-    if (!status) {
-      console.log(`✅ No hay cambios pendientes en ${name}.\n`);
-      return;
-    }
+    const status = gitSpawn(["status", "--porcelain"], dir);
+    if (status) {
+      console.log("Creando commit...");
+      const dynamicCommitMsg = generateCommitMessage(status, commitMsg);
+      console.log(`Mensaje dinámico generado: "\x1b[32m${dynamicCommitMsg}\x1b[0m"\n`);
 
-    console.log("Creando commit...");
-    const dynamicCommitMsg = generateCommitMessage(status, commitMsg);
-    console.log(`Mensaje dinámico generado: "\x1b[32m${dynamicCommitMsg}\x1b[0m"\n`);
-
-    const commitResult = spawnSync("git", ["commit", "-m", dynamicCommitMsg], { cwd: dir, stdio: "inherit" });
-    if (commitResult.status !== 0) {
-      throw new Error("git commit falló");
-    }
-
-    console.log("Haciendo git push...");
-    const publishTarget = process.env.PUBLISH_TARGET_BRANCH;
-    if (publishTarget) {
-      execSync(`git push origin HEAD:${publishTarget}`, { cwd: dir, stdio: "inherit" });
-      execSync("git push origin HEAD:editor-workspace --force-with-lease", { cwd: dir, stdio: "inherit" });
+      const commitResult = spawnSync("git", ["commit", "-m", dynamicCommitMsg], { cwd: dir, stdio: "inherit" });
+      if (commitResult.status !== 0) {
+        throw new Error("git commit falló");
+      }
     } else {
-      execSync("git push", { cwd: dir, stdio: "inherit" });
+      console.log(`✅ Working tree limpio en ${name}.`);
     }
 
-    console.log(`🎉 ¡${name} publicado con éxito!\n`);
+    if (publishTarget) {
+      assertAllowedPublishBranch(publishTarget);
+      const ahead = revCount(`origin/${publishTarget}..HEAD`, dir);
+      if (ahead > 0) {
+        if (!status) {
+          console.log(`📤 Nada que commitear, pero ${ahead} commit(s) por publicar a ${publishTarget}...`);
+        }
+        console.log("Haciendo git push...");
+        gitSpawn(["push", "origin", `HEAD:${publishTarget}`], dir, true);
+        gitSpawn(["push", "origin", "HEAD:editor-workspace", "--force-with-lease"], dir, true);
+        pushed = true;
+        console.log(`🎉 ¡${name} publicado con éxito!\n`);
+      } else if (!status) {
+        console.log(`✅ No hay commits por publicar a ${publishTarget} en ${name}.\n`);
+      }
+    } else if (status) {
+      console.log("Haciendo git push...");
+      execSync("git push", { cwd: dir, stdio: "inherit" });
+      pushed = true;
+      console.log(`🎉 ¡${name} publicado con éxito!\n`);
+    } else {
+      console.log(`✅ No hay cambios pendientes en ${name}.\n`);
+    }
+
+    return { pushed, error: false };
   } catch (error) {
     console.error(`❌ Error al publicar ${name}:`, error.message);
     console.log();
+    return { pushed: false, error: true };
   }
 }
 
 // ── 2. Hacer commit y push de ambos repositorios ──────────────────────────
+let hadError = false;
+let mainAppPushed = false;
+
 if (process.env.PUBLISH_SKIP_ASSETS_PUSH === "1") {
   console.log("⏭️ PUBLISH_SKIP_ASSETS_PUSH=1: omitiendo push del repo de assets (PAT inválido en CI).\n");
 } else {
-  publishRepo("the-boyz-comic (Assets)", siblingRoot);
+  const assetsResult = publishRepo("the-boyz-comic (Assets)", siblingRoot);
+  if (assetsResult.error) hadError = true;
 }
-publishRepo("the-boys (Main App)", projectRoot);
+
+const appResult = publishRepo("the-boys (Main App)", projectRoot);
+if (appResult.error) hadError = true;
+mainAppPushed = appResult.pushed;
+
+if (mainAppPushed) {
+  console.log("PUBLISH_MAIN_PUSHED=1");
+}
 
 console.log("🏁 ¡Flujo de publicación unificado completado!");
+
+if (hadError) {
+  process.exit(1);
+}
