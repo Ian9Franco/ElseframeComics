@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { exec, ChildProcess } from "child_process";
 import { validateMasterEditorAccess } from "@/lib/editorAccess";
 import {
-  assertEditorGithubAuth,
+  assertEditorGithubAccess,
   dispatchWorkflow,
   formatGithubApiAuthError,
   getEditorToken,
@@ -55,10 +55,32 @@ export async function GET(request: NextRequest) {
   return NextResponse.json({ status: publishStatus, log: publishLog, runId: lastRunId });
 }
 
+async function remotePublishInProgress(): Promise<{ running: boolean; runId: number | null }> {
+  if (!lastRunId) return { running: false, runId: null };
+  try {
+    const run = await getWorkflowRun(lastRunId);
+    return { running: mapGithubStatus(run) === "running", runId: lastRunId };
+  } catch {
+    return { running: false, runId: lastRunId };
+  }
+}
+
 export async function POST(request: NextRequest) {
   if (!validateMasterEditorAccess(request)) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
-  if (publishStatus === "running") {
+  // En Vercel no hay proceso local: el lock en memoria quedaba en "running" para siempre.
+  if (useRemotePublish()) {
+    const remote = await remotePublishInProgress();
+    if (remote.running) {
+      return NextResponse.json(
+        {
+          error: "Ya hay una publicación en GitHub Actions. Esperá a que termine o revisá Actions en ElseframeComics.",
+          runId: remote.runId,
+        },
+        { status: 409 }
+      );
+    }
+  } else if (publishStatus === "running") {
     return NextResponse.json({ error: "Publish already in progress" }, { status: 409 });
   }
 
@@ -72,14 +94,13 @@ export async function POST(request: NextRequest) {
 
   if (useRemotePublish()) {
     try {
-      await assertEditorGithubAuth();
+      await assertEditorGithubAccess();
       const dispatched = await dispatchWorkflow({
         workflowId: "publish-editor.yml",
         ref: "main",
         inputs: { message },
       });
       lastRunId = dispatched.runId;
-      publishStatus = "running";
       publishLog = ["Disparando GitHub Actions...", dispatched.runId ? `run ${dispatched.runId}` : "esperando run id..."];
       return NextResponse.json({ success: true, runId: dispatched.runId });
     } catch (error: any) {

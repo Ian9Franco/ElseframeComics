@@ -3,7 +3,7 @@ import { validateMasterEditorAccess } from "@/lib/editorAccess";
 import {
   GITHUB_MAIN_REPO,
   GITHUB_OWNER,
-  assertEditorGithubAuth,
+  assertEditorGithubAccess,
   describeEditorToken,
   formatGithubApiAuthError,
   getEditorToken,
@@ -32,7 +32,7 @@ export async function GET(request: NextRequest) {
   }
 
   try {
-    await assertEditorGithubAuth();
+    await assertEditorGithubAccess();
     const token = getEditorToken()!;
     const userRes = await fetch("https://api.github.com/user", {
       headers: {

@@ -44,12 +44,23 @@ export function PublishModal({ isOpen, onClose }: PublishModalProps) {
     const data = await res.json().catch(() => ({}));
     if (data.runId) setRunId(data.runId);
     if (!res.ok) {
-      setStatus("error");
       const err = data.error || "No se pudo disparar la publicación";
-      setLog([
-        err,
-        "\n\nSi dice «Bad credentials» o token inválido: en Vercel → Settings → Environment Variables, revisá GITHUB_EDITOR_TOKEN (PAT fine-grained, Contents + Actions en ElseframeComics). No uses un token viejo ni el secret de Actions (ELSEFRAME_PUBLISH_TOKEN) en Vercel.",
-      ]);
+      if (res.status === 409 && data.runId) {
+        setRunId(data.runId);
+        setStatus("running");
+        setLog([err, `\n\nSeguimiento del run ${data.runId}…`]);
+        return;
+      }
+      setStatus("error");
+      const tokenHint =
+        "\n\nToken en Vercel (GITHUB_EDITOR_TOKEN): PAT fine-grained con ElseframeComics + theboyz-comic-v1, Contents y Actions read/write. Luego redeploy.";
+      if (/already in progress|ya hay una publicación/i.test(err)) {
+        setLog([err, "\n\nSi no hay nada corriendo en GitHub Actions, cerrá el modal y volvé a intentar tras el próximo deploy."]);
+      } else if (/credentials|token|accessible/i.test(err)) {
+        setLog([err, tokenHint]);
+      } else {
+        setLog([err]);
+      }
     }
   };
 
@@ -109,6 +120,7 @@ export function PublishModal({ isOpen, onClose }: PublishModalProps) {
               <button
                 onClick={() => {
                   setStatus("idle");
+                  setRunId(null);
                   onClose();
                 }}
                 className="bg-zinc-200 text-[#0a0a0f] font-[var(--font-bangers)] text-xl py-2 px-4 border-2 border-[#0a0a0f] shadow-[3px_3px_0_#0a0a0f] hover:translate-x-0.5 hover:translate-y-0.5 hover:shadow-[1px_1px_0_#0a0a0f] transition-all mt-2"

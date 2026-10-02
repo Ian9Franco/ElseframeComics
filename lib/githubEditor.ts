@@ -59,31 +59,76 @@ export function formatGithubApiAuthError(message: string): string {
   if (message === "Bad credentials" || /bad credentials/i.test(message)) {
     return "GITHUB_EDITOR_TOKEN inválido o expirado. Usá un PAT fine-grained con Contents (read/write) y Actions (read/write) en el repo ElseframeComics.";
   }
+  if (/resource not accessible by personal access token/i.test(message)) {
+    return (
+      "El PAT inicia sesión pero no puede usar ElseframeComics ni Actions. " +
+      "Fine-grained: Repository access → seleccioná ElseframeComics (no solo theboyz-comic-v1). " +
+      "Permissions del repo → Contents Read and write + Actions Read and write. " +
+      "Classic PAT alternativo: scopes repo y workflow."
+    );
+  }
   return message;
 }
 
-/** Valida el PAT antes de workflow_dispatch o escrituras críticas. */
+function githubAuthHeaders(token: string): HeadersInit {
+  return {
+    Authorization: `Bearer ${token}`,
+    Accept: "application/vnd.github+json",
+    "X-GitHub-Api-Version": "2022-11-28",
+  };
+}
+
+async function readGithubErrorMessage(res: Response, fallback: string): Promise<string> {
+  try {
+    const data = (await res.json()) as { message?: string };
+    return data.message || fallback;
+  } catch {
+    return fallback;
+  }
+}
+
+/** Comprueba que el PAT sea válido (login). */
 export async function assertEditorGithubAuth(): Promise<void> {
   const token = getEditorToken();
   if (!token) throw new Error(editorTokenMissingMessage());
 
   const res = await fetch("https://api.github.com/user", {
-    headers: {
-      Authorization: `Bearer ${token}`,
-      Accept: "application/vnd.github+json",
-      "X-GitHub-Api-Version": "2022-11-28",
-    },
+    headers: githubAuthHeaders(token),
     cache: "no-store",
   });
 
   if (!res.ok) {
-    let message = `GitHub auth failed (${res.status})`;
-    try {
-      const data = (await res.json()) as { message?: string };
-      if (data.message) message = data.message;
-    } catch {
-      /* ignore */
-    }
+    const message = await readGithubErrorMessage(res, `GitHub auth failed (${res.status})`);
+    throw new Error(formatGithubApiAuthError(message));
+  }
+}
+
+/** Login + acceso al repo principal + workflow de publicación (lo que usa Publicar). */
+export async function assertEditorGithubAccess(): Promise<void> {
+  const token = getEditorToken();
+  if (!token) throw new Error(editorTokenMissingMessage());
+
+  await assertEditorGithubAuth();
+
+  const repoUrl = `https://api.github.com/repos/${GITHUB_OWNER}/${GITHUB_MAIN_REPO}`;
+  const repoRes = await fetch(repoUrl, { headers: githubAuthHeaders(token), cache: "no-store" });
+  if (!repoRes.ok) {
+    const message = await readGithubErrorMessage(
+      repoRes,
+      `No se pudo acceder a ${GITHUB_OWNER}/${GITHUB_MAIN_REPO} (${repoRes.status})`
+    );
+    throw new Error(formatGithubApiAuthError(message));
+  }
+
+  const workflowRes = await fetch(`${repoUrl}/actions/workflows/publish-editor.yml`, {
+    headers: githubAuthHeaders(token),
+    cache: "no-store",
+  });
+  if (!workflowRes.ok) {
+    const message = await readGithubErrorMessage(
+      workflowRes,
+      `No se pudo leer el workflow publish-editor.yml (${workflowRes.status})`
+    );
     throw new Error(formatGithubApiAuthError(message));
   }
 }

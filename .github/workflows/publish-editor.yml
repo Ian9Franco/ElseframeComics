@@ -20,13 +20,21 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      - name: Require ELSEFRAME_PUBLISH_TOKEN for assets repo
+        env:
+          PUBLISH_TOKEN: ${{ secrets.ELSEFRAME_PUBLISH_TOKEN }}
+        run: |
+          if [ -z "$PUBLISH_TOKEN" ]; then
+            echo "::error::Falta el secret ELSEFRAME_PUBLISH_TOKEN en este repo (Settings → Secrets and variables → Actions). Usá el mismo PAT que GITHUB_EDITOR_TOKEN en Vercel."
+            exit 1
+          fi
+
+      # Mismo repo que el workflow: usa GITHUB_TOKEN (no hace falta el PAT en este paso).
       - name: Checkout main app workspace
         uses: actions/checkout@v4
         with:
-          repository: Ian9Franco/ElseframeComics
           ref: editor-workspace
           path: the-boys
-          token: ${{ secrets.ELSEFRAME_PUBLISH_TOKEN }}
           fetch-depth: 0
 
       - name: Checkout assets workspace
