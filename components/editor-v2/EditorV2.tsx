@@ -341,6 +341,7 @@ export function EditorV2({
           pageIdx={pageIdx}
           chapterId={chapter.id}
           localDialogues={localDialogues}
+          hasUnsavedChanges={hasUnsavedChanges}
           onClose={() => setPagesOpen(false)}
           onApplied={() => window.location.reload()}
         />
