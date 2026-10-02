@@ -221,11 +221,15 @@ function isGitAncestor(ancestor, descendant, dir) {
   return result.status === 0;
 }
 
+function fetchOriginBranchForMerge(dir, publishTarget, depth = 64) {
+  gitSpawn(["fetch", `--depth=${depth}`, "origin", publishTarget], dir, true);
+}
+
 function mergeTargetBranchBeforePublish(dir, publishTarget) {
   assertAllowedPublishBranch(publishTarget);
   const remoteRef = `origin/${publishTarget}`;
   try {
-    gitSpawn(["fetch", "origin", publishTarget], dir, true);
+    fetchOriginBranchForMerge(dir, publishTarget, 64);
   } catch (error) {
     throw new Error(`No se pudo hacer fetch de origin/${publishTarget}: ${error.message}`);
   }
@@ -240,11 +244,26 @@ function mergeTargetBranchBeforePublish(dir, publishTarget) {
       ? `${behind} commit(s) de ${remoteRef}`
       : `historial divergente con ${remoteRef}`;
   console.log(`Integrando ${label} antes de publicar...`);
-  const mergeResult = spawnSync(
+  let mergeResult = spawnSync(
     "git",
     ["merge", remoteRef, "-m", `merge ${publishTarget} into workspace before publish`],
     { cwd: dir, stdio: "inherit" }
   );
+  if (mergeResult.status !== 0) {
+    console.log("Merge falló en clone superficial; profundizando historial y reintentando...");
+    try {
+      gitSpawn(["fetch", "--deepen=100", "origin", publishTarget], dir, true);
+    } catch (deepenErr) {
+      throw new Error(
+        `Merge con ${remoteRef} falló y no se pudo profundizar el historial: ${deepenErr.message}`
+      );
+    }
+    mergeResult = spawnSync(
+      "git",
+      ["merge", remoteRef, "-m", `merge ${publishTarget} into workspace before publish`],
+      { cwd: dir, stdio: "inherit" }
+    );
+  }
   if (mergeResult.status !== 0) {
     throw new Error(
       `Merge con ${remoteRef} falló. Resolvé conflictos en editor-workspace antes de publicar.`
