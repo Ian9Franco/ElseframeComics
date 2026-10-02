@@ -7,14 +7,16 @@ import { useEditorV2Store } from "./useEditorV2Store";
 import { useCanvasTransform } from "./useCanvasTransform";
 import { PageCanvas } from "./canvas/PageCanvas";
 import { ToolRail } from "./ui/ToolRail";
-import { BubblePalette } from "./ui/BubblePalette";
+import { BubblePalette, BubbleStyleSelect } from "./ui/BubblePalette";
 import { PageStrip } from "./ui/PageStrip";
 import { StopsTimeline } from "./ui/StopsTimeline";
 import { FloatingToolbar } from "./ui/FloatingToolbar";
-import { Inspector } from "./ui/Inspector";
+import { Inspector, type InspectorViewMode } from "./ui/Inspector";
 import { MetaPanel } from "./ui/MetaPanel";
 import { PageManager } from "./PageManager";
-import { Settings2, Images } from "lucide-react";
+import { MobileToolNav } from "./ui/MobileToolNav";
+import { useEditorBreakpoint } from "./useEditorBreakpoint";
+import { Settings2, Images, MoreHorizontal } from "lucide-react";
 import type { BubbleStylePreset, EditorV2Tool } from "./types";
 
 export function EditorV2({
@@ -49,18 +51,27 @@ export function EditorV2({
   const pageKey = getPageKeyFromUrl(pages[pageIdx]) || "";
   const store = useEditorV2Store(localDialogues, setLocalDialogues, pageKey);
   const canvas = useCanvasTransform();
+  const { isMobile } = useEditorBreakpoint();
   const [dragStyle, setDragStyle] = useState<BubbleStylePreset | null>(null);
   const [guides, setGuides] = useState<{ axis: "x" | "y"; value: number }[]>([]);
   const [activePanelIdx, setActivePanelIdx] = useState(0);
   const [soundPickerOpen, setSoundPickerOpen] = useState(false);
   const [metaOpen, setMetaOpen] = useState(false);
   const [pagesOpen, setPagesOpen] = useState(false);
-  const [inspectorOpen, setInspectorOpen] = useState(false);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [mobileOptionsOpen, setMobileOptionsOpen] = useState(false);
+  const [optionsViewMode, setOptionsViewMode] = useState<InspectorViewMode>("stops");
+
   const setTool = (t: EditorV2Tool) => {
     store.setActiveTool(t);
     if (t !== "bubble" && (store.selection.kind === "bubble" || store.selection.kind === "bubbles")) {
       store.setSelection({ kind: "none" });
     }
+  };
+
+  const openMobileOptions = (mode: InspectorViewMode) => {
+    setOptionsViewMode(mode);
+    setMobileOptionsOpen(true);
   };
 
   const pageData = store.getPage();
@@ -142,31 +153,81 @@ export function EditorV2({
     };
   }, [canvas, store, activePanelIdx]);
 
+  const saveButtonClass = `${
+    saveStatus === "success" ? "bg-green-600" : saveStatus === "conflict" ? "bg-amber-500 text-black" : saveStatus === "error" ? "bg-red-600" : "bg-[#e8185a]"
+  } text-white`;
+
+  const updateSelectedBubble = (fields: Parameters<typeof store.updateBubble>[2]) => {
+    if (store.selection.kind !== "bubble") return;
+    const { panelIdx, bubbleIdx } = store.selection;
+    store.updateBubble(panelIdx, bubbleIdx, fields);
+  };
+
+  const inspectorCommon = {
+    pageIdx,
+    pages,
+    pageData,
+    localDialogues,
+    panels,
+    activePanelIdx,
+    selection: store.selection,
+    activeTool: store.activeTool,
+    soundPickerOpen,
+    onCloseSoundPicker: () => setSoundPickerOpen(false),
+    onUpdateBubble: store.updateBubble,
+    onUpdatePanel: store.updatePanel,
+    onUpdateAudioTracks: store.updateAudioTracks,
+    onUpdatePage: store.updatePage,
+    onUpdateMask: store.updateMaskRect,
+  };
+
+  const stopsTimelineProps = {
+    panels,
+    activePanelIdx,
+    selection: store.selection,
+    onSelect: (idx: number) => {
+      setActivePanelIdx(idx);
+      store.setSelection({ kind: "stop", panelIdx: idx });
+    },
+    onReorder: store.reorderPanels,
+    onAddStop: () => {
+      store.addPanel();
+      setActivePanelIdx(panels.length);
+    },
+    onDelete: deleteSelection,
+    onPickSound: () => {
+      setSoundPickerOpen(true);
+      if (isMobile) openMobileOptions("stops");
+    },
+  };
+
   return (
     <div className="flex-1 flex flex-col min-h-0 text-zinc-200 relative pb-[env(safe-area-inset-bottom)]">
+      {/* Header — desktop: full toolbar; mobile: compact + overflow menu */}
       <div className="shrink-0 flex items-center justify-between gap-2 px-3 py-2.5 border-b border-white/10 bg-[#12121c] pt-[max(0.6rem,env(safe-area-inset-top))]">
         <div className="flex items-center gap-2 min-w-0">
-          <span className="font-[var(--font-bangers)] text-xl text-white tracking-wide">Editor 2.0</span>
+          <span className="font-[var(--font-bangers)] text-lg lg:text-xl text-white tracking-wide shrink-0">Editor 2.0</span>
           {hasUnsavedChanges ? (
-            <span className="text-xs font-mono text-amber-300 bg-amber-500/15 px-2 py-0.5 rounded-full shrink-0">
+            <span className="text-[10px] lg:text-xs font-mono text-amber-300 bg-amber-500/15 px-2 py-0.5 rounded-full shrink-0">
               Sin guardar
             </span>
           ) : saveStatus === "success" ? (
-            <span className="text-xs font-mono text-green-300 bg-green-500/15 px-2 py-0.5 rounded-full shrink-0">
+            <span className="text-[10px] lg:text-xs font-mono text-green-300 bg-green-500/15 px-2 py-0.5 rounded-full shrink-0 hidden sm:inline">
               ✓ Guardado
             </span>
           ) : saveStatus !== "error" ? (
-            <span className="text-xs font-mono text-zinc-400 bg-zinc-500/10 px-2 py-0.5 rounded-full shrink-0">
+            <span className="text-[10px] lg:text-xs font-mono text-zinc-400 bg-zinc-500/10 px-2 py-0.5 rounded-full shrink-0 hidden sm:inline">
               ✓ En servidor
             </span>
           ) : null}
           {saveStatus === "error" && saveMessage && (
-            <span className="text-[10px] text-red-300 max-w-[min(14rem,40vw)] truncate" title={saveMessage}>
+            <span className="text-[10px] text-red-300 max-w-[8rem] lg:max-w-[14rem] truncate hidden sm:inline" title={saveMessage}>
               {saveMessage}
             </span>
           )}
         </div>
-        <div className="flex items-center gap-2 overflow-x-auto">
+
+        <div className="hidden lg:flex items-center gap-2 overflow-x-auto">
           <button
             type="button"
             onClick={() => setPagesOpen(true)}
@@ -183,20 +244,10 @@ export function EditorV2({
             <Settings2 className="w-4 h-4" />
             Config
           </button>
-          <button
-            type="button"
-            onClick={() => store.undo()}
-            disabled={!store.canUndo}
-            className="text-sm px-3 py-1.5 rounded bg-zinc-800 disabled:opacity-40 min-h-11"
-          >
+          <button type="button" onClick={() => store.undo()} disabled={!store.canUndo} className="text-sm px-3 py-1.5 rounded bg-zinc-800 disabled:opacity-40 min-h-11">
             Undo
           </button>
-          <button
-            type="button"
-            onClick={() => store.redo()}
-            disabled={!store.canRedo}
-            className="text-sm px-3 py-1.5 rounded bg-zinc-800 disabled:opacity-40 min-h-11"
-          >
+          <button type="button" onClick={() => store.redo()} disabled={!store.canRedo} className="text-sm px-3 py-1.5 rounded bg-zinc-800 disabled:opacity-40 min-h-11">
             Redo
           </button>
           <button type="button" onClick={onPreview} className="text-sm px-3 py-1.5 rounded bg-zinc-700 hover:bg-zinc-600 font-bold min-h-11">
@@ -206,17 +257,116 @@ export function EditorV2({
             type="button"
             onClick={handleSaveChanges}
             disabled={isSaving}
-            className={`font-[var(--font-bangers)] text-base px-4 py-1.5 rounded min-h-11 ${
-              saveStatus === "success" ? "bg-green-600" : saveStatus === "conflict" ? "bg-amber-500 text-black" : saveStatus === "error" ? "bg-red-600" : "bg-[#e8185a]"
-            } text-white`}
+            className={`font-[var(--font-bangers)] text-base px-4 py-1.5 rounded min-h-11 ${saveButtonClass}`}
           >
             {isSaving ? "Guardando…" : saveStatus === "success" ? "Guardado" : saveStatus === "conflict" ? "Conflicto" : "Guardar JSON"}
           </button>
         </div>
+
+        <div className="flex lg:hidden items-center gap-2 shrink-0">
+          <button
+            type="button"
+            onClick={handleSaveChanges}
+            disabled={isSaving}
+            className={`font-[var(--font-bangers)] text-sm px-3 py-2 rounded min-h-10 ${saveButtonClass}`}
+          >
+            {isSaving ? "…" : saveStatus === "success" ? "✓" : "Guardar"}
+          </button>
+          <div className="relative">
+            <button
+              type="button"
+              onClick={() => setMobileMenuOpen((v) => !v)}
+              className="min-h-10 min-w-10 flex items-center justify-center rounded bg-zinc-800 hover:bg-zinc-700"
+              aria-label="Más opciones"
+            >
+              <MoreHorizontal className="w-5 h-5" />
+            </button>
+            {mobileMenuOpen && (
+              <>
+                <button type="button" className="fixed inset-0 z-[155]" aria-label="Cerrar menú" onClick={() => setMobileMenuOpen(false)} />
+                <div className="absolute right-0 top-full mt-1 z-[156] min-w-[11rem] rounded-lg border border-white/10 bg-[#161622] shadow-xl py-1 flex flex-col">
+                  <button
+                    type="button"
+                    className="text-left px-4 py-2.5 text-sm font-bold hover:bg-white/5"
+                    onClick={() => {
+                      setPagesOpen(true);
+                      setMobileMenuOpen(false);
+                    }}
+                  >
+                    Páginas
+                  </button>
+                  <button
+                    type="button"
+                    className="text-left px-4 py-2.5 text-sm font-bold hover:bg-white/5"
+                    onClick={() => {
+                      setMetaOpen(true);
+                      setMobileMenuOpen(false);
+                    }}
+                  >
+                    Config capítulo
+                  </button>
+                  <button
+                    type="button"
+                    className="text-left px-4 py-2.5 text-sm font-bold hover:bg-white/5"
+                    onClick={() => {
+                      openMobileOptions("page");
+                      setMobileMenuOpen(false);
+                    }}
+                  >
+                    Fades de página
+                  </button>
+                  <button
+                    type="button"
+                    className="text-left px-4 py-2.5 text-sm font-bold hover:bg-white/5"
+                    onClick={() => {
+                      openMobileOptions("audio");
+                      setMobileMenuOpen(false);
+                    }}
+                  >
+                    Audio del capítulo
+                  </button>
+                  <button
+                    type="button"
+                    className="text-left px-4 py-2.5 text-sm font-bold hover:bg-white/5 disabled:opacity-40"
+                    disabled={!store.canUndo}
+                    onClick={() => {
+                      store.undo();
+                      setMobileMenuOpen(false);
+                    }}
+                  >
+                    Undo
+                  </button>
+                  <button
+                    type="button"
+                    className="text-left px-4 py-2.5 text-sm font-bold hover:bg-white/5 disabled:opacity-40"
+                    disabled={!store.canRedo}
+                    onClick={() => {
+                      store.redo();
+                      setMobileMenuOpen(false);
+                    }}
+                  >
+                    Redo
+                  </button>
+                  <button
+                    type="button"
+                    className="text-left px-4 py-2.5 text-sm font-bold hover:bg-white/5"
+                    onClick={() => {
+                      onPreview();
+                      setMobileMenuOpen(false);
+                    }}
+                  >
+                    Probar lectura
+                  </button>
+                </div>
+              </>
+            )}
+          </div>
+        </div>
       </div>
 
+      {/* Desktop: bubble palette + inline toolbar */}
       {(store.activeTool === "bubble" || dragStyle) && (
-        <div className="shrink-0 border-b border-white/10 bg-[#14141e]">
+        <div className="hidden lg:block shrink-0 border-b border-white/10 bg-[#14141e]">
           <BubblePalette
             activeStyle={store.pendingBubbleStyle}
             onStyleChange={store.setPendingBubbleStyle}
@@ -226,15 +376,12 @@ export function EditorV2({
             }}
           />
           {selectedLine && store.selection.kind === "bubble" && (
-            <div className="px-3 pb-3 pt-1 flex items-center gap-3">
+            <div className="px-3 pb-3 pt-1 flex items-center gap-3 flex-wrap">
               <span className="text-xs font-bold text-zinc-400 uppercase tracking-wider">Globo</span>
               <FloatingToolbar
                 line={selectedLine}
                 speakers={speakers}
-                onUpdate={(fields) => {
-                  const { panelIdx, bubbleIdx } = store.selection as { kind: "bubble"; panelIdx: number; bubbleIdx: number };
-                  store.updateBubble(panelIdx, bubbleIdx, fields);
-                }}
+                onUpdate={updateSelectedBubble}
                 onDuplicate={() => {
                   const { panelIdx, bubbleIdx } = store.selection as { kind: "bubble"; panelIdx: number; bubbleIdx: number };
                   store.duplicateBubble(panelIdx, bubbleIdx);
@@ -249,92 +396,166 @@ export function EditorV2({
         </div>
       )}
 
-      <div className="flex-1 flex min-h-0">
-        <PageStrip pages={pages} pageIdx={pageIdx} onSelect={resetPage} />
-        <ToolRail
-          activeTool={store.activeTool}
-          onToolChange={setTool}
-          onAddStop={() => {
-            store.addPanel();
-            setActivePanelIdx(panels.length);
-          }}
-        />
-        <div className="flex-1 flex flex-col min-w-0 relative">
-          <PageCanvas
-            pageUrl={pages[pageIdx]}
-            panels={panels}
-            activePanelIdx={activePanelIdx}
-            store={store}
-            scale={canvas.scale}
-            pan={canvas.pan}
-            spaceHeld={canvas.spaceHeld}
-            onPanChange={canvas.setPan}
-            onWheelZoom={canvas.zoomBy}
-            dragBubbleStyle={dragStyle}
-            onDropBubbleStyle={() => setDragStyle(null)}
-            guides={guides}
-            setGuides={setGuides}
-          />
+      <div className="flex-1 flex flex-col lg:flex-row min-h-0">
+        <div className="flex-1 flex min-h-0">
+          <div className="hidden lg:flex">
+            <PageStrip pages={pages} pageIdx={pageIdx} onSelect={resetPage} />
+          </div>
+          <div className="hidden lg:flex">
+            <ToolRail
+              activeTool={store.activeTool}
+              onToolChange={setTool}
+              onAddStop={stopsTimelineProps.onAddStop}
+            />
+          </div>
+          <div className="flex-1 flex flex-col min-w-0 relative">
+            <PageCanvas
+              pageUrl={pages[pageIdx]}
+              panels={panels}
+              activePanelIdx={activePanelIdx}
+              store={store}
+              scale={canvas.scale}
+              pan={canvas.pan}
+              spaceHeld={canvas.spaceHeld}
+              onPanChange={canvas.setPan}
+              onWheelZoom={canvas.zoomBy}
+              dragBubbleStyle={dragStyle}
+              onDropBubbleStyle={() => setDragStyle(null)}
+              guides={guides}
+              setGuides={setGuides}
+            />
+          </div>
+          <div className="hidden lg:contents">
+            <Inspector {...inspectorCommon} viewMode="full" />
+          </div>
         </div>
-        <div className="hidden lg:contents">
-        <Inspector
-          pageIdx={pageIdx}
-          pages={pages}
-          pageData={pageData}
-          localDialogues={localDialogues}
-          panels={panels}
-          activePanelIdx={activePanelIdx}
-          selection={store.selection}
-          activeTool={store.activeTool}
-          soundPickerOpen={soundPickerOpen}
-          onCloseSoundPicker={() => setSoundPickerOpen(false)}
-          onUpdateBubble={store.updateBubble}
-          onUpdatePanel={store.updatePanel}
-          onUpdateAudioTracks={store.updateAudioTracks}
-          onUpdatePage={store.updatePage}
-          onUpdateMask={store.updateMaskRect}
-        />
+
+        {/* Mobile contextual layer panel */}
+        <div className="lg:hidden shrink-0 flex flex-col border-t border-white/10">
+          {store.activeTool === "stops" && (
+            <>
+              <StopsTimeline {...stopsTimelineProps} variant="compact" />
+              <button
+                type="button"
+                className="mx-3 mb-2 text-xs font-bold text-[#e8185a] text-left py-1"
+                onClick={() => openMobileOptions("stops")}
+              >
+                Fades y SFX de parada →
+              </button>
+            </>
+          )}
+
+          {store.activeTool === "bubble" && (
+            <div className="p-3 flex flex-col gap-2 max-h-[40vh] overflow-y-auto bg-[#14141e]">
+              <div className="flex items-center gap-2 flex-wrap">
+                <label className="text-xs font-bold text-zinc-400 shrink-0">Parada</label>
+                <select
+                  value={activePanelIdx}
+                  onChange={(e) => {
+                    const idx = parseInt(e.target.value, 10);
+                    setActivePanelIdx(idx);
+                    store.setSelection({ kind: "stop", panelIdx: idx });
+                  }}
+                  className="flex-1 text-sm bg-[#0a0a0f] text-white border border-white/10 rounded px-2 py-2"
+                  disabled={panels.length === 0}
+                >
+                  {panels.length === 0 ? (
+                    <option value={0}>Creá una parada primero</option>
+                  ) : (
+                    panels.map((_, idx) => (
+                      <option key={idx} value={idx}>
+                        Parada {idx + 1}
+                      </option>
+                    ))
+                  )}
+                </select>
+              </div>
+              <div>
+                <span className="text-xs font-bold text-zinc-400 uppercase tracking-wider block mb-1">Tipo de globo</span>
+                <BubbleStyleSelect activeStyle={store.pendingBubbleStyle} onStyleChange={store.setPendingBubbleStyle} />
+                <p className="text-[10px] text-zinc-500 mt-1">Tocá el lienzo para colocar con este tipo.</p>
+              </div>
+              {selectedLine && store.selection.kind === "bubble" ? (
+                <>
+                  <div>
+                    <label className="text-xs font-bold text-zinc-300 block mb-1">Texto</label>
+                    <textarea
+                      value={selectedLine.text || ""}
+                      onChange={(e) => updateSelectedBubble({ text: e.target.value })}
+                      rows={3}
+                      className="w-full text-sm bg-[#0a0a0f] text-white border border-white/15 rounded px-2 py-2 resize-none focus:outline-none focus:ring-2 focus:ring-[#e8185a]"
+                      placeholder="Escribí el diálogo…"
+                    />
+                  </div>
+                  <FloatingToolbar
+                    variant="compact"
+                    hideStyleSelect
+                    line={selectedLine}
+                    speakers={speakers}
+                    onUpdate={updateSelectedBubble}
+                    onDuplicate={() => {
+                      const { panelIdx, bubbleIdx } = store.selection as { kind: "bubble"; panelIdx: number; bubbleIdx: number };
+                      store.duplicateBubble(panelIdx, bubbleIdx);
+                    }}
+                    onDelete={() => {
+                      const { panelIdx, bubbleIdx } = store.selection as { kind: "bubble"; panelIdx: number; bubbleIdx: number };
+                      store.removeBubble(panelIdx, bubbleIdx);
+                    }}
+                  />
+                  <button
+                    type="button"
+                    className="text-xs font-bold text-[#e8185a] text-left py-1"
+                    onClick={() => openMobileOptions("bubble")}
+                  >
+                    Opciones avanzadas del globo →
+                  </button>
+                </>
+              ) : (
+                <p className="text-xs text-zinc-500 italic">Seleccioná un globo en el lienzo para editar texto y estilo.</p>
+              )}
+            </div>
+          )}
+
+          {store.activeTool === "mask" && (
+            <div className="p-3 flex flex-col gap-2 bg-[#14141e]">
+              <div className="flex items-center gap-2">
+                <label className="text-xs font-bold text-zinc-400 shrink-0">Parada</label>
+                <select
+                  value={activePanelIdx}
+                  onChange={(e) => {
+                    const idx = parseInt(e.target.value, 10);
+                    setActivePanelIdx(idx);
+                    store.setSelection({ kind: "stop", panelIdx: idx });
+                  }}
+                  className="flex-1 text-sm bg-[#0a0a0f] text-white border border-white/10 rounded px-2 py-2"
+                >
+                  {panels.map((_, idx) => (
+                    <option key={idx} value={idx}>
+                      Parada {idx + 1}
+                    </option>
+                  ))}
+                </select>
+              </div>
+              <p className="text-xs text-zinc-400">Dibujá rectángulos de máscara en el lienzo. Seleccioná uno para ajustar fades.</p>
+              <button
+                type="button"
+                className="text-sm font-bold py-2 px-3 rounded bg-zinc-800 hover:bg-zinc-700 text-left"
+                onClick={() => openMobileOptions("mask")}
+              >
+                Opciones de máscara →
+              </button>
+            </div>
+          )}
         </div>
       </div>
 
-      <div className="lg:hidden shrink-0 flex items-center gap-2 px-3 py-2 border-t border-white/10 bg-[#12121c]">
-        <button type="button" className="flex-1 min-h-11 bg-zinc-800 rounded font-bold" onClick={() => setPagesOpen(true)}>
-          Páginas
-        </button>
-        <button type="button" className="flex-1 min-h-11 bg-zinc-800 rounded font-bold" onClick={() => setInspectorOpen(true)}>
-          Inspector
-        </button>
-        <button
-          type="button"
-          className={`flex-1 min-h-11 rounded font-bold ${
-            saveStatus === "success" ? "bg-green-600" : saveStatus === "error" ? "bg-red-600" : "bg-[#e8185a]"
-          }`}
-          onClick={handleSaveChanges}
-          disabled={isSaving}
-        >
-          {isSaving ? "…" : saveStatus === "success" ? "Guardado" : "Guardar"}
-        </button>
+      <MobileToolNav activeTool={store.activeTool} onToolChange={setTool} />
+
+      <div className="hidden lg:block">
+        <StopsTimeline {...stopsTimelineProps} variant="default" />
       </div>
 
-      <StopsTimeline
-        panels={panels}
-        activePanelIdx={activePanelIdx}
-        selection={store.selection}
-        onSelect={(idx) => {
-          setActivePanelIdx(idx);
-          store.setSelection({ kind: "stop", panelIdx: idx });
-        }}
-        onReorder={store.reorderPanels}
-        onAddStop={() => {
-          store.addPanel();
-          setActivePanelIdx(panels.length);
-        }}
-        onDelete={deleteSelection}
-        onPickSound={() => setSoundPickerOpen(true)}
-      />
-      {metaOpen && (
-        <MetaPanel sagaId={saga.id} chapterId={chapter.id} onClose={() => setMetaOpen(false)} />
-      )}
+      {metaOpen && <MetaPanel sagaId={saga.id} chapterId={chapter.id} onClose={() => setMetaOpen(false)} />}
       {pagesOpen && (
         <PageManager
           pages={pages}
@@ -346,32 +567,17 @@ export function EditorV2({
           onApplied={() => window.location.reload()}
         />
       )}
-      {inspectorOpen && (
+
+      {mobileOptionsOpen && (
         <div className="lg:hidden fixed inset-0 z-[160] bg-black/60 flex items-end">
           <div className="w-full max-h-[85vh] bg-[#12121c] rounded-t-2xl overflow-y-auto pb-[env(safe-area-inset-bottom)]">
-            <div className="flex justify-between items-center px-4 py-3 border-b border-white/10">
-              <span className="font-bold">Inspector</span>
-              <button type="button" className="min-h-11 min-w-11 text-2xl" onClick={() => setInspectorOpen(false)}>
+            <div className="flex justify-between items-center px-4 py-3 border-b border-white/10 sticky top-0 bg-[#12121c] z-10">
+              <span className="font-bold font-[var(--font-bangers)] text-lg tracking-wide">Opciones</span>
+              <button type="button" className="min-h-11 min-w-11 text-2xl leading-none" onClick={() => setMobileOptionsOpen(false)}>
                 ×
               </button>
             </div>
-            <Inspector
-              pageIdx={pageIdx}
-              pages={pages}
-              pageData={pageData}
-              localDialogues={localDialogues}
-              panels={panels}
-              activePanelIdx={activePanelIdx}
-              selection={store.selection}
-              activeTool={store.activeTool}
-              soundPickerOpen={soundPickerOpen}
-              onCloseSoundPicker={() => setSoundPickerOpen(false)}
-              onUpdateBubble={store.updateBubble}
-              onUpdatePanel={store.updatePanel}
-              onUpdateAudioTracks={store.updateAudioTracks}
-              onUpdatePage={store.updatePage}
-              onUpdateMask={store.updateMaskRect}
-            />
+            <Inspector {...inspectorCommon} viewMode={optionsViewMode} showHeader={false} />
           </div>
         </div>
       )}
