@@ -195,6 +195,14 @@ function revCount(range, dir) {
   }
 }
 
+function isGitAncestor(ancestor, descendant, dir) {
+  const result = spawnSync("git", ["merge-base", "--is-ancestor", ancestor, descendant], {
+    cwd: dir,
+    encoding: "utf-8",
+  });
+  return result.status === 0;
+}
+
 function mergeTargetBranchBeforePublish(dir, publishTarget) {
   assertAllowedPublishBranch(publishTarget);
   const remoteRef = `origin/${publishTarget}`;
@@ -204,20 +212,46 @@ function mergeTargetBranchBeforePublish(dir, publishTarget) {
     throw new Error(`No se pudo hacer fetch de origin/${publishTarget}: ${error.message}`);
   }
 
-  const behind = revCount(`HEAD..${remoteRef}`, dir);
-  if (behind > 0) {
-    console.log(`Integrando ${behind} commit(s) de ${remoteRef} antes de publicar...`);
-    const mergeResult = spawnSync(
-      "git",
-      ["merge", remoteRef, "-m", `merge ${publishTarget} into workspace before publish`],
-      { cwd: dir, stdio: "inherit" }
-    );
-    if (mergeResult.status !== 0) {
-      throw new Error(
-        `Merge con ${remoteRef} falló. Resolvé conflictos en editor-workspace antes de publicar.`
-      );
-    }
+  if (isGitAncestor(remoteRef, "HEAD", dir)) {
+    return;
   }
+
+  const behind = revCount(`HEAD..${remoteRef}`, dir);
+  const label =
+    behind > 0
+      ? `${behind} commit(s) de ${remoteRef}`
+      : `historial divergente con ${remoteRef}`;
+  console.log(`Integrando ${label} antes de publicar...`);
+  const mergeResult = spawnSync(
+    "git",
+    ["merge", remoteRef, "-m", `merge ${publishTarget} into workspace before publish`],
+    { cwd: dir, stdio: "inherit" }
+  );
+  if (mergeResult.status !== 0) {
+    throw new Error(
+      `Merge con ${remoteRef} falló. Resolvé conflictos en editor-workspace antes de publicar.`
+    );
+  }
+}
+
+function pushHeadToBranch(dir, branch) {
+  assertAllowedPublishBranch(branch);
+  gitSpawn(["push", "origin", `HEAD:${branch}`], dir, true);
+}
+
+function pushToPublishTargets(dir, publishTarget) {
+  try {
+    pushHeadToBranch(dir, publishTarget);
+  } catch (error) {
+    const msg = error.message || "";
+    if (!/rejected|non-fast-forward|fetch first/i.test(msg)) {
+      throw error;
+    }
+    console.log("Push rechazado (non-fast-forward). Reintentando tras integrar main...");
+    mergeTargetBranchBeforePublish(dir, publishTarget);
+    pushHeadToBranch(dir, publishTarget);
+  }
+  gitSpawn(["push", "origin", "HEAD:editor-workspace", "--force-with-lease"], dir, true);
 }
 
 // Helper para publicar un repositorio. Devuelve { pushed, error }.
@@ -256,8 +290,7 @@ function publishRepo(name, dir) {
           console.log(`📤 Nada que commitear, pero ${ahead} commit(s) por publicar a ${publishTarget}...`);
         }
         console.log("Haciendo git push...");
-        gitSpawn(["push", "origin", `HEAD:${publishTarget}`], dir, true);
-        gitSpawn(["push", "origin", "HEAD:editor-workspace", "--force-with-lease"], dir, true);
+        pushToPublishTargets(dir, publishTarget);
         pushed = true;
         console.log(`🎉 ¡${name} publicado con éxito!\n`);
       } else if (!status) {

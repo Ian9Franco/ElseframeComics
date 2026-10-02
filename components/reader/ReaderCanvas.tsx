@@ -334,8 +334,8 @@ export function ReaderCanvas({
       onWheel={mode === "read" ? handleWheel : undefined}
       onDoubleClick={mode === "read" ? handleDoubleClick : undefined}
       onClick={mode === "read" ? onReaderClick : undefined}
-      className={`relative flex-1 h-full overflow-hidden select-none ${
-        mode === "edit" ? "bg-zinc-900 border-r-3 border-[#0a0a0f]" : "brand-grain"
+      className={`relative flex-1 h-full overflow-hidden select-none brand-grain ${
+        mode === "edit" ? "border-r-3 border-[#0a0a0f]/40" : ""
       } ${
         mode === "read"
           ? isPanning

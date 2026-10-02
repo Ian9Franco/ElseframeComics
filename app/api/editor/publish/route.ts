@@ -15,6 +15,7 @@ let currentProcess: ChildProcess | null = null;
 let publishLog: string[] = [];
 let publishStatus: "idle" | "running" | "success" | "error" = "idle";
 let lastRunId: number | null = null;
+let publishDispatchInFlight = false;
 
 function mapGithubStatus(run: { status: string; conclusion: string | null }): "idle" | "running" | "success" | "error" {
   if (run.status === "queued" || run.status === "in_progress" || run.status === "pending" || run.status === "waiting") {
@@ -72,6 +73,15 @@ export async function POST(request: NextRequest) {
 
   // En Vercel no hay proceso local: el lock en memoria quedaba en "running" para siempre.
   if (useRemotePublish()) {
+    if (publishDispatchInFlight) {
+      return NextResponse.json(
+        {
+          error: "Ya se está disparando una publicación. Esperá unos segundos.",
+          runId: lastRunId,
+        },
+        { status: 409 }
+      );
+    }
     const remote = await remotePublishInProgress();
     if (remote.running) {
       return NextResponse.json(
@@ -95,6 +105,8 @@ export async function POST(request: NextRequest) {
   }
 
   if (useRemotePublish()) {
+    publishDispatchInFlight = true;
+    publishStatus = "running";
     try {
       await assertEditorGithubAccess();
       const dispatched = await dispatchWorkflow({
@@ -107,8 +119,10 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ success: true, runId: dispatched.runId });
     } catch (error: any) {
       publishStatus = "error";
-      const message = formatGithubApiAuthError(error?.message || "No se pudo publicar");
-      return NextResponse.json({ error: message }, { status: 500 });
+      const errMessage = formatGithubApiAuthError(error?.message || "No se pudo publicar");
+      return NextResponse.json({ error: errMessage }, { status: 500 });
+    } finally {
+      publishDispatchInFlight = false;
     }
   }
 
