@@ -13,7 +13,7 @@ export function PublishModal({ isOpen, onClose }: PublishModalProps) {
   const [status, setStatus] = useState<"idle" | "running" | "success" | "error">("idle");
   const [log, setLog] = useState<string[]>([]);
   const [runId, setRunId] = useState<number | null>(null);
-  const [runUrl, setRunUrl] = useState<string | null>(null);
+  const [workflowRunUrl, setWorkflowRunUrl] = useState<string | null>(null);
 
   useEffect(() => {
     let interval: ReturnType<typeof setInterval>;
@@ -27,7 +27,7 @@ export function PublishModal({ isOpen, onClose }: PublishModalProps) {
             if (d.status) setStatus(d.status);
             if (d.log) setLog(d.log);
             if (d.runId) setRunId(d.runId);
-            if (d.runUrl) setRunUrl(d.runUrl);
+            if (d.workflowRunUrl) setWorkflowRunUrl(d.workflowRunUrl);
           });
       }, 2000);
     }
@@ -124,9 +124,9 @@ export function PublishModal({ isOpen, onClose }: PublishModalProps) {
             <div className="bg-[#0a0a0f] text-green-400 p-3 rounded font-mono text-xs h-64 overflow-y-auto whitespace-pre-wrap">
               {log.join("")}
             </div>
-            {runUrl && (
+            {workflowRunUrl && (
               <a
-                href={runUrl}
+                href={workflowRunUrl}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="text-sm text-[#e8185a] font-bold underline"
@@ -144,7 +144,7 @@ export function PublishModal({ isOpen, onClose }: PublishModalProps) {
                 onClick={() => {
                   setStatus("idle");
                   setRunId(null);
-                  setRunUrl(null);
+                  setWorkflowRunUrl(null);
                   onClose();
                 }}
                 className="bg-zinc-200 text-[#0a0a0f] font-[var(--font-bangers)] text-xl py-2 px-4 border-2 border-[#0a0a0f] shadow-[3px_3px_0_#0a0a0f] hover:translate-x-0.5 hover:translate-y-0.5 hover:shadow-[1px_1px_0_#0a0a0f] transition-all mt-2"

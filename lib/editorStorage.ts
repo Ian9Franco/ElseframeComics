@@ -29,12 +29,18 @@ export function contextRepoPath(sagaFolder: string, chapterFolder: string) {
   return `public/comics/${sagaFolder}/${chapterFolder}/ai-context.json`;
 }
 
+function readLocalRepoFile(relativePath: string): string | null {
+  const root = path.resolve(process.cwd());
+  const full = path.resolve(root, relativePath);
+  if (!full.startsWith(`${root}${path.sep}`)) return null;
+  if (!fs.existsSync(full)) return null;
+  return fs.readFileSync(full, "utf-8");
+}
+
 /** Lectura de archivos en la rama `main` (lector público en producción). */
 export async function loadMainBranchTextFile(relativePath: string): Promise<string | null> {
   if (process.env.NODE_ENV === "development") {
-    const full = path.join(process.cwd(), relativePath);
-    if (!fs.existsSync(full)) return null;
-    return fs.readFileSync(full, "utf-8");
+    return readLocalRepoFile(relativePath);
   }
 
   try {
@@ -52,9 +58,9 @@ export async function loadEditorTextFile(relativePath: string): Promise<{
   source: "workspace" | "main" | "filesystem";
 }> {
   if (!useGithubEditorStorage()) {
-    const full = path.join(process.cwd(), relativePath);
-    if (!fs.existsSync(full)) return { content: "", sha: null, source: "filesystem" };
-    return { content: fs.readFileSync(full, "utf-8"), sha: null, source: "filesystem" };
+    const content = readLocalRepoFile(relativePath);
+    if (!content) return { content: "", sha: null, source: "filesystem" };
+    return { content, sha: null, source: "filesystem" };
   }
 
   await ensureEditorBranch(GITHUB_MAIN_REPO);

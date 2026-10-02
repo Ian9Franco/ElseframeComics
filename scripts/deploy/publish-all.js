@@ -164,13 +164,30 @@ function generateCommitMessage(statusText, baseMsg) {
   return `editor [${timeStr}] - ${changeSummary}${context} (${baseMsg})`;
 }
 
-function gitOutput(cmd, dir) {
-  return execSync(cmd, { cwd: dir, encoding: "utf-8" }).trim();
+const ALLOWED_PUBLISH_BRANCHES = new Set(["main", "editor-workspace"]);
+
+function assertAllowedPublishBranch(branch) {
+  if (!branch || !ALLOWED_PUBLISH_BRANCHES.has(branch)) {
+    throw new Error(`Rama de publicación no permitida: ${branch}`);
+  }
+}
+
+function gitSpawn(args, dir, inherit = false) {
+  const result = spawnSync("git", args, {
+    cwd: dir,
+    encoding: "utf-8",
+    stdio: inherit ? "inherit" : "pipe",
+  });
+  if (result.status !== 0) {
+    const detail = result.stderr?.trim() || result.stdout?.trim() || `git ${args.join(" ")}`;
+    throw new Error(detail);
+  }
+  return (result.stdout || "").trim();
 }
 
 function revCount(range, dir) {
   try {
-    const out = gitOutput(`git rev-list --count ${range}`, dir);
+    const out = gitSpawn(["rev-list", "--count", range], dir);
     const n = parseInt(out, 10);
     return Number.isFinite(n) ? n : 0;
   } catch {
@@ -179,9 +196,10 @@ function revCount(range, dir) {
 }
 
 function mergeTargetBranchBeforePublish(dir, publishTarget) {
+  assertAllowedPublishBranch(publishTarget);
   const remoteRef = `origin/${publishTarget}`;
   try {
-    execSync(`git fetch origin ${publishTarget}`, { cwd: dir, stdio: "inherit" });
+    gitSpawn(["fetch", "origin", publishTarget], dir, true);
   } catch (error) {
     throw new Error(`No se pudo hacer fetch de origin/${publishTarget}: ${error.message}`);
   }
@@ -216,7 +234,7 @@ function publishRepo(name, dir) {
     console.log("Staging de archivos...");
     execSync("git add .", { cwd: dir, stdio: "inherit" });
 
-    const status = gitOutput("git status --porcelain", dir);
+    const status = gitSpawn(["status", "--porcelain"], dir);
     if (status) {
       console.log("Creando commit...");
       const dynamicCommitMsg = generateCommitMessage(status, commitMsg);
@@ -231,14 +249,15 @@ function publishRepo(name, dir) {
     }
 
     if (publishTarget) {
+      assertAllowedPublishBranch(publishTarget);
       const ahead = revCount(`origin/${publishTarget}..HEAD`, dir);
       if (ahead > 0) {
         if (!status) {
           console.log(`📤 Nada que commitear, pero ${ahead} commit(s) por publicar a ${publishTarget}...`);
         }
         console.log("Haciendo git push...");
-        execSync(`git push origin HEAD:${publishTarget}`, { cwd: dir, stdio: "inherit" });
-        execSync("git push origin HEAD:editor-workspace --force-with-lease", { cwd: dir, stdio: "inherit" });
+        gitSpawn(["push", "origin", `HEAD:${publishTarget}`], dir, true);
+        gitSpawn(["push", "origin", "HEAD:editor-workspace", "--force-with-lease"], dir, true);
         pushed = true;
         console.log(`🎉 ¡${name} publicado con éxito!\n`);
       } else if (!status) {
