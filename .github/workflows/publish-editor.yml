@@ -103,6 +103,16 @@ jobs:
           set -euo pipefail
           git fetch origin main editor-workspace --prune
 
+      # editor-workspace suele no tener los fixes de publish-all.js (solo vive en main).
+      # Sin esto, Actions corre un script viejo: push directo sin merge → non-fast-forward.
+      - name: Use publish script from main
+        working-directory: the-boys
+        run: |
+          set -euo pipefail
+          git fetch origin main
+          git checkout origin/main -- scripts/deploy/publish-all.js
+          node -e "const fs=require('fs'); const s=fs.readFileSync('scripts/deploy/publish-all.js','utf8'); if(!s.includes('pushToPublishTargets')) { console.error('publish-all.js from main is missing expected helpers'); process.exit(1); }"
+
       - name: Publish
         id: publish
         working-directory: the-boys
