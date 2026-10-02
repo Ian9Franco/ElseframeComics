@@ -51,7 +51,7 @@ jobs:
         with:
           ref: editor-workspace
           path: the-boys
-          fetch-depth: 1
+          fetch-depth: 0
 
       - name: Checkout assets workspace
         env:
@@ -98,6 +98,7 @@ jobs:
           git config --global user.email "actions@github.com"
 
       - name: Publish
+        id: publish
         working-directory: the-boys
         env:
           PUBLISH_TARGET_BRANCH: main
@@ -105,11 +106,35 @@ jobs:
           GH_TOKEN: ${{ secrets.ELSEFRAME_PUBLISH_TOKEN }}
           ASSETS_PAT_AUTH: ${{ steps.pat.outputs.mode }}
         run: |
+          set -euo pipefail
           if [ "$ASSETS_PAT_AUTH" = "auth" ]; then
             git -C ../theboyz-comic-v1 remote set-url origin \
               "https://x-access-token:${GH_TOKEN}@github.com/Ian9Franco/theboyz-comic-v1.git"
+            git -C ../theboyz-comic-v1 fetch origin main --depth=50 || true
           else
             echo "Sin PAT válido: no se intentará push a theboyz-comic-v1 si hubiera cambios en assets."
             export PUBLISH_SKIP_ASSETS_PUSH=1
           fi
-          npm run publish:all "${{ inputs.message }}"
+          npm run publish:all "${{ inputs.message }}" | tee /tmp/publish-all.log
+          if ! grep -q "PUBLISH_MAIN_PUSHED=1" /tmp/publish-all.log; then
+            WS_SHA=$(git rev-parse HEAD)
+            git fetch origin main
+            if ! git merge-base --is-ancestor "$WS_SHA" origin/main; then
+              echo "::error::Publicación no llevó editor-workspace a main (workspace $WS_SHA no está en origin/main)."
+              echo "Los guardados del editor ya están commiteados en editor-workspace; hace falta push a main."
+              exit 1
+            fi
+            echo "main ya contenía el workspace; no hubo commits nuevos que publicar."
+          fi
+
+      - name: Verify main contains workspace tip
+        working-directory: the-boys
+        run: |
+          set -euo pipefail
+          git fetch origin main editor-workspace
+          WS_SHA=$(git rev-parse origin/editor-workspace)
+          if ! git merge-base --is-ancestor "$WS_SHA" origin/main; then
+            echo "::error::Tras publicar, origin/main aún no incluye el tip de editor-workspace ($WS_SHA)."
+            exit 1
+          fi
+          echo "OK: origin/main incluye editor-workspace @ $WS_SHA"

@@ -18,7 +18,12 @@ import {
   resolveFolderName,
 } from "@/lib/githubComics";
 import { validateEditorAccess } from "@/lib/editorAccess";
-import { dialoguesRepoPath, loadEditorTextFile, resolveChapterFolders } from "@/lib/editorStorage";
+import {
+  dialoguesRepoPath,
+  loadEditorTextFile,
+  loadMainBranchTextFile,
+  resolveChapterFolders,
+} from "@/lib/editorStorage";
 import { GITHUB_EDITOR_BRANCH } from "@/lib/githubEditor";
 import fs from "fs";
 import path from "path";
@@ -156,13 +161,20 @@ export async function GET(
   const dialogues = await (async () => {
     try {
       const location = await resolveChapterFolders(foundChapter.id);
-      if (editorSource && location) {
-        const loaded = await loadEditorTextFile(
-          dialoguesRepoPath(location.sagaFolder, location.chapterFolder)
-        );
-        dialoguesSha = loaded.sha;
-        if (!loaded.content.trim()) return { pages: {} };
-        return JSON.parse(loaded.content);
+      if (location) {
+        const repoPath = dialoguesRepoPath(location.sagaFolder, location.chapterFolder);
+
+        if (editorSource) {
+          const loaded = await loadEditorTextFile(repoPath);
+          dialoguesSha = loaded.sha;
+          if (!loaded.content.trim()) return { pages: {} };
+          return JSON.parse(loaded.content);
+        }
+
+        const mainContent = await loadMainBranchTextFile(repoPath);
+        if (mainContent?.trim()) {
+          return JSON.parse(mainContent);
+        }
       }
 
       const comicsDir  = path.join(process.cwd(), "public", "comics");

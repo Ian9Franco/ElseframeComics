@@ -29,6 +29,23 @@ export function contextRepoPath(sagaFolder: string, chapterFolder: string) {
   return `public/comics/${sagaFolder}/${chapterFolder}/ai-context.json`;
 }
 
+/** Lectura de archivos en la rama `main` (lector público en producción). */
+export async function loadMainBranchTextFile(relativePath: string): Promise<string | null> {
+  if (process.env.NODE_ENV === "development") {
+    const full = path.join(process.cwd(), relativePath);
+    if (!fs.existsSync(full)) return null;
+    return fs.readFileSync(full, "utf-8");
+  }
+
+  try {
+    const main = await getFile(GITHUB_MAIN_REPO, relativePath, "main");
+    return main?.content ?? null;
+  } catch (error) {
+    console.error("[editorStorage] loadMainBranchTextFile failed:", error);
+    return null;
+  }
+}
+
 export async function loadEditorTextFile(relativePath: string): Promise<{
   content: string;
   sha: string | null;

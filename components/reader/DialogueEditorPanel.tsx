@@ -331,11 +331,11 @@ export function DialogueEditorPanel({
       </div>
 
       {/* Local Backup Notification & Recovery Banner */}
-      {hasLocalBackup && (
+      {hasLocalBackup && hasUnsavedChanges && (
         <div className="p-3 border-b border-amber-500/30 bg-amber-950/40 text-amber-200 text-xs flex flex-col gap-2 shadow-inner">
           <div className="flex items-center justify-between">
             <span className="font-bold flex items-center gap-1.5 text-amber-300 font-[var(--font-marker)]">
-              ⚡ Respaldo Automático Guardado en Local
+              ⚡ Solo en este dispositivo hasta Guardar JSON
             </span>
             {backupTimestamp && (
               <span className="text-[10px] font-mono text-amber-400/80">
@@ -344,7 +344,8 @@ export function DialogueEditorPanel({
             )}
           </div>
           <p className="text-[11px] text-amber-200/90 leading-tight">
-            Tus cambios se guardan solos en tiempo real en tu navegador. Si refrescas por accidente, puedes recuperar todo con un clic.
+            Hay una copia en el navegador (localStorage). Otros dispositivos no la ven hasta que pulses{" "}
+            <strong className="text-amber-100">Guardar JSON</strong> y luego <strong className="text-amber-100">Publicar</strong> para llevarlo a producción.
           </p>
           <div className="flex items-center gap-2 pt-0.5">
             {restoreLocalBackup && (

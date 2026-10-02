@@ -13,6 +13,7 @@ export function PublishModal({ isOpen, onClose }: PublishModalProps) {
   const [status, setStatus] = useState<"idle" | "running" | "success" | "error">("idle");
   const [log, setLog] = useState<string[]>([]);
   const [runId, setRunId] = useState<number | null>(null);
+  const [runUrl, setRunUrl] = useState<string | null>(null);
 
   useEffect(() => {
     let interval: ReturnType<typeof setInterval>;
@@ -26,6 +27,7 @@ export function PublishModal({ isOpen, onClose }: PublishModalProps) {
             if (d.status) setStatus(d.status);
             if (d.log) setLog(d.log);
             if (d.runId) setRunId(d.runId);
+            if (d.runUrl) setRunUrl(d.runUrl);
           });
       }, 2000);
     }
@@ -84,7 +86,13 @@ export function PublishModal({ isOpen, onClose }: PublishModalProps) {
         {status === "idle" && (
           <>
             <p className="text-sm text-zinc-600">
-              Esto publica el workspace del editor. En local corre <code className="bg-zinc-100 px-1 rounded border border-zinc-300">npm run publish:all</code>. En producción dispara GitHub Actions (WebP, audio, sync, commit y push a main).
+              <strong className="text-[#0a0a0f]">Guardar JSON</strong> guarda en el workspace del editor (rama{" "}
+              <code className="bg-zinc-100 px-1 rounded border border-zinc-300">editor-workspace</code>).{" "}
+              <strong className="text-[#0a0a0f]">Publicar</strong> lleva ese workspace a{" "}
+              <code className="bg-zinc-100 px-1 rounded border border-zinc-300">main</code> para que todos los lectores lo vean.
+            </p>
+            <p className="text-xs text-zinc-500">
+              En local corre <code className="bg-zinc-100 px-0.5 rounded">npm run publish:all</code>. En producción dispara GitHub Actions (sync, commit y push a main + deploy Vercel).
             </p>
             <div className="flex flex-col gap-1">
               <label className="text-xs font-bold text-zinc-700">Mensaje de Commit</label>
@@ -116,11 +124,27 @@ export function PublishModal({ isOpen, onClose }: PublishModalProps) {
             <div className="bg-[#0a0a0f] text-green-400 p-3 rounded font-mono text-xs h-64 overflow-y-auto whitespace-pre-wrap">
               {log.join("")}
             </div>
+            {runUrl && (
+              <a
+                href={runUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-sm text-[#e8185a] font-bold underline"
+              >
+                Ver ejecución en GitHub Actions
+              </a>
+            )}
+            {status === "success" && (
+              <p className="text-xs text-zinc-600">
+                Cuando Vercel termine el deploy, abrí el capítulo en modo lectura (sin editor) en otro navegador para confirmar.
+              </p>
+            )}
             {status !== "running" && (
               <button
                 onClick={() => {
                   setStatus("idle");
                   setRunId(null);
+                  setRunUrl(null);
                   onClose();
                 }}
                 className="bg-zinc-200 text-[#0a0a0f] font-[var(--font-bangers)] text-xl py-2 px-4 border-2 border-[#0a0a0f] shadow-[3px_3px_0_#0a0a0f] hover:translate-x-0.5 hover:translate-y-0.5 hover:shadow-[1px_1px_0_#0a0a0f] transition-all mt-2"

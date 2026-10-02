@@ -328,22 +328,6 @@ export function CinematicReader({
       .catch(() => {});
   }, [isAuthorized, chapter.id]);
 
-  useEffect(() => {
-    if (!isAuthorized) return;
-    const pass = typeof window !== "undefined" ? sessionStorage.getItem("editor_password") || "" : "";
-    fetch(`/api/chapters/${encodeURIComponent(chapter.id)}?source=editor`, {
-      headers: { "x-editor-password": pass },
-    })
-      .then((r) => (r.ok ? r.json() : null))
-      .then((data) => {
-        if (!data) return;
-        if (data.dialogues) setWorkspaceDialogues(data.dialogues);
-        if (data.dialoguesSha !== undefined) setWorkspaceSha(data.dialoguesSha ?? null);
-        if (Array.isArray(data.pages) && data.pages.length > 0) setWorkspacePageUrls(data.pages);
-      })
-      .catch(() => {});
-  }, [isAuthorized, chapter.id]);
-
   const prevModeRef = useRef(mode);
   useEffect(() => {
     if (prevModeRef.current !== mode) {
