@@ -52,7 +52,9 @@ jobs:
         with:
           ref: editor-workspace
           path: the-boys
-          fetch-depth: 0
+          # Default depth=1: evita bajar ~1.5GB de historial (public/comics en commits viejos).
+          fetch-depth: 1
+          show-progress: false
 
       - name: Record workspace commit
         id: ws
@@ -73,9 +75,9 @@ jobs:
           if git ls-remote --exit-code "$REPO" refs/heads/editor-workspace >/dev/null 2>&1; then
             BRANCH=editor-workspace
           fi
-          # Blobless (no shallow): el merge con main necesita historial; las imágenes se bajan solo si hacen falta.
-          git clone --filter=blob:none --branch "$BRANCH" "$REPO" theboyz-comic-v1
-          git -C theboyz-comic-v1 fetch origin main
+          # Shallow + blobless remote: historial mínimo; blobs de HEAD bajo demanda si hace falta.
+          git clone --filter=blob:none --single-branch --depth 1 --branch "$BRANCH" "$REPO" theboyz-comic-v1
+          git -C theboyz-comic-v1 fetch --depth=64 origin main
 
           if [ "$BRANCH" = "editor-workspace" ] && \
              ! git -C theboyz-comic-v1 merge-base --is-ancestor origin/editor-workspace origin/main; then
@@ -98,11 +100,16 @@ jobs:
 
       # editor-workspace puede tener versiones viejas de los scripts. Se usan los de main,
       # copiados fuera del checkout para que el working tree quede limpio para el merge.
+      - name: Deepen refs for merge (shallow CI)
+        run: |
+          set -euo pipefail
+          git -C the-boys fetch --depth=64 origin main editor-workspace
+          git -C theboyz-comic-v1 fetch --depth=64 origin main || true
+
       - name: Load publish scripts from main
         working-directory: the-boys
         run: |
           set -euo pipefail
-          git fetch origin main editor-workspace --prune
           mkdir -p "$RUNNER_TEMP/publish-tools"
           git show origin/main:scripts/deploy/publish-all.js > "$RUNNER_TEMP/publish-tools/publish-all.js"
           git show origin/main:scripts/deploy/sync-placeholders.js > "$RUNNER_TEMP/publish-tools/sync-placeholders.js"
@@ -141,7 +148,7 @@ jobs:
           WS_SHA: ${{ steps.ws.outputs.sha }}
         run: |
           set -euo pipefail
-          git fetch origin main
+          git fetch --depth=64 origin main
           if ! git merge-base --is-ancestor "$WS_SHA" origin/main; then
             echo "::error::Tras publicar, origin/main aún no incluye editor-workspace @ $WS_SHA."
             exit 1
