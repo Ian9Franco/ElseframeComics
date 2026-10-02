@@ -1,8 +1,15 @@
 "use client";
 
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, useMemo } from "react";
 import type { AudioTrack, AudioTrackStopTrigger, Dialogues } from "./audioPlayer";
 import { getPageKeyFromUrl, getComicAssetUrl } from "./readerUtils";
+import { filterSoundsForEditorPicker, isReaderSystemSound } from "@/lib/readerSystemSounds";
+import {
+  describeStopTrigger,
+  describeTrackSpan,
+  isTrackActiveAtPosition,
+  pageNumberFromKey,
+} from "@/lib/editorAudioHelpers";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -77,15 +84,8 @@ function buildStopTrigger(form: TrackFormState): AudioTrackStopTrigger | undefin
 }
 
 /** Returns a human-readable description of a stop trigger */
-function describeTrigger(trigger?: AudioTrackStopTrigger): string {
-  if (!trigger) return "Nunca (manual / fin del cap.)";
-  switch (trigger.type) {
-    case "panelStart": return `Al llegar a pág ${trigger.pageKey}, viñeta ${trigger.panelIdx + 1}`;
-    case "panelEnd":   return `Al salir de pág ${trigger.pageKey}, viñeta ${trigger.panelIdx + 1}`;
-    case "pageStart":  return `Al comenzar pág ${trigger.pageKey}`;
-    case "pageEnd":    return `Al terminar pág ${trigger.pageKey}`;
-    default:           return "";
-  }
+function describeTrigger(trigger?: AudioTrackStopTrigger, pages: string[] = []): string {
+  return describeStopTrigger(trigger, pages);
 }
 
 // ─── Component ────────────────────────────────────────────────────────────────
@@ -116,7 +116,9 @@ export function EditorAudioTracks({
   useEffect(() => {
     fetch("/api/sounds")
       .then((r) => r.json())
-      .then(setAvailableSounds)
+      .then((data) =>
+        setAvailableSounds(filterSoundsForEditorPicker(Array.isArray(data) ? data : []))
+      )
       .catch((err) => console.error("Error loading sounds:", err));
   }, []);
 
@@ -126,6 +128,11 @@ export function EditorAudioTracks({
   // Count panels for a given pageKey
   const panelCountForPage = (pageKey: string): number =>
     localDialogues.pages?.[pageKey]?.panels?.length ?? 0;
+
+  const editableTracks = useMemo(
+    () => audioTracks.filter((t) => !isReaderSystemSound(t.src)),
+    [audioTracks]
+  );
 
   // ─── Preview helpers ───────────────────────────────────────────────────────
 
@@ -334,7 +341,7 @@ export function EditorAudioTracks({
         <div className="flex items-center gap-1.5 font-[var(--font-bangers)] text-lg text-zinc-300 tracking-wider">
           <span>🔊 Pistas de Audio</span>
           <span className="text-xs font-mono bg-zinc-800 text-zinc-300 px-1.5 py-0.5 rounded-full border border-white/10">
-            {audioTracks.length}
+            {editableTracks.length}
           </span>
         </div>
         {!showForm && (
@@ -350,21 +357,29 @@ export function EditorAudioTracks({
 
       <div className="px-4 pb-4 flex flex-col gap-3 bg-[#0a0a0f] pt-2">
           {/* ── Track List ── */}
-          {audioTracks.length === 0 && !showForm && (
+          {editableTracks.length === 0 && !showForm && (
             <div className="text-sm text-zinc-500 italic text-center py-4 border border-dashed border-white/10 rounded">
               No hay pistas. Usá "+ Nueva Pista" para agregar música o SFX persistente.
             </div>
           )}
 
-          {audioTracks.map((track) => {
+          {editableTracks.map((track) => {
             const isPreviewing = previewingId === track.id;
             const layerColor = track.layer === "music" ? "bg-purple-950/20 border-purple-900/40 text-purple-250" : "bg-amber-950/20 border-amber-900/40 text-amber-250";
             const layerBadge = track.layer === "music"
               ? "bg-purple-650 text-white"
               : "bg-orange-650 text-white";
+            const currentKey =
+              currentPageIdx !== undefined && pageKeys[currentPageIdx]
+                ? pageKeys[currentPageIdx]
+                : pageKeys[0] ?? "";
+            const activeHere =
+              currentKey &&
+              activePanelIdx !== undefined &&
+              isTrackActiveAtPosition(track, currentKey, activePanelIdx, pages);
 
             return (
-              <div key={track.id} className={`border rounded p-3 flex flex-col gap-2 ${layerColor}`}>
+              <div key={track.id} className={`border rounded p-3 flex flex-col gap-2 ${layerColor} ${activeHere ? "ring-1 ring-[#e8185a]/60" : ""}`}>
                 {/* Track header */}
                 <div className="flex items-center justify-between gap-2">
                   <div className="flex items-center gap-2 min-w-0">
@@ -405,16 +420,14 @@ export function EditorAudioTracks({
                 </div>
 
                 {/* Track details */}
-                <div className="flex flex-col gap-0.5">
-                  <div className="flex gap-2 text-[9px] font-mono text-zinc-400">
-                    <span className="bg-[#0a0a0f] px-1.5 py-0.5 rounded border border-white/5">
-                      ▶ Pág {track.startPageKey}, Viñeta {track.startPanelIdx + 1}
-                    </span>
-                    <span className="bg-[#0a0a0f] px-1.5 py-0.5 rounded border border-white/5">
-                      ⏹ {describeTrigger(track.stopTrigger)}
-                    </span>
-                  </div>
-                  <div className="flex gap-2 text-[8px] text-zinc-500 font-mono">
+                <div className="flex flex-col gap-1">
+                  <p className="text-[11px] sm:text-xs font-bold text-zinc-200 leading-snug">
+                    {describeTrackSpan(track, pages)}
+                  </p>
+                  {activeHere && (
+                    <span className="text-[10px] font-bold text-[#e8185a]">▶ Suena en tu posición actual</span>
+                  )}
+                  <div className="flex flex-wrap gap-2 text-[10px] text-zinc-500 font-mono">
                     <span>Vol: {Math.round((track.soundConfig?.volume ?? 1) * 100)}%</span>
                     <span>×{track.soundConfig?.playbackRate ?? 1}</span>
                     {track.soundConfig?.loop && <span>🔁 Loop</span>}
@@ -552,12 +565,12 @@ export function EditorAudioTracks({
                       className="text-[8px] px-1 py-0.5 border border-white/10 rounded font-mono bg-[#0a0a0f] text-white focus:outline-none focus:ring-1 focus:ring-blue-500 cursor-pointer"
                     >
                       {pageKeys.map((k) => (
-                        <option key={k} value={k}>Pág {k}</option>
+                        <option key={k} value={k}>Pág {pageNumberFromKey(pages, k)} ({k})</option>
                       ))}
                     </select>
                   </div>
                   <div className="flex flex-col gap-0.5">
-                    <label className="text-[8px] font-mono text-zinc-500">Viñeta</label>
+                    <label className="text-[8px] font-mono text-zinc-500">Parada</label>
                     <select
                       value={form.startPanelIdx}
                       onChange={(e) => handleFormChange("startPanelIdx", parseInt(e.target.value))}
@@ -599,13 +612,13 @@ export function EditorAudioTracks({
                         className="text-[8px] px-1 py-0.5 border border-white/10 rounded font-mono bg-[#0a0a0f] text-white focus:outline-none focus:ring-1 focus:ring-blue-500 cursor-pointer"
                       >
                         {pageKeys.map((k) => (
-                          <option key={k} value={k}>Pág {k}</option>
+                          <option key={k} value={k}>Pág {pageNumberFromKey(pages, k)} ({k})</option>
                         ))}
                       </select>
                     </div>
                     {needsPanelSelector && (
                       <div className="flex flex-col gap-0.5">
-                        <label className="text-[8px] font-mono text-zinc-500">Viñeta</label>
+                        <label className="text-[8px] font-mono text-zinc-500">Parada</label>
                         <select
                           value={form.stopPanelIdx}
                           onChange={(e) => handleFormChange("stopPanelIdx", parseInt(e.target.value))}

@@ -1,6 +1,8 @@
 import { readdirSync, statSync, existsSync } from 'fs';
 import { join, relative } from 'path';
 import { AUDIO_FILE_NAME_REGEX, getAssetsSoundsDir } from '@/lib/serverData';
+import { fetchGithubSoundFiles } from '@/lib/githubSounds';
+import { filterSoundsForEditorPicker } from '@/lib/readerSystemSounds';
 
 function getFilesRecursively(dir: string, baseDir: string, filesList: Array<{ name: string; path: string }> = []) {
   if (!existsSync(dir)) return filesList;
@@ -41,7 +43,14 @@ export async function GET() {
       });
     }
 
-    const sounds = Array.from(map.values()).sort((a, b) => a.name.localeCompare(b.name));
+    const remote = await fetchGithubSoundFiles();
+    remote.forEach((s) => {
+      if (!map.has(s.path)) map.set(s.path, s);
+    });
+
+    const sounds = filterSoundsForEditorPicker(
+      Array.from(map.values()).sort((a, b) => a.name.localeCompare(b.name))
+    );
     return Response.json(sounds);
   } catch (error) {
     console.error('Error reading sounds directory:', error);

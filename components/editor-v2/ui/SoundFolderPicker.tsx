@@ -2,6 +2,7 @@
 
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import { getComicAssetUrl } from "@/components/reader/readerUtils";
+import { filterSoundsForEditorPicker } from "@/lib/readerSystemSounds";
 
 type SoundFile = { name: string; path: string };
 
@@ -50,7 +51,7 @@ export function SoundFolderPicker({
   useEffect(() => {
     fetch("/api/sounds")
       .then((r) => r.json())
-      .then((data) => setFiles(Array.isArray(data) ? data : []))
+      .then((data) => setFiles(filterSoundsForEditorPicker(Array.isArray(data) ? data : [])))
       .catch(() => setFiles([]));
     return () => {
       audioRef.current?.pause();

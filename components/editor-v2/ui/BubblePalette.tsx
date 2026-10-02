@@ -24,6 +24,31 @@ const PALETTE_ICONS: Record<BubbleStylePreset, typeof MessageSquare> = {
   sfx: Sparkles,
 };
 
+export function BubbleStyleSelect({
+  activeStyle,
+  onStyleChange,
+  className = "",
+}: {
+  activeStyle: BubbleStylePreset;
+  onStyleChange: (s: BubbleStylePreset) => void;
+  className?: string;
+}) {
+  return (
+    <select
+      value={activeStyle}
+      onChange={(e) => onStyleChange(e.target.value as BubbleStylePreset)}
+      className={`w-full text-sm bg-[#0a0a0f] text-white border border-white/10 rounded px-2 py-2 font-bold ${className}`}
+      aria-label="Tipo de globo"
+    >
+      {BUBBLE_PALETTE.map((item) => (
+        <option key={item.id} value={item.id}>
+          {item.emoji} {item.label}
+        </option>
+      ))}
+    </select>
+  );
+}
+
 export function BubblePalette({
   activeStyle,
   onStyleChange,

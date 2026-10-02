@@ -7,7 +7,8 @@ import {
   Dialogues,
   playAudioWithGain,
 } from "./audioPlayer";
-import { getPageKeyFromUrl, getComicAssetUrl } from "./readerUtils";
+import { getComicAssetUrl, getPageKeyFromUrl } from "./readerUtils";
+import { isReaderSystemSound } from "@/lib/readerSystemSounds";
 
 const BACKGROUND_DUCK_GAIN = 0.3;
 const DUCK_ATTACK_MS = 300;
@@ -85,7 +86,7 @@ export function useReaderAudio({
     if (mode !== "read" || soundsToPlay.length === 0) return;
 
     soundsToPlay.forEach((soundItem) => {
-      if (!soundItem.sound) return;
+      if (!soundItem.sound || isReaderSystemSound(soundItem.sound)) return;
 
       const config = soundItem.soundConfig || {};
       const panelFade = activePanel?.audioFade;
@@ -207,7 +208,7 @@ export function useReaderAudio({
       setActiveMusicTrack(null);
       return;
     }
-    const tracks = localDialogues.audioTracks || [];
+    const tracks = (localDialogues.audioTracks || []).filter((t) => !isReaderSystemSound(t.src));
     const activeTracks = activeTracksRef.current;
     const currentPageKey = getPageKeyFromUrl(pages[pageIdx]) || "";
 
@@ -349,7 +350,7 @@ export function useReaderAudio({
     if (fadeMs <= 0) return;
 
     const timers: NodeJS.Timeout[] = [];
-    const tracks = localDialogues.audioTracks || [];
+    const tracks = (localDialogues.audioTracks || []).filter((t) => !isReaderSystemSound(t.src));
     tracks.forEach((track) => {
       if (!track.pauseOnFade) return;
       const ctrl = activeTracksRef.current.get(track.id);
