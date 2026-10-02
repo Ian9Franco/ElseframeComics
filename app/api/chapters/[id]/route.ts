@@ -165,13 +165,13 @@ export async function GET(
         const repoPath = dialoguesRepoPath(location.sagaFolder, location.chapterFolder);
 
         if (editorSource) {
-          const loaded = await loadEditorTextFile(repoPath);
+          const loaded = await loadEditorTextFile(repoPath, foundChapter.id);
           dialoguesSha = loaded.sha;
           if (!loaded.content.trim()) return { pages: {} };
           return JSON.parse(loaded.content);
         }
 
-        const mainContent = await loadMainBranchTextFile(repoPath);
+        const mainContent = await loadMainBranchTextFile(foundChapter.id);
         if (mainContent?.trim()) {
           return JSON.parse(mainContent);
         }

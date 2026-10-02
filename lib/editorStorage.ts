@@ -29,27 +29,26 @@ export function contextRepoPath(sagaFolder: string, chapterFolder: string) {
   return `public/comics/${sagaFolder}/${chapterFolder}/ai-context.json`;
 }
 
-function readLocalRepoFile(relativePath: string): string | null {
-  const normalized = relativePath.replace(/\\/g, "/");
-  const parts = normalized.match(
-    /^public\/comics\/([^/]+)\/([^/]+)\/(dialogues\.json|ai-context\.json)$/
-  );
-  if (!parts) return null;
-
-  const [, sagaFolder, chapterFolder, fileName] = parts;
-  const full = path.join(process.cwd(), "public", "comics", sagaFolder, chapterFolder, fileName);
-  if (!fs.existsSync(full)) return null;
-  return fs.readFileSync(full, "utf-8");
+function readChapterFileFromDisk(chapterId: string, fileName: "dialogues.json" | "ai-context.json"): string | null {
+  const local = findLocalChapter(chapterId);
+  if (!local) return null;
+  const filePath = path.join(local.chapterPath, fileName);
+  if (!fs.existsSync(filePath)) return null;
+  return fs.readFileSync(filePath, "utf-8");
 }
 
-/** Lectura de archivos en la rama `main` (lector público en producción). */
-export async function loadMainBranchTextFile(relativePath: string): Promise<string | null> {
-  if (process.env.NODE_ENV === "development") {
-    return readLocalRepoFile(relativePath);
+/** Lectura de dialogues.json en la rama `main` (lector público en producción). */
+export async function loadMainBranchTextFile(chapterId: string): Promise<string | null> {
+  if (!useGithubEditorStorage()) {
+    return readChapterFileFromDisk(chapterId, "dialogues.json");
   }
 
+  const location = await resolveChapterFolders(chapterId);
+  if (!location) return null;
+  const repoPath = dialoguesRepoPath(location.sagaFolder, location.chapterFolder);
+
   try {
-    const main = await getFile(GITHUB_MAIN_REPO, relativePath, "main");
+    const main = await getFile(GITHUB_MAIN_REPO, repoPath, "main");
     return main?.content ?? null;
   } catch (error) {
     console.error("[editorStorage] loadMainBranchTextFile failed:", error);
@@ -57,13 +56,18 @@ export async function loadMainBranchTextFile(relativePath: string): Promise<stri
   }
 }
 
-export async function loadEditorTextFile(relativePath: string): Promise<{
+export async function loadEditorTextFile(
+  relativePath: string,
+  chapterId?: string
+): Promise<{
   content: string;
   sha: string | null;
   source: "workspace" | "main" | "filesystem";
 }> {
   if (!useGithubEditorStorage()) {
-    const content = readLocalRepoFile(relativePath);
+    if (!chapterId) return { content: "", sha: null, source: "filesystem" };
+    const fileName = relativePath.endsWith("ai-context.json") ? "ai-context.json" : "dialogues.json";
+    const content = readChapterFileFromDisk(chapterId, fileName);
     if (!content) return { content: "", sha: null, source: "filesystem" };
     return { content, sha: null, source: "filesystem" };
   }
