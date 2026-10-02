@@ -220,7 +220,7 @@
           "focusY": 0.09837612920574687,
           "dialogue": [
             { "text": "", "size": "small", "posX": 44.22854944209311, "posY": 31.21773598820059, "tailX": 44.22854944209311, "tailY": 46.21773598820059, "tailWidth": 6, "tailCurvature": -22, "width": 120, "fontSize": 8, "borderRadius": 18 },
-            { "text": "", "size": "small", "posX": 13.193887664897161, "posY": 17.685461773936765, "tailX": 31.866537717601528, "tailY": 35.79757011605416, "tailWidth": 6, "tailCurvature": -22, "width": 211.111083984375, "fontSize": 8, "borderRadius": 18 }
+            { "text": "asdasdsadaddsesdaweas", "size": "small", "posX": 11.97398510095475, "posY": 17.866188631238927, "tailX": 31.866537717601528, "tailY": 35.79757011605416, "tailWidth": 6, "tailCurvature": -22, "width": 389.99993896484375, "fontSize": 8, "borderRadius": 18 }
           ]
         }
       ]
