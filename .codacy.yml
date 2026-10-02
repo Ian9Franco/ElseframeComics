@@ -1,0 +1,5 @@
+---
+# Contenido de cómic editado desde el web editor: JSON e imágenes bajo public/comics.
+# No aplica las mismas reglas que código TypeScript de la app.
+exclude_paths:
+  - "public/comics/**"

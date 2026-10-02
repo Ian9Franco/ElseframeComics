@@ -1,3 +1,4 @@
+# Publicación de contenido del editor (JSON / sync de assets), no suite de tests de app.
 name: Publish Elseframe Editor
 
 on:
