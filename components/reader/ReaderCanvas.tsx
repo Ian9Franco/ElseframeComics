@@ -11,6 +11,7 @@ import { sceneFadeDurationMs, sceneFadeExit, sceneFadeOrigin } from "./sceneFade
 
 import { PageEndGesture } from "./PageEndGesture";
 import { MaskedPageImage, NeighborPages, type GhostPanel } from "./pageFlip/NeighborPages";
+import { measureVisiblePageRect, type PageRect } from "./pageFlip/useFlipExpand";
 import type { PageFlipController } from "./pageFlip/usePageFlipGesture";
 
 const PageFlip3D = dynamic(() => import("./pageFlip/PageFlip3D").then((m) => m.PageFlip3D), {
@@ -159,12 +160,40 @@ export function ReaderCanvas({
 }: ReaderCanvasProps) {
   const isLastPage = pageIdx === pages.length - 1;
   const flipDir = pageFlip?.direction ?? null;
-  const readLayoutAtFlip = React.useRef({ left: imgLeft, top: imgTop, width: imgWidth, height: imgHeight });
-  if (!flipDir) {
-    readLayoutAtFlip.current = { left: imgLeft, top: imgTop, width: imgWidth, height: imgHeight };
-  }
-  const flipRect = readLayoutAtFlip.current;
-  const sheetActive = !!flipDir && flipRect.width > 0;
+  const [lockedFlipRect, setLockedFlipRect] = React.useState<PageRect | null>(null);
+  const lockVisiblePage = React.useCallback(() => {
+    const measured = measureVisiblePageRect(imgRef.current);
+    if (measured) setLockedFlipRect(measured);
+  }, [imgRef]);
+  const hitFlipZone = React.useCallback(
+    (clientX: number, clientY: number, target: EventTarget | null): "next" | "prev" | null => {
+      if (target instanceof Element) {
+        const neighbor = target.closest("[data-flip-neighbor]");
+        const side = neighbor?.getAttribute("data-flip-neighbor");
+        if (side === "prev" || side === "next") return side;
+      }
+      const frame = imgRef.current?.parentElement;
+      if (!frame) return null;
+      const r = frame.getBoundingClientRect();
+      if (clientY < r.top || clientY > r.bottom) return null;
+      const edge = Math.max(36, Math.min(96, r.width * 0.18));
+      if (clientX >= r.left && clientX <= r.left + edge) return "prev";
+      if (clientX >= r.right - edge && clientX <= r.right) return "next";
+      if (clientX < r.left && clientX >= r.left - r.width) return "prev";
+      if (clientX > r.right && clientX <= r.right + r.width) return "next";
+      return null;
+    },
+    [imgRef]
+  );
+  React.useLayoutEffect(() => {
+    if (!flipDir) {
+      setLockedFlipRect(null);
+      return;
+    }
+    setLockedFlipRect((current) => current ?? measureVisiblePageRect(imgRef.current));
+  }, [flipDir, imgRef]);
+  const flipRect = lockedFlipRect ?? { left: imgLeft, top: imgTop, width: imgWidth, height: imgHeight };
+  const sheetActive = !!flipDir && !!lockedFlipRect && flipRect.width > 0;
   const neighborFrame = sheetActive
     ? {
         imgLeft: flipRect.left,
@@ -186,11 +215,14 @@ export function ReaderCanvas({
     (handleMouseUp as () => void)();
   };
   const onFlipMouseDown = (e: React.MouseEvent) => {
-    pageFlip?.onPointerStart(e.clientX, e.clientY, e.target);
-    handleMouseDown(e);
+    const zone = hitFlipZone(e.clientX, e.clientY, e.target);
+    pageFlip?.onPointerStart(e.clientX, e.clientY, e.target, zone);
+    if (!zone) handleMouseDown(e);
   };
   const onFlipMouseMove = (e: React.MouseEvent) => {
+    const hadDir = !!flipDir;
     if (pageFlip?.onPointerMove(e.clientX, e.clientY)) {
+      if (!hadDir) lockVisiblePage();
       takeOverFromPan();
       return;
     }
@@ -202,13 +234,20 @@ export function ReaderCanvas({
   };
   const onFlipTouchStart = (e: React.TouchEvent) => {
     const t = e.touches[0];
-    if (e.touches.length === 1 && t) pageFlip?.onPointerStart(t.clientX, t.clientY, e.target);
-    else pageFlip?.onPointerEnd();
-    handleTouchStart(e);
+    if (e.touches.length === 1 && t) {
+      const zone = hitFlipZone(t.clientX, t.clientY, e.target);
+      pageFlip?.onPointerStart(t.clientX, t.clientY, e.target, zone);
+      if (!zone) handleTouchStart(e);
+    } else {
+      pageFlip?.onPointerEnd();
+      handleTouchStart(e);
+    }
   };
   const onFlipTouchMove = (e: React.TouchEvent) => {
     const t = e.touches[0];
+    const hadDir = !!flipDir;
     if (e.touches.length === 1 && t && pageFlip?.onPointerMove(t.clientX, t.clientY)) {
+      if (!hadDir) lockVisiblePage();
       takeOverFromPan();
       return;
     }
@@ -328,6 +367,7 @@ export function ReaderCanvas({
         {/* Comic page frame: image + spoiler masks share the same pan/zoom transform */}
         {imgSize && (
           <div
+            data-page-frame="true"
             style={{
               position: "absolute",
               left: frameLayout.left,

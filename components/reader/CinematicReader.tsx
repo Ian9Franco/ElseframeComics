@@ -757,7 +757,7 @@ export function CinematicReader({
     enabled: mode === "read" && zoomScale <= 1.01,
     canNext: pageIdx < pages.length - 1,
     canPrev: pageIdx > 0,
-    pageWidth: pageSheetLayout.imgWidth > 0 ? pageSheetLayout.imgWidth : containerSize.w,
+    pageWidth: imgWidth > 0 ? imgWidth : containerSize.w,
     onCommit: (dir) =>
       resetPage(dir === "next" ? pageIdx + 1 : pageIdx - 1, { fromPageFlip: true }),
   });

@@ -52,6 +52,7 @@ export function usePageFlipGesture({
 
   const latest = useRef({ canNext, canPrev, pageWidth, onCommit });
   latest.current = { canNext, canPrev, pageWidth, onCommit };
+  const zoneRef = useRef<FlipDirection | null>(null);
 
   useEffect(() => {
     preloadPageFlipSound();
@@ -100,11 +101,16 @@ export function usePageFlipGesture({
   );
 
   const onPointerStart = useCallback(
-    (x: number, y: number, target: EventTarget | null) => {
+    (x: number, y: number, target: EventTarget | null, zone: FlipDirection | null = null) => {
       tracking.current = false;
+      zoneRef.current = null;
       if (!enabled || isAnimating()) return;
       if (target instanceof Element && target.closest(IGNORE_SELECTOR)) return;
+      if (!zone) return;
+      const allowed = zone === "next" ? latest.current.canNext : latest.current.canPrev;
+      if (!allowed) return;
       tracking.current = true;
+      zoneRef.current = zone;
       axis.current = "undecided";
       start.current = { x, y };
       lastSample.current = { x, t: performance.now() };
@@ -123,7 +129,7 @@ export function usePageFlipGesture({
       if (Math.hypot(dx, dy) < AXIS_LOCK_PX) return false;
       if (Math.abs(dx) > Math.abs(dy) * 1.15) {
         axis.current = "x";
-        const dir: FlipDirection = dx < 0 ? "next" : "prev";
+        const dir = zoneRef.current ?? (dx < 0 ? "next" : "prev");
         dirRef.current = dir;
         setDirection(dir);
       } else {

@@ -33,6 +33,21 @@ export function useFlipExpand(direction: FlipDirection | null, durationMs: numbe
 
 export type PageRect = { left: number; top: number; width: number; height: number };
 
+/** Painted page box in the zoom wrapper's local CSS pixels (matches the 3D canvas). */
+export function measureVisiblePageRect(img: HTMLElement | null): PageRect | null {
+  const frame = img?.parentElement;
+  if (!frame) return null;
+  const width = frame.offsetWidth;
+  const height = frame.offsetHeight;
+  if (width < 2 || height < 2) return null;
+  return {
+    left: frame.offsetLeft,
+    top: frame.offsetTop,
+    width,
+    height,
+  };
+}
+
 export function lerpPageRect(from: PageRect, to: PageRect, t: number): PageRect {
   return {
     left: from.left + (to.left - from.left) * t,

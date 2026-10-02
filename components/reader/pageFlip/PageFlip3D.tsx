@@ -53,8 +53,11 @@ function Sheet({
     backSynced.current = false;
   }, [backTexture]);
 
-  const spineX = rect.left - viewport.w / 2;
-  const centerY = -(rect.top + rect.height / 2 - viewport.h / 2);
+  const { size } = useThree();
+  const viewW = size.width || viewport.w;
+  const viewH = size.height || viewport.h;
+  const spineX = rect.left - viewW / 2;
+  const centerY = -(rect.top + rect.height / 2 - viewH / 2);
 
   useFrame((_, delta) => {
     const target = Math.min(1, Math.max(0, progressRef.current));
@@ -125,9 +128,11 @@ function Sheet({
   );
 }
 
-/** Keeps 1 world unit = 1 CSS pixel when the reader is resized (e.g. rotating a phone). */
-function CameraRig({ distance }: { distance: number }) {
+/** Keeps 1 world unit = 1 CSS pixel of the actual canvas, not a stale container size. */
+function CameraRig() {
   const camera = useThree((s) => s.camera);
+  const height = useThree((s) => s.size.height);
+  const distance = height > 0 ? height / 2 / Math.tan((FOV * Math.PI) / 360) : 1;
   useEffect(() => {
     camera.position.set(0, 0, distance);
     camera.far = distance * 4;
@@ -171,7 +176,7 @@ export function PageFlip3D({
         camera={{ fov: FOV, position: [0, 0, distance], near: 1, far: distance * 4 }}
         style={{ width: "100%", height: "100%", pointerEvents: "none" }}
       >
-        <CameraRig distance={distance} />
+        <CameraRig />
         <ambientLight intensity={0.86} />
         <directionalLight position={[0.4, 0.6, 1]} intensity={0.3} />
         {active && direction && (

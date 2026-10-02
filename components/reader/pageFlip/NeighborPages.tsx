@@ -135,7 +135,8 @@ export function NeighborPages({
       <div
         key={side}
         aria-hidden
-        className="absolute pointer-events-none select-none"
+        className="absolute pointer-events-auto select-none cursor-grab"
+        data-flip-neighbor={side}
         style={{
           left,
           top: imgTop,
