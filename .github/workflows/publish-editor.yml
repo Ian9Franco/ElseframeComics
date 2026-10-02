@@ -80,7 +80,7 @@ jobs:
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: 22
           cache: npm
           cache-dependency-path: the-boys/package-lock.json
 
@@ -97,6 +97,12 @@ jobs:
           git config --global user.name "Elseframe Editor"
           git config --global user.email "actions@github.com"
 
+      - name: Fetch git refs for publish merge
+        working-directory: the-boys
+        run: |
+          set -euo pipefail
+          git fetch origin main editor-workspace --prune
+
       - name: Publish
         id: publish
         working-directory: the-boys
@@ -107,6 +113,7 @@ jobs:
           ASSETS_PAT_AUTH: ${{ steps.pat.outputs.mode }}
         run: |
           set -euo pipefail
+          git fetch origin main editor-workspace --prune
           if [ "$ASSETS_PAT_AUTH" = "auth" ]; then
             git -C ../theboyz-comic-v1 remote set-url origin \
               "https://x-access-token:${GH_TOKEN}@github.com/Ian9Franco/theboyz-comic-v1.git"

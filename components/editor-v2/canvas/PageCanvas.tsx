@@ -222,7 +222,7 @@ export function PageCanvas({
   };
 
   if (!layout) {
-    return <div ref={containerRef} className="flex-1 bg-[#0a0a0f] flex items-center justify-center text-zinc-500">Cargando página…</div>;
+    return <div ref={containerRef} className="flex-1 brand-grain flex items-center justify-center text-zinc-400">Cargando página…</div>;
   }
 
   const { imgWidth, imgHeight, imgLeft, imgTop } = layout;
@@ -243,7 +243,7 @@ export function PageCanvas({
   return (
     <div
       ref={containerRef}
-      className="flex-1 relative overflow-hidden bg-[#0a0a0f] touch-none"
+      className="flex-1 relative overflow-hidden brand-grain touch-none"
       style={{ cursor }}
       onPointerDown={handlePointerDown}
       onPointerMove={handlePointerMove}
