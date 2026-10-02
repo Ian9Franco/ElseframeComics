@@ -1,8 +1,9 @@
 "use client";
 
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, useMemo } from "react";
 import type { AudioTrack, AudioTrackStopTrigger, Dialogues } from "./audioPlayer";
 import { getPageKeyFromUrl, getComicAssetUrl } from "./readerUtils";
+import { filterSoundsForEditorPicker, isReaderSystemSound } from "@/lib/readerSystemSounds";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -116,7 +117,9 @@ export function EditorAudioTracks({
   useEffect(() => {
     fetch("/api/sounds")
       .then((r) => r.json())
-      .then(setAvailableSounds)
+      .then((data) =>
+        setAvailableSounds(filterSoundsForEditorPicker(Array.isArray(data) ? data : []))
+      )
       .catch((err) => console.error("Error loading sounds:", err));
   }, []);
 
@@ -126,6 +129,11 @@ export function EditorAudioTracks({
   // Count panels for a given pageKey
   const panelCountForPage = (pageKey: string): number =>
     localDialogues.pages?.[pageKey]?.panels?.length ?? 0;
+
+  const editableTracks = useMemo(
+    () => audioTracks.filter((t) => !isReaderSystemSound(t.src)),
+    [audioTracks]
+  );
 
   // ─── Preview helpers ───────────────────────────────────────────────────────
 
@@ -334,7 +342,7 @@ export function EditorAudioTracks({
         <div className="flex items-center gap-1.5 font-[var(--font-bangers)] text-lg text-zinc-300 tracking-wider">
           <span>🔊 Pistas de Audio</span>
           <span className="text-xs font-mono bg-zinc-800 text-zinc-300 px-1.5 py-0.5 rounded-full border border-white/10">
-            {audioTracks.length}
+            {editableTracks.length}
           </span>
         </div>
         {!showForm && (
@@ -350,13 +358,13 @@ export function EditorAudioTracks({
 
       <div className="px-4 pb-4 flex flex-col gap-3 bg-[#0a0a0f] pt-2">
           {/* ── Track List ── */}
-          {audioTracks.length === 0 && !showForm && (
+          {editableTracks.length === 0 && !showForm && (
             <div className="text-sm text-zinc-500 italic text-center py-4 border border-dashed border-white/10 rounded">
               No hay pistas. Usá "+ Nueva Pista" para agregar música o SFX persistente.
             </div>
           )}
 
-          {audioTracks.map((track) => {
+          {editableTracks.map((track) => {
             const isPreviewing = previewingId === track.id;
             const layerColor = track.layer === "music" ? "bg-purple-950/20 border-purple-900/40 text-purple-250" : "bg-amber-950/20 border-amber-900/40 text-amber-250";
             const layerBadge = track.layer === "music"

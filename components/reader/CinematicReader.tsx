@@ -26,6 +26,7 @@ import { UnlockNotificationModal } from "@/components/UnlockNotificationModal";
 import { markChapterCompletionUnlock } from "@/lib/characterData/completionUnlocks";
 import { isPreviewAuthBypassedClient } from "@/lib/previewAuthClient";
 import { readEditorVersion, writeEditorVersion, type EditorVersion } from "@/lib/editorVersion";
+import { readPageFlipSoundEnabled, writePageFlipSoundEnabled } from "@/lib/readerSystemSounds";
 import { EditorV2 } from "@/components/editor-v2/EditorV2";
 
 export function CinematicReader({
@@ -210,6 +211,7 @@ export function CinematicReader({
   const [speedMultiplier, setSpeedMultiplierState] = useState<number>(1.0);
   const [focusEnabled, setFocusEnabled] = useState<boolean>(true);
   const [bubbleOpacity, setBubbleOpacityState] = useState<number>(0.90);
+  const [pageFlipSoundEnabled, setPageFlipSoundEnabledState] = useState<boolean>(true);
 
   useEffect(() => {
     if (typeof window !== "undefined") {
@@ -248,6 +250,7 @@ export function CinematicReader({
       if (savedBubbleOpacity !== null) {
         setBubbleOpacityState(parseFloat(savedBubbleOpacity));
       }
+      setPageFlipSoundEnabledState(readPageFlipSoundEnabled());
       const hasRead = localStorage.getItem("has_read_instructions") === "true";
       if (!hasRead) {
         setShowInstructions(true);
@@ -296,6 +299,11 @@ export function CinematicReader({
     if (typeof window !== "undefined") {
       localStorage.setItem("reader_bubble_opacity", String(value));
     }
+  };
+
+  const handleSetPageFlipSoundEnabled = (value: boolean) => {
+    setPageFlipSoundEnabledState(value);
+    writePageFlipSoundEnabled(value);
   };
 
   useEffect(() => {
@@ -1054,6 +1062,8 @@ export function CinematicReader({
         setPanOffset={setPanOffset}
         bubbleOpacity={bubbleOpacity}
         setBubbleOpacity={handleSetBubbleOpacity}
+        pageFlipSoundEnabled={pageFlipSoundEnabled}
+        setPageFlipSoundEnabled={handleSetPageFlipSoundEnabled}
         editorVersion={editorVersion}
         setEditorVersion={handleSetEditorVersion}
       />
