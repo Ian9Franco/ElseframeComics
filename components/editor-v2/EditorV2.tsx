@@ -55,7 +55,6 @@ export function EditorV2({
   const [dragStyle, setDragStyle] = useState<BubbleStylePreset | null>(null);
   const [guides, setGuides] = useState<{ axis: "x" | "y"; value: number }[]>([]);
   const [activePanelIdx, setActivePanelIdx] = useState(0);
-  const [soundPickerOpen, setSoundPickerOpen] = useState(false);
   const [metaOpen, setMetaOpen] = useState(false);
   const [pagesOpen, setPagesOpen] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -172,13 +171,17 @@ export function EditorV2({
     activePanelIdx,
     selection: store.selection,
     activeTool: store.activeTool,
-    soundPickerOpen,
-    onCloseSoundPicker: () => setSoundPickerOpen(false),
     onUpdateBubble: store.updateBubble,
     onUpdatePanel: store.updatePanel,
     onUpdateAudioTracks: store.updateAudioTracks,
     onUpdatePage: store.updatePage,
     onUpdateMask: store.updateMaskRect,
+  };
+
+  const scrollInspectorSection = (id: string) => {
+    requestAnimationFrame(() => {
+      document.getElementById(id)?.scrollIntoView({ behavior: "smooth", block: "start" });
+    });
   };
 
   const stopsTimelineProps = {
@@ -195,9 +198,16 @@ export function EditorV2({
       setActivePanelIdx(panels.length);
     },
     onDelete: deleteSelection,
-    onPickSound: () => {
-      setSoundPickerOpen(true);
+    onPickSfx: () => {
       if (isMobile) openMobileOptions("stops");
+      else {
+        setTool("stops");
+        scrollInspectorSection("inspector-parada-sfx");
+      }
+    },
+    onPickTrack: () => {
+      if (isMobile) openMobileOptions("audio");
+      else scrollInspectorSection("inspector-chapter-tracks");
     },
   };
 
@@ -572,7 +582,22 @@ export function EditorV2({
         <div className="lg:hidden fixed inset-0 z-[160] bg-black/60 flex items-end">
           <div className="w-full max-h-[85vh] bg-[#12121c] rounded-t-2xl overflow-y-auto pb-[env(safe-area-inset-bottom)]">
             <div className="flex justify-between items-center px-4 py-3 border-b border-white/10 sticky top-0 bg-[#12121c] z-10">
-              <span className="font-bold font-[var(--font-bangers)] text-lg tracking-wide">Opciones</span>
+              <div>
+                <span className="font-bold font-[var(--font-bangers)] text-lg tracking-wide">Opciones</span>
+                <p className="text-[11px] text-zinc-400 mt-0.5">
+                  {optionsViewMode === "audio"
+                    ? "Pistas con inicio y fin en el capítulo"
+                    : optionsViewMode === "stops"
+                      ? "Fades y SFX solo en esta parada"
+                      : optionsViewMode === "page"
+                        ? "Fades de toda la página"
+                        : optionsViewMode === "mask"
+                          ? "Fades de máscaras"
+                          : optionsViewMode === "bubble"
+                            ? "Globo seleccionado"
+                            : ""}
+                </p>
+              </div>
               <button type="button" className="min-h-11 min-w-11 text-2xl leading-none" onClick={() => setMobileOptionsOpen(false)}>
                 ×
               </button>

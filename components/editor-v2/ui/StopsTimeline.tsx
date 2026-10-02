@@ -12,7 +12,8 @@ export function StopsTimeline({
   onReorder,
   onAddStop,
   onDelete,
-  onPickSound,
+  onPickSfx,
+  onPickTrack,
   variant = "default",
 }: {
   panels: PanelStop[];
@@ -22,7 +23,8 @@ export function StopsTimeline({
   onReorder: (from: number, to: number) => void;
   onAddStop: () => void;
   onDelete: () => void;
-  onPickSound: () => void;
+  onPickSfx: () => void;
+  onPickTrack: () => void;
   variant?: "default" | "compact";
 }) {
   const dragFrom = React.useRef<number | null>(null);
@@ -40,10 +42,17 @@ export function StopsTimeline({
     <div className="flex flex-wrap items-center gap-2 shrink-0">
       <button
         type="button"
-        onClick={onPickSound}
-        className="px-3 py-2 rounded-lg bg-zinc-800 hover:bg-zinc-700 text-white text-xs font-bold"
+        onClick={onPickSfx}
+        className="px-3 py-2 rounded-lg bg-amber-900/60 hover:bg-amber-800/80 text-amber-50 text-xs font-bold border border-amber-700/40"
       >
-        Pista / SFX
+        SFX parada
+      </button>
+      <button
+        type="button"
+        onClick={onPickTrack}
+        className="px-3 py-2 rounded-lg bg-purple-900/60 hover:bg-purple-800/80 text-purple-50 text-xs font-bold border border-purple-700/40"
+      >
+        Pista capítulo
       </button>
       <button
         type="button"

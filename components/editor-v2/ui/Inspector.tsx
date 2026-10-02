@@ -1,16 +1,15 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import type { DialogueLine } from "@/components/reader/DialogueBubble";
-import type { AudioTrack, Dialogues, PageData, PanelStop, SceneFadeType, ZoomRect } from "@/components/reader/audioPlayer";
+import type { Dialogues, PageData, PanelStop, SceneFadeType, ZoomRect } from "@/components/reader/audioPlayer";
 import { EditorBubbleVisualsForm } from "@/components/reader/editor/EditorBubbleVisualsForm";
 import { EditorBubbleLayoutForm } from "@/components/reader/editor/EditorBubbleLayoutForm";
 import { EditorBubbleTailForm } from "@/components/reader/editor/EditorBubbleTailForm";
-import { SoundFolderPicker } from "./SoundFolderPicker";
+import { ParadaSfxEditor } from "./ParadaSfxEditor";
+import { EditorAudioTracks } from "@/components/reader/EditorAudioTracks";
 import type { EditorV2Tool, Selection } from "../types";
-import { getPageKeyFromUrl } from "@/components/reader/readerUtils";
 import { SCENE_FADE_OPTIONS } from "@/components/reader/sceneFade";
-import { isReaderSystemSound } from "@/lib/readerSystemSounds";
 
 export type InspectorViewMode = "full" | "stops" | "bubble" | "mask" | "page" | "audio";
 
@@ -114,8 +113,6 @@ export function Inspector({
   activePanelIdx,
   selection,
   activeTool,
-  soundPickerOpen,
-  onCloseSoundPicker,
   onUpdateBubble,
   onUpdatePanel,
   onUpdateAudioTracks,
@@ -132,8 +129,6 @@ export function Inspector({
   activePanelIdx: number;
   selection: Selection;
   activeTool: EditorV2Tool;
-  soundPickerOpen: boolean;
-  onCloseSoundPicker?: () => void;
   onUpdateBubble: (pIdx: number, bIdx: number, u: Partial<DialogueLine>) => void;
   onUpdatePanel: (pIdx: number, u: Partial<PanelStop>) => void;
   onUpdateAudioTracks: (tracks: NonNullable<Dialogues["audioTracks"]>) => void;
@@ -143,50 +138,16 @@ export function Inspector({
   showHeader?: boolean;
 }) {
   const [openAdvanced, setOpenAdvanced] = useState(false);
-  const [pickerMode, setPickerMode] = useState<"sfx" | "track">("sfx");
-  const [trackLayer, setTrackLayer] = useState<"music" | "sfx">("music");
-
-  useEffect(() => {
-    if (soundPickerOpen) {
-      setPickerMode("sfx");
-      onCloseSoundPicker?.();
-    }
-  }, [soundPickerOpen, onCloseSoundPicker]);
   const panel = panels[activePanelIdx];
   const maskPanelIdx = selection.kind === "mask" ? selection.panelIdx : activePanelIdx;
   const maskPanel = panels[maskPanelIdx];
   const maskRects = maskPanel?.zoomRects || (maskPanel?.zoomRect ? [maskPanel.zoomRect] : []);
   const activeBubbleIdx = selection.kind === "bubble" ? selection.bubbleIdx : null;
   const line = activeBubbleIdx !== null ? panel?.dialogue?.[activeBubbleIdx] : null;
-  const pageKey = getPageKeyFromUrl(pages[pageIdx]) || "";
-  const tracks = localDialogues.audioTracks ?? [];
-
-  const addSfx = (path: string) => {
-    if (!panel || isReaderSystemSound(path)) return;
-    const existing = panel.sounds || (panel.sound ? [{ sound: panel.sound, soundConfig: panel.soundConfig }] : []);
-    onUpdatePanel(activePanelIdx, {
-      sound: undefined,
-      sounds: [...existing, { sound: path }],
-    });
-  };
-
-  const addTrack = (path: string) => {
-    if (isReaderSystemSound(path)) return;
-    const track: AudioTrack = {
-      id: `track-${Date.now()}`,
-      layer: trackLayer,
-      src: path,
-      startPageKey: pageKey,
-      startPanelIdx: Math.max(0, activePanelIdx),
-      pauseOnFade: trackLayer === "music",
-    };
-    onUpdateAudioTracks([...tracks, track]);
-  };
-
   const showPage = viewMode === "full" || viewMode === "page";
   const showStopPanel = viewMode === "full" || viewMode === "stops";
   const showMask = viewMode === "full" || viewMode === "mask";
-  const showAudio = viewMode === "full" || viewMode === "stops" || viewMode === "audio";
+  const showAudio = viewMode === "full" || viewMode === "audio";
   const showBubbleAdvanced = viewMode === "full" || viewMode === "bubble";
 
   const pageSection = showPage ? (
@@ -203,40 +164,32 @@ export function Inspector({
     </div>
   ) : null;
 
-  const stopSection =
-    panel && showStopPanel ? (
-      <div className="p-4 border-b border-white/10 space-y-3">
-        <div className="text-sm font-bold text-zinc-300">Parada {activePanelIdx + 1}</div>
-        <FadeSliders
-          fadeIn={panel.fadeIn}
-          fadeOut={panel.fadeOut}
-          fadeInType={panel.fadeInType}
-          fadeOutType={panel.fadeOutType}
-          audioFade={panel.audioFade ?? false}
-          onChange={(u) => onUpdatePanel(activePanelIdx, u)}
-        />
-        <div className="space-y-1">
-          {(panel.sounds || (panel.sound ? [{ sound: panel.sound }] : []))
-            .filter((s) => !isReaderSystemSound(s.sound))
-            .map((s, i) => (
-            <div key={`${s.sound}-${i}`} className="flex items-center gap-2 text-sm">
-              <span className="truncate flex-1 text-zinc-400">{s.sound.split("/").pop()}</span>
-              <button
-                type="button"
-                className="text-red-400 text-xs"
-                onClick={() => {
-                  const list = [...(panel.sounds || (panel.sound ? [{ sound: panel.sound }] : []))];
-                  list.splice(i, 1);
-                  onUpdatePanel(activePanelIdx, { sounds: list, sound: undefined });
-                }}
-              >
-                Quitar
-              </button>
-            </div>
-          ))}
-        </div>
-      </div>
-    ) : null;
+  const stopSection = showStopPanel ? (
+    <div id="inspector-parada-sfx" className="p-4 border-b border-white/10 space-y-3 scroll-mt-4">
+      <div className="text-sm font-bold text-zinc-300">Parada {activePanelIdx + 1}</div>
+      {panel ? (
+        <>
+          <FadeSliders
+            fadeIn={panel.fadeIn}
+            fadeOut={panel.fadeOut}
+            fadeInType={panel.fadeInType}
+            fadeOutType={panel.fadeOutType}
+            audioFade={panel.audioFade ?? false}
+            onChange={(u) => onUpdatePanel(activePanelIdx, u)}
+          />
+          <ParadaSfxEditor
+            pages={pages}
+            pageIdx={pageIdx}
+            activePanelIdx={activePanelIdx}
+            panel={panel}
+            onUpdatePanel={onUpdatePanel}
+          />
+        </>
+      ) : (
+        <p className="text-sm text-zinc-500 italic">Agregá una parada para editar fades y SFX.</p>
+      )}
+    </div>
+  ) : null;
 
   const maskSection =
     showMask && (activeTool === "mask" || selection.kind === "mask" || viewMode === "mask") ? (
@@ -263,62 +216,21 @@ export function Inspector({
     ) : null;
 
   const audioSection = showAudio ? (
-    <div className="p-4 border-b border-white/10 space-y-3">
-      <div className="flex items-center justify-between gap-2 flex-wrap">
-        <span className="text-sm font-bold text-zinc-300">Audio</span>
-        <select
-          value={pickerMode}
-          onChange={(e) => setPickerMode(e.target.value as "sfx" | "track")}
-          className="text-xs bg-[#0a0a0f] border border-white/10 rounded px-2 py-1"
-        >
-          <option value="sfx">SFX en parada</option>
-          <option value="track">Pista de capítulo</option>
-        </select>
+    <div id="inspector-chapter-tracks" className="border-b border-white/10 scroll-mt-4">
+      <div className="px-4 pt-4 pb-2 space-y-1">
+        <div className="text-sm font-bold text-zinc-300">Pistas del capítulo</div>
+        <p className="text-[11px] text-zinc-400 leading-snug">
+          Música o ambientes con <span className="text-zinc-200">inicio y fin</span> en la página/parada que elijas. Cada tarjeta muestra el tramo completo (ej. Pág 2 · Parada 1 → al salir de Parada 3).
+        </p>
       </div>
-      {pickerMode === "track" && (
-        <label className="flex items-center gap-2 text-sm flex-wrap">
-          Tipo de pista
-          <select
-            value={trackLayer}
-            onChange={(e) => setTrackLayer(e.target.value as "music" | "sfx")}
-            className="bg-[#0a0a0f] border border-white/10 rounded px-2 py-1 text-sm"
-          >
-            <option value="music">Música</option>
-            <option value="sfx">SFX capítulo</option>
-          </select>
-        </label>
-      )}
-      {(pickerMode === "sfx" || pickerMode === "track") && (
-        <SoundFolderPicker onPick={pickerMode === "sfx" ? addSfx : addTrack} />
-      )}
-      {tracks.length > 0 && (
-        <div className="space-y-2">
-          {tracks.map((track) => (
-            <div key={track.id} className="p-2 rounded bg-[#161622] border border-white/10 space-y-1">
-              <div className="text-sm truncate">{track.src.split("/").pop()}</div>
-              <label className="flex items-center gap-2 text-xs text-zinc-400">
-                <input
-                  type="checkbox"
-                  checked={!!track.pauseOnFade}
-                  onChange={(e) =>
-                    onUpdateAudioTracks(
-                      tracks.map((t) => (t.id === track.id ? { ...t, pauseOnFade: e.target.checked } : t))
-                    )
-                  }
-                />
-                Pausar en el fade
-              </label>
-              <button
-                type="button"
-                className="text-xs text-red-400"
-                onClick={() => onUpdateAudioTracks(tracks.filter((t) => t.id !== track.id))}
-              >
-                Quitar pista
-              </button>
-            </div>
-          ))}
-        </div>
-      )}
+      <EditorAudioTracks
+        audioTracks={localDialogues.audioTracks ?? []}
+        pages={pages}
+        localDialogues={localDialogues}
+        onUpdate={onUpdateAudioTracks}
+        currentPageIdx={pageIdx}
+        activePanelIdx={activePanelIdx}
+      />
     </div>
   ) : null;
 
