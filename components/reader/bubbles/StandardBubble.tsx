@@ -274,8 +274,26 @@ export function StandardBubble({
                                       (isTransparent ? "p-2 text-2xl sm:text-4xl"    : "px-11 py-8 rounded-none text-xl sm:text-3xl");
   }
 
-  const hasElasticTail = line.tail !== "none" && line.tailX !== undefined && line.tailY !== undefined;
   const organicBalloon = style === "normal" || style === "whisper";
+  if (organicBalloon) {
+    if (style === "whisper") {
+      sizeClass =
+        size === "small"
+          ? "text-[10px] sm:text-xs leading-tight"
+          : size === "large"
+            ? "text-sm sm:text-base leading-normal"
+            : "text-xs sm:text-sm leading-snug";
+    } else {
+      sizeClass =
+        size === "small"
+          ? "text-xs leading-tight"
+          : size === "large"
+            ? "text-base sm:text-lg leading-normal"
+            : "text-sm sm:text-base leading-snug";
+    }
+  }
+
+  const hasElasticTail = line.tail !== "none" && line.tailX !== undefined && line.tailY !== undefined;
   const bodyRef = useRef<HTMLDivElement>(null);
   const [balloonBox, setBalloonBox] = useState({ w: 0, h: 0 });
 
@@ -312,9 +330,9 @@ export function StandardBubble({
     const ro = new ResizeObserver(measure);
     ro.observe(el);
     return () => ro.disconnect();
-  }, [organicBalloon, line.text, line.width, finalFontSize, textScale]);
+  }, [organicBalloon, line.text, line.width, finalFontSize, textScale, isMobile]);
 
-  const balloonBleed = 16;
+  const balloonBleed = isMobile ? 10 : 16;
   const balloonW = balloonBox.w + balloonBleed * 2;
   const balloonH = balloonBox.h + balloonBleed * 2;
   const balloonPath =
@@ -332,7 +350,10 @@ export function StandardBubble({
     "rgb($1, $2, $3)"
   );
   if (style !== "sfx") {
-    Object.assign(bubbleStyles, comicTextContainment(finalFontSize, organicBalloon ? finalFontSize * 0.35 : 0));
+    Object.assign(
+      bubbleStyles,
+      comicTextContainment(finalFontSize, 0, { mobile: isMobile, speechBalloon: organicBalloon })
+    );
   }
   bubbleStyles.fontSize = `${finalFontSize}px`;
   if (line.width)     bubbleStyles.maxWidth  = `${line.width}px`;

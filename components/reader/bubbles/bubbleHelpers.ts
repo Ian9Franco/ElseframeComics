@@ -489,7 +489,11 @@ export function comicBalloonSeed(index: number, text: string): number {
 }
 
 /** Padding and wrapping so glyphs stay inside the bubble at any font size. */
-export function comicTextContainment(fontSizePx: number, extraPad = 0): {
+export function comicTextContainment(
+  fontSizePx: number,
+  legacyExtraPad = 0,
+  opts?: { mobile?: boolean; speechBalloon?: boolean }
+): {
   paddingTop: string;
   paddingRight: string;
   paddingBottom: string;
@@ -501,9 +505,26 @@ export function comicTextContainment(fontSizePx: number, extraPad = 0): {
   boxSizing: "border-box";
   lineHeight: number;
 } {
-  const padX = Math.max(14, fontSizePx * 0.7) + extraPad;
-  const padY = Math.max(10, fontSizePx * 0.55) + extraPad * 0.65;
-  const descender = fontSizePx * 0.25;
+  const mobile = opts?.mobile ?? false;
+  const speech = opts?.speechBalloon ?? false;
+  let extra = legacyExtraPad;
+  if (speech) {
+    extra = mobile ? fontSizePx * 0.14 : fontSizePx * 0.35;
+  }
+
+  let padX: number;
+  let padY: number;
+  let descender: number;
+  if (mobile) {
+    padX = Math.max(6, fontSizePx * 0.42) + extra;
+    padY = Math.max(5, fontSizePx * 0.36) + extra * 0.65;
+    descender = fontSizePx * 0.18;
+  } else {
+    padX = Math.max(14, fontSizePx * 0.7) + extra;
+    padY = Math.max(10, fontSizePx * 0.55) + extra * 0.65;
+    descender = fontSizePx * 0.25;
+  }
+
   return {
     paddingTop: `${padY}px`,
     paddingRight: `${padX}px`,

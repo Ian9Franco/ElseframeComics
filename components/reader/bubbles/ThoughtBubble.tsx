@@ -76,9 +76,9 @@ export function ThoughtBubble({
   const thoughtBorderColor = line.customColor || "#ffffff";
   const thoughtSpeakerColor = getSpeakerColor(line.speaker, "#ffffff");
 
-  let thoughtSizeClass = "px-3 py-2 text-sm sm:text-base leading-snug";
-  if (size === "small") thoughtSizeClass = "px-2.5 py-1.5 text-xs leading-tight";
-  if (size === "large") thoughtSizeClass = "px-5 py-3 text-base sm:text-lg leading-normal";
+  let thoughtSizeClass = "text-sm sm:text-base leading-snug";
+  if (size === "small") thoughtSizeClass = "text-xs leading-tight";
+  if (size === "large") thoughtSizeClass = "text-base sm:text-lg leading-normal";
 
   let baseFontSize = line.fontSize;
   if (!baseFontSize) {
@@ -93,7 +93,7 @@ export function ThoughtBubble({
     border: `2px solid ${thoughtBorderColor}`,
     borderRadius: 0,
     fontSize: `${finalFontSize}px`,
-    ...comicTextContainment(finalFontSize),
+    ...comicTextContainment(finalFontSize, 0, { mobile: isMobile }),
   };
 
   if (line.width)       thoughtStyles.maxWidth   = `${line.width}px`;

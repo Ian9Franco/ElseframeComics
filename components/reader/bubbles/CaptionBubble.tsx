@@ -118,7 +118,7 @@ export function CaptionBubble({
   }
   const minFont = isMobile ? 8 : 10;
   const finalFontSize = Math.max(minFont, baseFontSize * textScale);
-  Object.assign(captionStyles, comicTextContainment(finalFontSize));
+  Object.assign(captionStyles, comicTextContainment(finalFontSize, 0, { mobile: isMobile }));
   captionStyles.fontSize = `${finalFontSize}px`;
   if (line.width)     captionStyles.maxWidth = `${line.width}px`;
   if (line.textColor) captionStyles.color    = line.textColor;
