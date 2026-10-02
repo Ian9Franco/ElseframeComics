@@ -48,7 +48,7 @@ export async function GET(request: NextRequest) {
         log.push("Listo. Esperá el deploy de Vercel (1–3 min) y probá en otro navegador.\n");
       }
       if (status === "error") log.push("Falló la publicación.\n");
-      return NextResponse.json({ status, log, runId, workflowRunUrl: run.html_url });
+      return NextResponse.json({ status, log, runId });
     } catch (error: any) {
       return NextResponse.json({ status: "error", log: [error.message], runId });
     }

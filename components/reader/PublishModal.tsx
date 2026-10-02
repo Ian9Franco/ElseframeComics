@@ -25,9 +25,13 @@ export function PublishModal({ isOpen, onClose }: PublishModalProps) {
           .then((r) => r.json())
           .then((d) => {
             if (d.status) setStatus(d.status);
-            if (d.log) setLog(d.log);
+            if (d.log) {
+              setLog(d.log);
+              const logText = Array.isArray(d.log) ? d.log.join("") : String(d.log);
+              const urlMatch = logText.match(/https:\/\/github\.com\/[^\s\n]+/);
+              setWorkflowRunUrl(urlMatch ? urlMatch[0] : null);
+            }
             if (d.runId) setRunId(d.runId);
-            if (d.workflowRunUrl) setWorkflowRunUrl(d.workflowRunUrl);
           });
       }, 2000);
     }
