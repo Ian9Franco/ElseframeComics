@@ -29,17 +29,15 @@ export function contextRepoPath(sagaFolder: string, chapterFolder: string) {
   return `public/comics/${sagaFolder}/${chapterFolder}/ai-context.json`;
 }
 
-/** Solo rutas bajo public/comics/... generadas por el servidor (sin segmentos ..). */
-const SAFE_REPO_RELATIVE_FILE =
-  /^public\/comics\/[^/\\]+\/[^/\\]+\/(dialogues\.json|ai-context\.json)$/;
-
 function readLocalRepoFile(relativePath: string): string | null {
   const normalized = relativePath.replace(/\\/g, "/");
-  if (!SAFE_REPO_RELATIVE_FILE.test(normalized)) return null;
+  const parts = normalized.match(
+    /^public\/comics\/([^/]+)\/([^/]+)\/(dialogues\.json|ai-context\.json)$/
+  );
+  if (!parts) return null;
 
-  const root = path.resolve(process.cwd());
-  const full = path.join(root, ...normalized.split("/"));
-  if (!full.startsWith(`${root}${path.sep}`)) return null;
+  const [, sagaFolder, chapterFolder, fileName] = parts;
+  const full = path.join(process.cwd(), "public", "comics", sagaFolder, chapterFolder, fileName);
   if (!fs.existsSync(full)) return null;
   return fs.readFileSync(full, "utf-8");
 }
