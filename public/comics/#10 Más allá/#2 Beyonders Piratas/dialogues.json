@@ -106,14 +106,18 @@
         },
         {
           "focusY": 0.736540152592784,
-          "dialogue": [],
+          "dialogue": [
+            { "text": "", "style": "thought", "size": "small", "posX": 71.14661654135335, "posY": 65.20328681373243, "tailX": 64.49673712583342, "tailY": 68.71713145965256, "tailWidth": 6, "tailCurvature": -22, "width": 96, "fontSize": 8, "borderRadius": 18 }
+          ],
           "zoomRects": [
             { "x": 0, "y": 60.568522372612485, "w": 100.05045847895897, "h": 18.94208075935979 }
           ]
         },
         {
           "focusY": 0.95,
-          "dialogue": [],
+          "dialogue": [
+            { "text": "", "size": "small", "posX": 44.22446129117592, "posY": 84.50362086515459, "tailX": 44.22446129117592, "tailY": 99.50362086515459, "tailWidth": 6, "tailCurvature": -22, "width": 96, "fontSize": 8, "borderRadius": 18 }
+          ],
           "zoomRects": [
             { "x": 0, "y": 78.7045571422123, "w": 99.74819123279894, "h": 21.49695435522771 }
           ]
