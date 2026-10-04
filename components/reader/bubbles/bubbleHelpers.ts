@@ -463,7 +463,7 @@ export function buildComicBalloonPath(
   const n = kind === "scallop" ? 18 : 12;
   const cx = w / 2;
   const cy = h / 2;
-  const fit = kind === "scallop" ? 1.14 : 1.06;
+  const fit = kind === "scallop" ? 1.1 : 1.02;
   const a = (w / 2 - 2) / fit;
   const b = (h / 2 - 2) / fit;
   const power = kind === "scallop" ? 2.15 : 3.1;
@@ -851,20 +851,20 @@ export function comicTextContainment(
   const speech = opts?.speechBalloon ?? false;
   let extra = legacyExtraPad;
   if (speech) {
-    extra = mobile ? fontSizePx * 0.14 : fontSizePx * 0.35;
+    extra = mobile ? fontSizePx * 0.1 : fontSizePx * 0.22;
   }
 
   let padX: number;
   let padY: number;
   let descender: number;
   if (mobile) {
-    padX = Math.max(6, fontSizePx * 0.42) + extra;
-    padY = Math.max(5, fontSizePx * 0.36) + extra * 0.65;
-    descender = fontSizePx * 0.18;
+    padX = Math.max(6, fontSizePx * 0.38) + extra;
+    padY = Math.max(5, fontSizePx * 0.32) + extra * 0.65;
+    descender = fontSizePx * 0.16;
   } else {
-    padX = Math.max(14, fontSizePx * 0.7) + extra;
-    padY = Math.max(10, fontSizePx * 0.55) + extra * 0.65;
-    descender = fontSizePx * 0.25;
+    padX = Math.max(10, fontSizePx * 0.48) + extra;
+    padY = Math.max(8, fontSizePx * 0.38) + extra * 0.65;
+    descender = fontSizePx * 0.2;
   }
 
   return {

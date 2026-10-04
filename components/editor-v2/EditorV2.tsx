@@ -82,6 +82,12 @@ export function EditorV2({
     }
   }, [store.selection]);
 
+  useEffect(() => {
+    if (isMobile && store.selection.kind === "bubble") {
+      openMobileOptions("bubble");
+    }
+  }, [isMobile, store.selection]);
+
   const speakers = useMemo(() => {
     const set = new Set<string>();
     Object.values(localDialogues.pages || {}).forEach((pg) => {
@@ -172,6 +178,7 @@ export function EditorV2({
     selection: store.selection,
     activeTool: store.activeTool,
     onUpdateBubble: store.updateBubble,
+    onUpdateBubbleLive: store.updateBubbleLive,
     onUpdatePanel: store.updatePanel,
     onUpdateAudioTracks: store.updateAudioTracks,
     onUpdatePage: store.updatePage,

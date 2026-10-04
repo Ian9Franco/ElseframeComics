@@ -148,8 +148,7 @@ export function EditorAudioTracks({
     stopPreview();
     const config = track.soundConfig || {};
     const audio = new Audio(getComicAssetUrl(track.src));
-    const volume = config.volume ?? 1;
-    const targetVolume = volume * volume;
+    const targetVolume = Math.max(0, Math.min(1, config.volume ?? 1));
     const playbackRate = config.playbackRate ?? 1;
     const startTime = config.startTime ?? 0;
 
@@ -253,7 +252,7 @@ export function EditorAudioTracks({
     if (previewingId === "__form_preview__" && previewAudioRef.current) {
       if (key === "volume") {
         const v = val as number;
-        previewAudioRef.current.volume = v * v;
+        previewAudioRef.current.volume = Math.max(0, Math.min(1, v));
       } else if (key === "playbackRate") {
         previewAudioRef.current.playbackRate = val as number;
       }

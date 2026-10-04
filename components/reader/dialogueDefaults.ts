@@ -1,4 +1,5 @@
 import type { DialogueLine } from "./DialogueBubble";
+import { suggestBubbleWidth } from "./readerUtils";
 
 export type DialogueSeed = Pick<DialogueLine, "text"> &
   Partial<
@@ -45,7 +46,18 @@ export function createDialogueLine(
     tailY: omitsTailGeometry ? undefined : seed.tailY ?? posY + 15,
     tailWidth: omitsTailGeometry ? undefined : 6,
     tailCurvature: omitsTailGeometry ? undefined : -22,
-    width: isCinematic ? 900 : isCaption ? 160 : 120,
+    width: isCinematic
+      ? 900
+      : isCaption
+        ? 160
+        : seed.text?.trim()
+          ? suggestBubbleWidth({
+              text: seed.text,
+              style,
+              size: seed.size ?? (isCinematic ? "large" : isCaption ? "medium" : "small"),
+              fontSize: isCinematic ? 76 : 8,
+            })
+          : 96,
     fontSize: isCinematic ? 76 : 8,
     borderRadius: isCinematic ? 0 : isCaption ? 4 : 18,
     tail: isCinematic ? "none" : seed.tail,

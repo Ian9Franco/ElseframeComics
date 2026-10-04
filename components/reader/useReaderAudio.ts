@@ -94,10 +94,14 @@ export function useReaderAudio({
         volume = 1,
         playbackRate = 1,
         loop = false,
-        fadeIn = panelFade ? activePanel.fadeIn ?? 0 : 0,
-        fadeOut = panelFade ? activePanel.fadeOut ?? 0 : 0,
+        fadeIn: cfgFadeIn = 0,
+        fadeOut: cfgFadeOut = 0,
         delay = 0,
       } = config;
+      const fadeIn =
+        cfgFadeIn > 0 ? cfgFadeIn : panelFade ? activePanel.fadeIn ?? 0 : 0;
+      const fadeOut =
+        cfgFadeOut > 0 ? cfgFadeOut : panelFade ? activePanel.fadeOut ?? 0 : 0;
       const soundStartTime = soundItem.soundStartTime || 0;
       const soundEndTime = soundItem.soundEndTime || undefined;
 
@@ -261,6 +265,7 @@ export function useReaderAudio({
           playbackRate = 1,
           loop = false,
           fadeIn = 0,
+          fadeOut = 0,
           delay = 0,
           startTime = 0,
           endTime,
@@ -275,8 +280,9 @@ export function useReaderAudio({
                 playbackRate,
                 loop,
                 fadeIn,
+                fadeOut,
                 startTime,
-                endTime
+                endTime,
               },
               () => {
                 activeTracks.delete(track.id);

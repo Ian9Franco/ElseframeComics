@@ -1,17 +1,21 @@
 // ─── Types ───────────────────────────────────────────────────────────────────
 
+export type SoundPlaybackConfig = {
+  volume?: number;
+  playbackRate?: number;
+  loop?: boolean;
+  fadeIn?: number;
+  fadeOut?: number;
+  delay?: number;
+  startTime?: number;
+  endTime?: number;
+};
+
 export type PanelSound = {
   sound: string;
   soundStartTime?: number;
   soundEndTime?: number;
-  soundConfig?: {
-    volume?: number;
-    playbackRate?: number;
-    loop?: boolean;
-    fadeIn?: number;
-    fadeOut?: number;
-    delay?: number;
-  };
+  soundConfig?: SoundPlaybackConfig;
 };
 
 export type SceneFadeType = "fade" | "wipeUp" | "wipeDown" | "wipeLeft" | "wipeRight" | "iris" | "cut";
@@ -40,14 +44,7 @@ export type PanelStop = {
   sound?: string; // Path to the audio file
   soundStartTime?: number; // in seconds
   soundEndTime?: number; // in seconds
-  soundConfig?: {
-    volume?: number; // 0 to 1 (default: 1)
-    playbackRate?: number; // 0.5 to 2 (default: 1)
-    loop?: boolean; // default: false
-    fadeIn?: number; // duration in ms (default: 0)
-    fadeOut?: number; // duration in ms (default: 0)
-    delay?: number; // delay before playing in ms (default: 0)
-  };
+  soundConfig?: SoundPlaybackConfig;
   sounds?: PanelSound[];
 };
 
@@ -66,16 +63,7 @@ export type AudioTrack = {
   startPageKey: string;
   startPanelIdx: number;
   stopTrigger?: AudioTrackStopTrigger;
-  soundConfig?: {
-    volume?: number;       // 0–1, default 1
-    playbackRate?: number; // 0.5–2, default 1
-    loop?: boolean;        // default false
-    fadeIn?: number;       // fade-in duration in ms
-    fadeOut?: number;      // fade-out duration in ms
-    delay?: number;        // delay before playing in ms
-    startTime?: number;    // seek to this offset when starting
-    endTime?: number;      // stop at this timestamp (seconds)
-  };
+  soundConfig?: SoundPlaybackConfig;
   /** If true, pause (don't kill) this track when a page/stop fade happens. */
   pauseOnFade?: boolean;
 };
@@ -152,10 +140,12 @@ export function playAudioWithGain(
 ): AudioPlaybackController {
   const ctx = getAudioContext();
   const volume = options.volume ?? 1;
-  const targetVolume = volume * volume; // logarithmic scaling
+  /** Linear 0–1 so editor % matches playback (no volume² curve). */
+  const baseVolume = Math.max(0, Math.min(1, volume));
   const playbackRate = options.playbackRate ?? 1;
   const loop = options.loop ?? false;
   const fadeIn = options.fadeIn ?? 0;
+  const fadeOut = options.fadeOut ?? 0;
   const startTime = options.startTime ?? 0;
   const endTime = options.endTime;
 
@@ -169,7 +159,23 @@ export function playAudioWithGain(
   let gainMultiplier = 1;
   let nativeVolumeInterval: ReturnType<typeof setInterval> | null = null;
 
-  const effectiveTargetVolume = () => Math.max(0, Math.min(1, targetVolume * gainMultiplier));
+  const effectiveTargetVolume = () => Math.max(0, Math.min(1, baseVolume * gainMultiplier));
+
+  const applyOutputGain = (gain: number, transitionMs = 0) => {
+    const safe = Math.max(0, Math.min(1, gain));
+    if (usingGainNode && gainNode && ctx) {
+      const now = ctx.currentTime;
+      gainNode.gain.cancelScheduledValues(now);
+      if (transitionMs > 0) {
+        gainNode.gain.setValueAtTime(gainNode.gain.value, now);
+        gainNode.gain.linearRampToValueAtTime(safe, now + transitionMs / 1000);
+      } else {
+        gainNode.gain.setValueAtTime(safe, now);
+      }
+      return;
+    }
+    rampNativeVolume(safe, transitionMs);
+  };
 
   const clearNativeVolumeInterval = () => {
     if (nativeVolumeInterval) {
@@ -221,7 +227,7 @@ export function playAudioWithGain(
     try {
       sourceNode = ctx.createMediaElementSource(audio);
       gainNode = ctx.createGain();
-      gainNode.gain.setValueAtTime(fadeIn > 0 ? 0 : targetVolume, ctx.currentTime);
+      gainNode.gain.setValueAtTime(fadeIn > 0 ? 0 : effectiveTargetVolume(), ctx.currentTime);
       sourceNode.connect(gainNode);
       gainNode.connect(ctx.destination);
       // When using GainNode, native volume must be 1.0 (GainNode controls the actual level)
@@ -230,11 +236,11 @@ export function playAudioWithGain(
     } catch (e) {
       console.error("Error creating MediaElementSource, falling back to native volume:", e);
       // Fallback: use native audio.volume
-      audio.volume = fadeIn > 0 ? 0 : targetVolume;
+      audio.volume = fadeIn > 0 ? 0 : effectiveTargetVolume();
     }
   } else {
     // No Web Audio API: use native audio.volume
-    audio.volume = fadeIn > 0 ? 0 : targetVolume;
+    audio.volume = fadeIn > 0 ? 0 : effectiveTargetVolume();
   }
 
   // Apply playbackRate after metadata is available to avoid browsers ignoring/resetting it
@@ -297,6 +303,27 @@ export function playAudioWithGain(
     }
   }, { once: true });
 
+  let detachFadeOutListener: (() => void) | null = null;
+  if (fadeOut > 0 && !loop) {
+    const onTimeUpdate = () => {
+      const clipEnd = endTime ?? audio.duration;
+      if (!clipEnd || !Number.isFinite(clipEnd)) return;
+      const fadeSec = fadeOut / 1000;
+      const fadeStart = clipEnd - fadeSec;
+      if (audio.currentTime < fadeStart) return;
+      const remaining = Math.max(0, clipEnd - audio.currentTime);
+      const ratio = Math.min(1, remaining / fadeSec);
+      applyOutputGain(effectiveTargetVolume() * ratio);
+      if (remaining <= 0.05) {
+        audio.pause();
+        detachFadeOutListener?.();
+        if (onEnded) onEnded();
+      }
+    };
+    audio.addEventListener("timeupdate", onTimeUpdate);
+    detachFadeOutListener = () => audio.removeEventListener("timeupdate", onTimeUpdate);
+  }
+
   const playPromise = audio.play();
   if (playPromise !== undefined) {
     playPromise.catch((error) => {
@@ -331,6 +358,8 @@ export function playAudioWithGain(
       setGainMultiplier(1, fadeInDuration);
     },
     stop: (fadeOutDuration: number) => {
+      detachFadeOutListener?.();
+      detachFadeOutListener = null;
       if (checkInterval) clearInterval(checkInterval);
       clearNativeVolumeInterval();
       if (ctx && gainNode && fadeOutDuration > 0) {

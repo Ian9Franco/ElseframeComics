@@ -37,6 +37,40 @@ export function buildTailPath(
   return `M ${bLX} ${bLY} Q ${cx} ${cy} ${targetX} ${targetY} Q ${cx} ${cy} ${bRX} ${bRY}`;
 }
 
+/** Suggested max-width in px from text length and style (editor defaults + fit button). */
+export function suggestBubbleWidth(
+  line: DialogueLine,
+  opts?: { mobile?: boolean; baseFontSize?: number; padX?: number }
+): number {
+  const size = line.size ?? "medium";
+  const style = line.style ?? "normal";
+  let baseFontSize = opts?.baseFontSize ?? line.fontSize;
+  if (!baseFontSize) {
+    baseFontSize = style === "sfx"
+      ? (size === "small" ? 18 : size === "large" ? 48 : 32)
+      : (size === "small" ? 12 : size === "large" ? 18 : 14);
+  }
+  const mobile =
+    opts?.mobile ?? (typeof window !== "undefined" && window.innerWidth < 768);
+  const isSpeech = style === "normal" || style === "whisper";
+  let padX = opts?.padX;
+  if (padX === undefined) {
+    const pad = comicTextContainment(baseFontSize, 0, {
+      mobile,
+      speechBalloon: isSpeech,
+    });
+    padX = parseFloat(pad.paddingLeft) || 10;
+  }
+  const textLen = (line.text || "").length || 4;
+  if (style === "cinematic") {
+    return Math.min(960, Math.max(280, textLen * baseFontSize * 0.55 + padX * 2));
+  }
+  if (style === "caption") {
+    return Math.min(220, Math.max(72, textLen * baseFontSize * 0.5 + padX * 2));
+  }
+  return Math.min(280, Math.max(72, textLen * baseFontSize * 0.42 + padX * 2));
+}
+
 /**
  * Estimate bubble half-dimensions from width/fontSize settings (approximate)
  */
@@ -63,7 +97,7 @@ export function estimateBubbleSize(
   const textLen = line.text?.length ?? 8;
   const w =
     line.width ??
-    Math.min(300, Math.max(96, textLen * baseFontSize * 0.42 + padX * 2));
+    suggestBubbleWidth(line, { mobile, baseFontSize, padX });
   const charPerLine = Math.max(1, (w - padX * 2) / (baseFontSize * 0.52));
   const lineCount =
     Math.ceil(textLen / charPerLine) +
