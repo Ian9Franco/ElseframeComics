@@ -314,7 +314,9 @@
       "panels": [
         {
           "focusY": 0.15,
-          "dialogue": [],
+          "dialogue": [
+            { "text": "", "size": "small", "posX": 46.28014587883548, "posY": 3.092656321128663, "tailX": 30.957215692678147, "tailY": 13.93087281377729, "tailWidth": 6, "tailCurvature": -22, "width": 96, "fontSize": 8, "borderRadius": 18 }
+          ],
           "zoomRects": [
             { "x": 0.1652162142499063, "y": 0, "w": 99.09310952433898, "h": 22.660398621541713 }
           ]
@@ -336,7 +338,7 @@
         {
           "focusY": 0.88,
           "dialogue": [
-            { "text": "", "size": "small", "posX": 68.47001885212256, "posY": 81.59902702798412, "tailX": 34.419062882884056, "tailY": 78.62768915533046, "tailWidth": 6, "tailCurvature": -22, "width": 96, "fontSize": 8, "borderRadius": 18 }
+            { "text": "", "size": "small", "posX": 53.430846632375555, "posY": 85.7608105353355, "tailX": 34.419062882884056, "tailY": 78.62768915533046, "tailWidth": 6, "tailCurvature": -22, "width": 96, "fontSize": 8, "borderRadius": 18 }
           ],
           "zoomRects": [
             { "x": 0.9684697227979973, "y": 67.023917315804, "w": 98.18025637797103, "h": 32.21939477376848 }
@@ -348,9 +350,9 @@
       "panels": [
         {
           "focusY": 0.09837612920574687,
-          "dialogue": [
-            { "text": "", "size": "small", "posX": 44.22854944209311, "posY": 31.21773598820059, "tailX": 44.22854944209311, "tailY": 46.21773598820059, "tailWidth": 6, "tailCurvature": -22, "width": 120, "fontSize": 8, "borderRadius": 18 },
-            { "text": "asdasdsadaddsesdaweas", "size": "small", "posX": 11.97398510095475, "posY": 17.866188631238927, "tailX": 31.866537717601528, "tailY": 35.79757011605416, "tailWidth": 6, "tailCurvature": -22, "width": 389.99993896484375, "fontSize": 8, "borderRadius": 18 }
+          "dialogue": [],
+          "zoomRects": [
+            { "x": 0, "y": 0, "w": 94.77516078104716, "h": 37.7022607867375 }
           ]
         }
       ]
