@@ -238,7 +238,8 @@
         {
           "focusY": 0.2,
           "dialogue": [
-            { "text": "", "size": "small", "posX": 36.15485548636051, "posY": 13.671108893049084, "tailX": 22.305233724306564, "tailY": 21.189129320445225, "tailWidth": 6, "tailCurvature": -22, "width": 96, "fontSize": 8, "borderRadius": 18 }
+            { "text": "", "size": "small", "posX": 36.15485548636051, "posY": 13.671108893049084, "tailX": 22.305233724306564, "tailY": 21.189129320445225, "tailWidth": 6, "tailCurvature": -22, "width": 96, "fontSize": 8, "borderRadius": 18 },
+            { "text": "", "size": "small", "posX": 92.03091569878507, "posY": 8.57699514148901, "tailX": 89.64304987774128, "tailY": 17.761049451109244, "tailWidth": 6, "tailCurvature": -22, "width": 188.5, "fontSize": 8, "borderRadius": 18 }
           ],
           "zoomRects": [
             { "x": 0, "y": 0, "w": 100, "h": 36.489764275731254 }
@@ -246,7 +247,10 @@
         },
         {
           "focusY": 0.5,
-          "dialogue": [],
+          "dialogue": [
+            { "text": "", "size": "small", "posX": 36.87121523267365, "posY": 39.84211829168895, "tailX": 23.021593470619703, "tailY": 51.021532978018904, "tailWidth": 6, "tailCurvature": -22, "width": 96, "fontSize": 8, "borderRadius": 18 },
+            { "text": "", "size": "small", "posX": 53.15646013219225, "posY": 42.59065134611956, "tailX": 53.15646013219225, "tailY": 57.59065134611956, "tailWidth": 6, "tailCurvature": -22, "width": 96, "fontSize": 8, "borderRadius": 18 }
+          ],
           "zoomRects": [
             { "x": 0.15859402651854815, "y": 36.48976427573126, "w": 99.84140597348146, "h": 26.375615998257505 }
           ]
