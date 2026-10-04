@@ -38,7 +38,7 @@
     "2": {
       "panels": [
         {
-          "focusY": 0.2188284887282529,
+          "focusY": 0.3071349047911548,
           "dialogue": [
             { "text": "habia una vez truz", "size": "small", "posX": 25, "posY": 3.8982421746221823, "tailX": 16.73610165494534, "tailY": 21.348621983492556, "tailWidth": 6, "tailCurvature": -22, "width": 120, "fontSize": 8, "borderRadius": 18 },
             { "text": "", "size": "small", "posX": 41.50024503798088, "posY": 9.717894220689322, "tailX": 33.00049007596177, "tailY": 24.01835487625582, "tailWidth": 6, "tailCurvature": -22, "width": 120, "fontSize": 8, "borderRadius": 18 },
