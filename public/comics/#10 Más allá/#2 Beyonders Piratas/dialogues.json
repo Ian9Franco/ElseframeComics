@@ -359,7 +359,7 @@
           "focusY": 0.6589044611897797,
           "dialogue": [
             { "text": "Mati ponele voluntad, yo no pienso morir aca con voos!", "size": "small", "posX": 44.517472068031466, "posY": 32.38963416296141, "tailX": 28.17638762185699, "tailY": 47.1873064770669, "tailWidth": 6, "tailCurvature": -22, "width": 96, "fontSize": 8, "borderRadius": 18 },
-            { "text": "Esa licuadora galactica es miy", "size": "small", "posX": 90.09237589258902, "posY": 50, "tailX": 73.6344138407904, "tailY": 57.89916970905651, "tailWidth": 6, "tailCurvature": -22, "width": 96, "fontSize": 8, "borderRadius": 18 },
+            { "text": "Esa licuadora galactica es muy fuerte", "size": "small", "posX": 90.09237589258902, "posY": 50, "tailX": 73.6344138407904, "tailY": 57.89916970905651, "tailWidth": 6, "tailCurvature": -22, "width": 96, "fontSize": 8, "borderRadius": 18 },
             { "text": "-Que- las luces rojas son el modo frutifantastico?", "size": "small", "posX": 63.89657642195605, "posY": 77.70419691360992, "tailX": 30.59778893522506, "tailY": 76.1605712807074, "tailWidth": 6, "tailCurvature": -22, "width": 96, "fontSize": 8, "borderRadius": 18 },
             { "text": "ma-mati?!", "size": "small", "posX": 46.66279495423726, "posY": 63.89657642195605, "tailX": 55.819311753213846, "tailY": 76.92058096097979, "tailWidth": 6, "tailCurvature": -22, "width": 96, "fontSize": 8, "borderRadius": 18 }
           ],
