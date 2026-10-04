@@ -1,9 +1,8 @@
 "use client";
 
-import React, { useRef } from "react";
+import React, { useEffect, useRef } from "react";
 import type { SoundPlaybackConfig } from "@/components/reader/audioPlayer";
-import { playAudioWithGain } from "@/components/reader/audioPlayer";
-import { getComicAssetUrl } from "@/components/reader/readerUtils";
+import { stopEditorSoundPreviewIf, useEditorSoundPreview } from "./useEditorSoundPreview";
 
 export function mergeSoundConfig(
   prev: SoundPlaybackConfig | undefined,
@@ -21,13 +20,19 @@ export function SoundConfigControls({
   config,
   onChange,
   compact,
+  previewId,
 }: {
   src: string;
   config?: SoundPlaybackConfig;
   onChange: (next: SoundPlaybackConfig) => void;
   compact?: boolean;
+  /** Unique id for shared preview session (one sound at a time in editor). */
+  previewId: string;
 }) {
-  const previewRef = useRef<ReturnType<typeof playAudioWithGain> | null>(null);
+  const { isPreviewing, togglePreview, updatePreviewConfig } = useEditorSoundPreview();
+  const livePreviewStartedRef = useRef(false);
+  const playing = isPreviewing(previewId);
+
   const volume = config?.volume ?? 1;
   const fadeIn = config?.fadeIn ?? 0;
   const fadeOut = config?.fadeOut ?? 0;
@@ -35,23 +40,26 @@ export function SoundConfigControls({
   const playbackRate = config?.playbackRate ?? 1;
   const loop = config?.loop ?? false;
 
-  const patch = (p: Partial<SoundPlaybackConfig>) => onChange(mergeSoundConfig(config, p));
-
-  const preview = () => {
-    previewRef.current?.stop(0);
-    const play = () => {
-      previewRef.current = playAudioWithGain(getComicAssetUrl(src), {
-        volume,
-        playbackRate,
-        loop,
-        fadeIn,
-        fadeOut,
-        startTime: config?.startTime,
-        endTime: config?.endTime,
-      });
+  useEffect(() => {
+    return () => {
+      stopEditorSoundPreviewIf(previewId);
     };
-    if (delay > 0) window.setTimeout(play, delay);
-    else play();
+  }, [previewId]);
+
+  const applyChange = (patch: Partial<SoundPlaybackConfig>) => {
+    const next = mergeSoundConfig(config, patch);
+    onChange(next);
+    if (playing) {
+      updatePreviewConfig(previewId, next);
+    }
+  };
+
+  const startLivePreviewIfNeeded = () => {
+    if (playing) return;
+    if (!livePreviewStartedRef.current) {
+      livePreviewStartedRef.current = true;
+      togglePreview(previewId, src, mergeSoundConfig(config, {}));
+    }
   };
 
   const labelClass = compact ? "text-[10px] text-zinc-500" : "text-xs text-zinc-400";
@@ -65,10 +73,13 @@ export function SoundConfigControls({
         </label>
         <button
           type="button"
-          onClick={preview}
+          onClick={() => {
+            livePreviewStartedRef.current = false;
+            togglePreview(previewId, src, mergeSoundConfig(config, {}));
+          }}
           className="text-[10px] px-2 py-0.5 rounded bg-zinc-700 hover:bg-zinc-600 font-bold"
         >
-          Probar
+          {playing ? "Detener" : "Probar"}
         </button>
       </div>
       <input
@@ -77,7 +88,8 @@ export function SoundConfigControls({
         max={1}
         step={0.01}
         value={volume}
-        onChange={(e) => patch({ volume: parseFloat(e.target.value) })}
+        onPointerDown={startLivePreviewIfNeeded}
+        onChange={(e) => applyChange({ volume: parseFloat(e.target.value) })}
         className="w-full accent-[#e8185a]"
       />
 
@@ -89,7 +101,7 @@ export function SoundConfigControls({
             min={0}
             step={50}
             value={fadeIn}
-            onChange={(e) => patch({ fadeIn: Math.max(0, parseInt(e.target.value, 10) || 0) })}
+            onChange={(e) => applyChange({ fadeIn: Math.max(0, parseInt(e.target.value, 10) || 0) })}
             className="w-full text-xs bg-[#0a0a0f] border border-white/10 rounded px-2 py-1"
           />
         </div>
@@ -100,7 +112,7 @@ export function SoundConfigControls({
             min={0}
             step={50}
             value={fadeOut}
-            onChange={(e) => patch({ fadeOut: Math.max(0, parseInt(e.target.value, 10) || 0) })}
+            onChange={(e) => applyChange({ fadeOut: Math.max(0, parseInt(e.target.value, 10) || 0) })}
             className="w-full text-xs bg-[#0a0a0f] border border-white/10 rounded px-2 py-1"
           />
         </div>
@@ -114,7 +126,7 @@ export function SoundConfigControls({
             min={0}
             step={50}
             value={delay}
-            onChange={(e) => patch({ delay: Math.max(0, parseInt(e.target.value, 10) || 0) })}
+            onChange={(e) => applyChange({ delay: Math.max(0, parseInt(e.target.value, 10) || 0) })}
             className="w-full text-xs bg-[#0a0a0f] border border-white/10 rounded px-2 py-1"
           />
         </div>
@@ -126,18 +138,18 @@ export function SoundConfigControls({
             max={2}
             step={0.05}
             value={playbackRate}
-            onChange={(e) => patch({ playbackRate: parseFloat(e.target.value) || 1 })}
+            onChange={(e) => applyChange({ playbackRate: parseFloat(e.target.value) || 1 })}
             className="w-full text-xs bg-[#0a0a0f] border border-white/10 rounded px-2 py-1"
           />
         </div>
       </div>
 
       <label className={`flex items-center gap-2 ${labelClass}`}>
-        <input type="checkbox" checked={loop} onChange={(e) => patch({ loop: e.target.checked })} />
+        <input type="checkbox" checked={loop} onChange={(e) => applyChange({ loop: e.target.checked })} />
         Loop
       </label>
       <p className="text-[10px] text-zinc-600 leading-snug">
-        El % de volumen coincide con la lectura. «También fade de audio» en la parada usa fades de escena si no definís fade acá.
+        Mové el volumen con preview activo para oír el nivel en vivo. Cambiar fades puede reiniciar el preview.
       </p>
     </div>
   );

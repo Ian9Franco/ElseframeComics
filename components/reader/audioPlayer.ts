@@ -96,6 +96,9 @@ export type AudioPlaybackController = {
   pause: (fadeOutDuration?: number) => void;
   resume: (fadeInDuration?: number) => void;
   setGainMultiplier: (multiplier: number, transitionDuration?: number) => void;
+  /** Update base volume (0–1) while playing; matches editor % in read mode. */
+  setVolume: (level: number, transitionMs?: number) => void;
+  setPlaybackRate: (rate: number) => void;
 };
 
 // ─── Web Audio API Helpers for Mobile/iOS Compatibility ──────────────────────
@@ -141,8 +144,8 @@ export function playAudioWithGain(
   const ctx = getAudioContext();
   const volume = options.volume ?? 1;
   /** Linear 0–1 so editor % matches playback (no volume² curve). */
-  const baseVolume = Math.max(0, Math.min(1, volume));
-  const playbackRate = options.playbackRate ?? 1;
+  let baseVolume = Math.max(0, Math.min(1, volume));
+  let playbackRate = options.playbackRate ?? 1;
   const loop = options.loop ?? false;
   const fadeIn = options.fadeIn ?? 0;
   const fadeOut = options.fadeOut ?? 0;
@@ -201,6 +204,16 @@ export function playAudioWithGain(
       audio.volume = initialVolume + (safeVolume - initialVolume) * progress;
       if (progress >= 1) clearNativeVolumeInterval();
     }, duration / steps);
+  };
+
+  const setVolume = (level: number, transitionMs = 0) => {
+    baseVolume = Math.max(0, Math.min(1, level));
+    applyOutputGain(effectiveTargetVolume(), transitionMs);
+  };
+
+  const setPlaybackRate = (rate: number) => {
+    playbackRate = rate;
+    audio.playbackRate = rate;
   };
 
   const setGainMultiplier = (multiplier: number, transitionDuration = 0) => {
@@ -334,6 +347,8 @@ export function playAudioWithGain(
   return {
     audio,
     setGainMultiplier,
+    setVolume,
+    setPlaybackRate,
     pause: (fadeOutDuration = 0) => {
       clearNativeVolumeInterval();
       if (fadeOutDuration > 0) {
