@@ -1,5 +1,11 @@
 {
-  "title": "Piratas",
+  "title": "Salvar el mundo",
   "number": 2,
-  "status": "draft"
+  "status": "draft",
+  "nuevo": false,
+  "proximamente": true,
+  "date": "",
+  "releaseDate": "",
+  "estimatedTime": "",
+  "cinematic": true
 }
