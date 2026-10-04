@@ -360,7 +360,7 @@
           "dialogue": [
             { "text": "", "size": "small", "posX": 33.000273050832455, "posY": 39.18666964852148, "tailX": 28.17638762185699, "tailY": 47.1873064770669, "tailWidth": 6, "tailCurvature": -22, "width": 96, "fontSize": 8, "borderRadius": 18 },
             { "text": "", "size": "small", "posX": 90.09237589258902, "posY": 50, "tailX": 73.6344138407904, "tailY": 57.89916970905651, "tailWidth": 6, "tailCurvature": -22, "width": 96, "fontSize": 8, "borderRadius": 18 },
-            { "text": "", "size": "small", "posX": 67.10798061335302, "posY": 79.63636776031274, "tailX": 67.10798061335302, "tailY": 94.63636776031274, "tailWidth": 6, "tailCurvature": -22, "width": 96, "fontSize": 8, "borderRadius": 18 }
+            { "text": "Que- por que se prendieron las luces rojas?", "size": "small", "posX": 50, "posY": 75, "tailX": 34.192056509755794, "tailY": 74.96248208919715, "tailWidth": 6, "tailCurvature": -22, "width": 96, "fontSize": 8, "borderRadius": 18 }
           ],
           "zoomRects": [
             { "x": 0, "y": 36.567228921096216, "w": 100.16656214284328, "h": 63.24359910129691 }
