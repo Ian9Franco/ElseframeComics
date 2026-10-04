@@ -426,7 +426,9 @@
         },
         {
           "focusY": 0.8,
-          "dialogue": [],
+          "dialogue": [
+            { "text": "-Que?! que paso?", "size": "small", "posX": 44.25692232296006, "posY": 58.791694743935324, "tailX": 41.270521930899285, "tailY": 71.03501745895615, "tailWidth": 6, "tailCurvature": -22, "width": 96, "fontSize": 8, "borderRadius": 18 }
+          ],
           "zoomRects": [
             { "x": 0, "y": 58.94484348198971, "w": 100, "h": 41.05515651801029 }
           ]
