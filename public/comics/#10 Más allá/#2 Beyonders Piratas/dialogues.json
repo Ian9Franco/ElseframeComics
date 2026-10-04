@@ -80,7 +80,7 @@
         {
           "focusY": 0.11044842315401528,
           "dialogue": [
-            { "text": "", "style": "caption", "size": "small", "posX": 75, "posY": 3.7368042386243814, "tailX": 82.54077751616718, "tailY": 7.2506488845445, "tailWidth": 6, "tailCurvature": -22, "width": 96, "fontSize": 8, "borderRadius": 18 }
+            { "text": "", "style": "scream", "size": "small", "posX": 62.01565046930101, "posY": 2.0038502907401625, "tailX": 83.71884473197025, "tailY": 6.46527074067579, "tailWidth": 6, "tailCurvature": -22, "width": 201, "fontSize": 8, "borderRadius": 18, "fontFamily": "marker" }
           ],
           "zoomRects": [
             { "x": 0, "y": 0, "w": 100.35272572511896, "h": 22.885872351332875 }
