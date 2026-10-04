@@ -186,14 +186,13 @@
       "panels": [
         {
           "focusY": 0.15,
-          "dialogue": [],
-          "zoomRects": [
-            { "x": 0, "y": 0, "w": 55.57485277880015, "h": 24.52038093485463 },
-            { "x": 0, "y": 0, "w": 100, "h": 100 }
-          ]
+          "dialogue": [
+            { "text": "", "size": "small", "posX": 38.87702252235042, "posY": 3.196337491403683, "tailX": 29.56434582027967, "tailY": 11.191931083008583, "tailWidth": 6, "tailCurvature": -22, "width": 96, "fontSize": 8, "borderRadius": 18 }
+          ],
+          "zoomRects": []
         },
         {
-          "focusY": 0.55,
+          "focusY": 0.5993492269682382,
           "dialogue": [],
           "zoomRects": []
         }
