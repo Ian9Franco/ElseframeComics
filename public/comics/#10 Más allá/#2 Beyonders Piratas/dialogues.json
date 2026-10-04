@@ -142,7 +142,10 @@
           "focusY": 0.5,
           "dialogue": [],
           "fadeIn": 4000,
-          "fadeOut": 3900
+          "fadeOut": 3900,
+          "zoomRects": [
+            { "x": 0, "y": 0, "w": 100, "h": 100 }
+          ]
         }
       ],
       "fadeOut": 4000
