@@ -360,8 +360,8 @@
           "dialogue": [
             { "text": "", "size": "small", "posX": 33.000273050832455, "posY": 39.18666964852148, "tailX": 28.17638762185699, "tailY": 47.1873064770669, "tailWidth": 6, "tailCurvature": -22, "width": 96, "fontSize": 8, "borderRadius": 18 },
             { "text": "", "size": "small", "posX": 90.09237589258902, "posY": 50, "tailX": 73.6344138407904, "tailY": 57.89916970905651, "tailWidth": 6, "tailCurvature": -22, "width": 96, "fontSize": 8, "borderRadius": 18 },
-            { "text": "-Que- las luces rojas son el modo frutifantastico?", "size": "small", "posX": 52.3106005836269, "posY": 75, "tailX": 30.59778893522506, "tailY": 76.1605712807074, "tailWidth": 6, "tailCurvature": -22, "width": 96, "fontSize": 8, "borderRadius": 18 },
-            { "text": "", "size": "small", "posX": 94.5860548785096, "posY": 75.09956206759247, "tailX": 94.5860548785096, "tailY": 90.09956206759247, "tailWidth": 6, "tailCurvature": -22, "width": 96, "fontSize": 8, "borderRadius": 18 }
+            { "text": "-Que- las luces rojas son el modo frutifantastico?", "size": "small", "posX": 63.89657642195605, "posY": 77.70419691360992, "tailX": 30.59778893522506, "tailY": 76.1605712807074, "tailWidth": 6, "tailCurvature": -22, "width": 96, "fontSize": 8, "borderRadius": 18 },
+            { "text": "ma-mati?!", "size": "small", "posX": 46.66279495423726, "posY": 63.89657642195605, "tailX": 55.819311753213846, "tailY": 76.92058096097979, "tailWidth": 6, "tailCurvature": -22, "width": 96, "fontSize": 8, "borderRadius": 18 }
           ],
           "zoomRects": [
             { "x": 0, "y": 36.567228921096216, "w": 100.16656214284328, "h": 63.24359910129691 }
