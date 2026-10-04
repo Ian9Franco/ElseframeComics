@@ -164,7 +164,8 @@
         },
         {
           "focusY": 0.55,
-          "dialogue": []
+          "dialogue": [],
+          "zoomRects": []
         }
       ]
     },
@@ -172,11 +173,17 @@
       "panels": [
         {
           "focusY": 0.15,
-          "dialogue": []
+          "dialogue": [],
+          "zoomRects": [
+            { "x": 0, "y": 0, "w": 100, "h": 24.86180453456397 }
+          ]
         },
         {
           "focusY": 0.35,
-          "dialogue": []
+          "dialogue": [],
+          "zoomRects": [
+            { "x": 0, "y": 25.429022082913594, "w": 100, "h": 18.71817909553758 }
+          ]
         },
         {
           "focusY": 0.5,
