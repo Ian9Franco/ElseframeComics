@@ -429,8 +429,8 @@
         {
           "focusY": 0.8,
           "dialogue": [
-            { "text": "-Que?! que paso?", "size": "small", "posX": 44.02719921587846, "posY": 58.791694743935324, "tailX": 41.270521930899285, "tailY": 71.03501745895615, "tailWidth": 6, "tailCurvature": -22, "width": 96, "fontSize": 8, "borderRadius": 18 },
-            { "text": "Estas bien?", "size": "small", "posX": 86.5352557676743, "posY": 61.5762172540153, "tailX": 70.21563342318059, "tailY": 67.97204269786818, "tailWidth": 6, "tailCurvature": -22, "width": 72, "fontSize": 8, "borderRadius": 18 }
+            { "text": "Est", "size": "small", "posX": 94.96580122092837, "posY": 60.656114163728, "tailX": 74.83007148716746, "tailY": 68.10521551356766, "tailWidth": 6, "tailCurvature": -22, "width": 96, "fontSize": 8, "borderRadius": 18 },
+            { "text": "-Que?! que paso?", "size": "small", "posX": 50, "posY": 56.116131810336746, "tailX": 37.45512076110927, "tailY": 68.63790677636555, "tailWidth": 6, "tailCurvature": -22, "width": 72, "fontSize": 8, "borderRadius": 18 }
           ],
           "zoomRects": [
             { "x": 0, "y": 58.94484348198971, "w": 100, "h": 41.05515651801029 }
