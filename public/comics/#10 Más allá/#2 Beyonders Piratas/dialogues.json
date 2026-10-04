@@ -79,7 +79,9 @@
       "panels": [
         {
           "focusY": 0.11044842315401528,
-          "dialogue": [],
+          "dialogue": [
+            { "text": "", "style": "caption", "size": "small", "posX": 75, "posY": 3.7368042386243814, "tailX": 82.54077751616718, "tailY": 7.2506488845445, "tailWidth": 6, "tailCurvature": -22, "width": 96, "fontSize": 8, "borderRadius": 18 }
+          ],
           "zoomRects": [
             { "x": 0, "y": 0, "w": 100.35272572511896, "h": 22.885872351332875 }
           ]
