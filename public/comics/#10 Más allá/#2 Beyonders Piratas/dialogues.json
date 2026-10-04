@@ -35,7 +35,7 @@
         {
           "focusY": 0.2188284887282529,
           "dialogue": [
-            { "text": "", "size": "small", "posX": 22.70890243906688, "posY": 12.0151252915053, "tailX": 22.70890243906688, "tailY": 27.0151252915053, "tailWidth": 6, "tailCurvature": -22, "width": 120, "fontSize": 8, "borderRadius": 18 }
+            { "text": "", "size": "small", "posX": 28.216123499142366, "posY": 9.717894220689322, "tailX": 16.73610165494534, "tailY": 21.348621983492556, "tailWidth": 6, "tailCurvature": -22, "width": 120, "fontSize": 8, "borderRadius": 18 }
           ]
         },
         {
