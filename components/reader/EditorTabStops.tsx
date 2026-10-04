@@ -218,7 +218,7 @@ export function EditorTabStops({
       fadeOut = 0,
       delay = 0,
     } = config || {};
-    const targetVolume = volume * volume;
+    const targetVolume = Math.max(0, Math.min(1, volume));
 
     const audio = new Audio();
     audio.src = getComicAssetUrl(soundPath);

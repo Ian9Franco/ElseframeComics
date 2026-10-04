@@ -345,7 +345,7 @@ export function StandardBubble({
     return () => ro.disconnect();
   }, [organicBalloon, line.text, line.width, finalFontSize, textScale, isMobile, onBodyMeasure]);
 
-  const balloonBleed = isMobile ? 10 : 16;
+  const balloonBleed = isMobile ? 6 : 10;
   const balloonW = balloonBox.w + balloonBleed * 2;
   const balloonH = balloonBox.h + balloonBleed * 2;
   const balloonPath =

@@ -1,8 +1,10 @@
 "use client";
 
-import React, { useState, useEffect, useRef, useMemo } from "react";
-import type { AudioTrack, AudioTrackStopTrigger, Dialogues } from "./audioPlayer";
-import { getPageKeyFromUrl, getComicAssetUrl } from "./readerUtils";
+import React, { useState, useEffect, useMemo } from "react";
+import type { AudioTrack, AudioTrackStopTrigger, Dialogues, SoundPlaybackConfig } from "./audioPlayer";
+import { getPageKeyFromUrl } from "./readerUtils";
+import { SoundConfigControls } from "./editor/SoundConfigControls";
+import { useEditorSoundPreview } from "./editor/useEditorSoundPreview";
 import { filterSoundsForEditorPicker, isReaderSystemSound } from "@/lib/readerSystemSounds";
 import {
   describeStopTrigger,
@@ -88,6 +90,31 @@ function describeTrigger(trigger?: AudioTrackStopTrigger, pages: string[] = []):
   return describeStopTrigger(trigger, pages);
 }
 
+function formToSoundConfig(form: TrackFormState): SoundPlaybackConfig {
+  return {
+    volume: form.volume,
+    playbackRate: form.playbackRate,
+    loop: form.loop,
+    fadeIn: form.fadeIn,
+    fadeOut: form.fadeOut,
+    delay: form.delay > 0 ? form.delay : undefined,
+    startTime: form.startTime > 0 ? form.startTime : undefined,
+  };
+}
+
+function applySoundConfigToForm(form: TrackFormState, config: SoundPlaybackConfig): TrackFormState {
+  return {
+    ...form,
+    volume: config.volume ?? form.volume,
+    playbackRate: config.playbackRate ?? form.playbackRate,
+    loop: config.loop ?? form.loop,
+    fadeIn: config.fadeIn ?? form.fadeIn,
+    fadeOut: config.fadeOut ?? form.fadeOut,
+    delay: config.delay ?? form.delay,
+    startTime: config.startTime ?? form.startTime,
+  };
+}
+
 // ─── Component ────────────────────────────────────────────────────────────────
 
 /**
@@ -109,8 +136,11 @@ export function EditorAudioTracks({
   const [form, setForm] = useState<TrackFormState>(DEFAULT_FORM);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [availableSounds, setAvailableSounds] = useState<Array<{ name: string; path: string }>>([]);
-  const [previewingId, setPreviewingId] = useState<string | null>(null);
-  const previewAudioRef = useRef<HTMLAudioElement | null>(null);
+  const [expandedTrackId, setExpandedTrackId] = useState<string | null>(null);
+  const { isPreviewing, togglePreview, stopPreview, startPreview, updatePreviewConfig } =
+    useEditorSoundPreview();
+
+  const formPreviewId = `track-form-${editingId ?? "new"}`;
 
   // Fetch available sounds from the API
   useEffect(() => {
@@ -136,45 +166,18 @@ export function EditorAudioTracks({
 
   // ─── Preview helpers ───────────────────────────────────────────────────────
 
-  const stopPreview = () => {
-    if (previewAudioRef.current) {
-      previewAudioRef.current.pause();
-      previewAudioRef.current.currentTime = 0;
-    }
-    setPreviewingId(null);
+  const playPreview = (track: AudioTrack) => {
+    const id = `track-${track.id}`;
+    togglePreview(id, track.src, track.soundConfig ?? {});
   };
 
-  const playPreview = (track: AudioTrack) => {
-    stopPreview();
-    const config = track.soundConfig || {};
-    const audio = new Audio(getComicAssetUrl(track.src));
-    const volume = config.volume ?? 1;
-    const targetVolume = volume * volume;
-    const playbackRate = config.playbackRate ?? 1;
-    const startTime = config.startTime ?? 0;
-
-    audio.volume = targetVolume;
-    audio.playbackRate = playbackRate;
-
-    if (startTime > 0) {
-      if (audio.readyState >= 1) {
-        audio.currentTime = startTime;
-      } else {
-        audio.addEventListener("loadedmetadata", () => {
-          audio.currentTime = startTime;
-        }, { once: true });
-      }
+  const updateTrackSoundConfig = (trackId: string, soundConfig: SoundPlaybackConfig) => {
+    onUpdate(
+      audioTracks.map((t) => (t.id === trackId ? { ...t, soundConfig } : t))
+    );
+    if (isPreviewing(`track-${trackId}`)) {
+      updatePreviewConfig(`track-${trackId}`, soundConfig);
     }
-
-    audio.addEventListener("playing", () => {
-      audio.volume = targetVolume;
-      audio.playbackRate = playbackRate;
-    }, { once: true });
-
-    previewAudioRef.current = audio;
-    setPreviewingId(track.id);
-    audio.play().catch(console.error);
-    audio.onended = () => setPreviewingId(null);
   };
 
   // ─── Form helpers ──────────────────────────────────────────────────────────
@@ -248,42 +251,17 @@ export function EditorAudioTracks({
 
       return updated;
     });
-
-    // Dynamically update active form preview settings if playing
-    if (previewingId === "__form_preview__" && previewAudioRef.current) {
-      if (key === "volume") {
-        const v = val as number;
-        previewAudioRef.current.volume = v * v;
-      } else if (key === "playbackRate") {
-        previewAudioRef.current.playbackRate = val as number;
-      }
-    }
   };
 
   const handlePreviewFormTrack = () => {
     if (!form.src) return;
-    const tempTrack: AudioTrack = {
-      id: "__form_preview__",
-      layer: form.layer,
-      src: form.src,
-      title: form.title || undefined,
-      artist: form.artist || undefined,
-      startPageKey: form.startPageKey,
-      startPanelIdx: form.startPanelIdx,
-      soundConfig: {
-        volume: form.volume,
-        playbackRate: form.playbackRate,
-        loop: form.loop,
-        fadeIn: form.fadeIn,
-        fadeOut: form.fadeOut,
-        delay: form.delay,
-        startTime: form.startTime,
-      },
-    };
-    if (previewingId === "__form_preview__") {
-      stopPreview();
-    } else {
-      playPreview(tempTrack);
+    togglePreview(formPreviewId, form.src, formToSoundConfig(form));
+  };
+
+  const handleFormSoundConfigChange = (config: SoundPlaybackConfig) => {
+    setForm((prev) => applySoundConfigToForm(prev, config));
+    if (isPreviewing(formPreviewId)) {
+      updatePreviewConfig(formPreviewId, config);
     }
   };
 
@@ -364,7 +342,9 @@ export function EditorAudioTracks({
           )}
 
           {editableTracks.map((track) => {
-            const isPreviewing = previewingId === track.id;
+            const trackPreviewId = `track-${track.id}`;
+            const trackPlaying = isPreviewing(trackPreviewId);
+            const expanded = expandedTrackId === track.id;
             const layerColor = track.layer === "music" ? "bg-purple-950/20 border-purple-900/40 text-purple-250" : "bg-amber-950/20 border-amber-900/40 text-amber-250";
             const layerBadge = track.layer === "music"
               ? "bg-purple-650 text-white"
@@ -393,14 +373,25 @@ export function EditorAudioTracks({
                   <div className="flex gap-1 shrink-0">
                     <button
                       type="button"
-                      onClick={() => isPreviewing ? stopPreview() : playPreview(track)}
+                      onClick={() => setExpandedTrackId(expanded ? null : track.id)}
                       className={`text-[9px] font-bold px-1.5 py-0.5 rounded border transition-all cursor-pointer ${
-                        isPreviewing
+                        expanded
+                          ? "bg-zinc-600 text-white border-zinc-500"
+                          : "bg-zinc-900 text-zinc-300 border-white/10 hover:bg-zinc-800"
+                      }`}
+                    >
+                      {expanded ? "▲" : "Vol"}
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => (trackPlaying ? stopPreview() : playPreview(track))}
+                      className={`text-[9px] font-bold px-1.5 py-0.5 rounded border transition-all cursor-pointer ${
+                        trackPlaying
                           ? "bg-green-600 text-white border-green-700"
                           : "bg-green-950 text-green-300 border-green-800 hover:bg-green-900"
                       }`}
                     >
-                      {isPreviewing ? "⏸" : "▶"}
+                      {trackPlaying ? "⏸" : "▶"}
                     </button>
                     <button
                       type="button"
@@ -435,6 +426,18 @@ export function EditorAudioTracks({
                     {(track.soundConfig?.fadeOut ?? 0) > 0 && <span>FO: {track.soundConfig!.fadeOut}ms</span>}
                   </div>
                 </div>
+
+                {expanded && (
+                  <div className="pt-2 border-t border-white/10">
+                    <SoundConfigControls
+                      previewId={trackPreviewId}
+                      src={track.src}
+                      config={track.soundConfig}
+                      compact
+                      onChange={(soundConfig) => updateTrackSoundConfig(track.id, soundConfig)}
+                    />
+                  </div>
+                )}
               </div>
             );
           })}
@@ -491,15 +494,7 @@ export function EditorAudioTracks({
                       const val = e.target.value;
                       handleFormChange("src", val);
                       if (val) {
-                        const tempTrack: AudioTrack = {
-                          id: "__form_preview__",
-                          layer: form.layer,
-                          src: val,
-                          startPageKey: form.startPageKey || "1",
-                          startPanelIdx: form.startPanelIdx || 0,
-                          soundConfig: { volume: form.volume, playbackRate: form.playbackRate, loop: form.loop }
-                        };
-                        playPreview(tempTrack);
+                        startPreview(formPreviewId, val, formToSoundConfig({ ...form, src: val }));
                       } else {
                         stopPreview();
                       }
@@ -516,12 +511,12 @@ export function EditorAudioTracks({
                       type="button"
                       onClick={handlePreviewFormTrack}
                       className={`text-[8px] font-bold px-2.5 py-1 rounded border transition-all cursor-pointer shrink-0 flex items-center gap-1 ${
-                        previewingId === "__form_preview__"
+                        isPreviewing(formPreviewId)
                           ? "bg-rose-600 hover:bg-rose-500 text-white border-rose-700 shadow-inner"
                           : "bg-emerald-600 hover:bg-emerald-500 text-white border-emerald-700"
                       }`}
                     >
-                      {previewingId === "__form_preview__" ? "⏸ Pausa" : "▶ Preview"}
+                      {isPreviewing(formPreviewId) ? "⏸ Pausa" : "▶ Preview"}
                     </button>
                   )}
                 </div>
@@ -634,97 +629,18 @@ export function EditorAudioTracks({
                 )}
               </div>
 
-              {/* Sound config */}
-              <div className="border border-white/5 rounded p-2 bg-[#0a0a0f] flex flex-col gap-2">
-                <span className="text-[9px] font-bold text-zinc-400 uppercase tracking-wider">⚙️ Configuración</span>
-
-                {/* Volume */}
-                <div className="flex flex-col gap-0.5">
-                  <div className="flex justify-between text-[8px] font-mono text-zinc-500">
-                    <span>Volumen</span>
-                    <span className="font-bold">{Math.round(form.volume * 100)}%</span>
-                  </div>
-                  <input
-                    type="range" min="0" max="1" step="0.05"
-                    value={form.volume}
-                    onChange={(e) => handleFormChange("volume", parseFloat(e.target.value))}
-                    className="w-full accent-blue-500 cursor-pointer h-1.5"
+              {form.src && (
+                <div className="border border-white/5 rounded p-2 bg-[#0a0a0f] flex flex-col gap-2">
+                  <span className="text-[9px] font-bold text-zinc-400 uppercase tracking-wider">⚙️ Configuración</span>
+                  <SoundConfigControls
+                    previewId={formPreviewId}
+                    src={form.src}
+                    config={formToSoundConfig(form)}
+                    compact
+                    onChange={handleFormSoundConfigChange}
                   />
                 </div>
-
-                {/* Playback rate */}
-                <div className="flex flex-col gap-0.5">
-                  <div className="flex justify-between text-[8px] font-mono text-zinc-500">
-                    <span>Velocidad</span>
-                    <span className="font-bold">×{form.playbackRate.toFixed(2)}</span>
-                  </div>
-                  <input
-                    type="range" min="0.5" max="5" step="0.1"
-                    value={form.playbackRate}
-                    onChange={(e) => handleFormChange("playbackRate", parseFloat(e.target.value))}
-                    className="w-full accent-blue-500 cursor-pointer h-1.5"
-                  />
-                </div>
-
-                {/* Fade In */}
-                <div className="flex flex-col gap-0.5">
-                  <div className="flex justify-between text-[8px] font-mono text-zinc-500">
-                    <span>Fade In</span>
-                    <span className="font-bold">{form.fadeIn}ms</span>
-                  </div>
-                  <input
-                    type="range" min="0" max="5000" step="100"
-                    value={form.fadeIn}
-                    onChange={(e) => handleFormChange("fadeIn", parseInt(e.target.value))}
-                    className="w-full accent-blue-500 cursor-pointer h-1.5"
-                  />
-                </div>
-
-                {/* Fade Out */}
-                <div className="flex flex-col gap-0.5">
-                  <div className="flex justify-between text-[8px] font-mono text-zinc-500">
-                    <span>Fade Out</span>
-                    <span className="font-bold">{form.fadeOut}ms</span>
-                  </div>
-                  <input
-                    type="range" min="0" max="5000" step="100"
-                    value={form.fadeOut}
-                    onChange={(e) => handleFormChange("fadeOut", parseInt(e.target.value))}
-                    className="w-full accent-blue-500 cursor-pointer h-1.5"
-                  />
-                </div>
-
-                {/* Loop, delay, startTime in a grid */}
-                <div className="grid grid-cols-2 gap-2 text-white">
-                  <div className="flex items-center justify-between">
-                    <span className="text-[8px] font-mono text-zinc-550">Loop</span>
-                    <input
-                      type="checkbox"
-                      checked={form.loop}
-                      onChange={(e) => handleFormChange("loop", e.target.checked)}
-                      className="w-3.5 h-3.5 accent-blue-500 cursor-pointer"
-                    />
-                  </div>
-                  <div className="flex flex-col gap-0.5">
-                    <label className="text-[8px] font-mono text-zinc-500">Delay (ms)</label>
-                    <input
-                      type="number" min="0" step="100"
-                      value={form.delay}
-                      onChange={(e) => handleFormChange("delay", parseInt(e.target.value) || 0)}
-                      className="text-[8px] px-1 py-0.5 border border-white/10 rounded font-mono bg-[#0a0a0f] text-white w-full focus:outline-none focus:ring-1 focus:ring-blue-500"
-                    />
-                  </div>
-                  <div className="flex flex-col gap-0.5">
-                    <label className="text-[8px] font-mono text-zinc-500">Inicio (seg)</label>
-                    <input
-                      type="number" min="0" step="0.5"
-                      value={form.startTime}
-                      onChange={(e) => handleFormChange("startTime", parseFloat(e.target.value) || 0)}
-                      className="text-[8px] px-1 py-0.5 border border-white/10 rounded font-mono bg-[#0a0a0f] text-white w-full focus:outline-none focus:ring-1 focus:ring-blue-500"
-                    />
-                  </div>
-                </div>
-              </div>
+              )}
 
               {/* Save / Cancel */}
               <div className="flex gap-2">
