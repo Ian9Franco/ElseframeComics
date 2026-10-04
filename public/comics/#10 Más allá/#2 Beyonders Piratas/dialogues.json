@@ -299,7 +299,10 @@
         },
         {
           "focusY": 0.88,
-          "dialogue": [],
+          "dialogue": [
+            { "text": "", "size": "small", "posX": 50, "posY": 77.79954163846021, "tailX": 34.86986646166331, "tailY": 79.96287172942188, "tailWidth": 6, "tailCurvature": -22, "width": 96, "fontSize": 8, "borderRadius": 18 },
+            { "text": "", "size": "small", "posX": 94.94548163596268, "posY": 77.79954163846021, "tailX": 81.08187813420128, "tailY": 83.62988043343715, "tailWidth": 6, "tailCurvature": -22, "width": 96, "fontSize": 8, "borderRadius": 18 }
+          ],
           "zoomRects": [
             { "x": 0, "y": 52.28339669137312, "w": 100, "h": 22.445938717811565 },
             { "x": 0, "y": 74.72933540918469, "w": 100, "h": 25.270664590815315 }
