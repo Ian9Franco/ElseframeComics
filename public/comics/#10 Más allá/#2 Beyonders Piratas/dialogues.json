@@ -26,8 +26,8 @@
             {
               "sound": "/sounds/sfx/despegue nave.mp3",
               "soundConfig": {
-                "volume": 0.26,
-                "fadeIn": 0,
+                "volume": 0.31,
+                "fadeIn": 150,
                 "fadeOut": 0
               }
             }
