@@ -43,6 +43,9 @@
             { "text": "habia una vez truz", "size": "small", "posX": 22.005528255528255, "posY": 7.123057899437907, "tailX": 16.73610165494534, "tailY": 21.348621983492556, "tailWidth": 6, "tailCurvature": -22, "width": 120, "fontSize": 8, "borderRadius": 18 },
             { "text": "", "size": "small", "posX": 50, "posY": 7.123057899437907, "tailX": 32.07911415458585, "tailY": 23.86479222269317, "tailWidth": 6, "tailCurvature": -22, "width": 120, "fontSize": 8, "borderRadius": 18 },
             { "text": "", "size": "small", "posX": 88.3637588826268, "posY": 12.387213197944329, "tailX": 77.32897839029914, "tailY": 22.789439732246336, "tailWidth": 6, "tailCurvature": -22, "width": 72, "fontSize": 8, "borderRadius": 18 }
+          ],
+          "zoomRects": [
+            { "x": 0, "y": 0, "w": 100, "h": 58.790679920408536 }
           ]
         },
         {
@@ -61,17 +64,26 @@
           "dialogue": [
             { "text": "mati ponete unos temas de esos", "size": "small", "posX": 53.755608375173594, "posY": 2.1624292276466193, "tailX": 35, "tailY": 10, "tailWidth": 6, "tailCurvature": -22, "width": 120, "fontSize": 8, "borderRadius": 18 },
             { "text": "", "size": "small", "posX": 85.73336182031834, "posY": 5.768322361393018, "tailX": 68.45756329451982, "tailY": 16.59542416675569, "tailWidth": 6, "tailCurvature": -22, "width": 96, "fontSize": 8, "borderRadius": 18 }
+          ],
+          "zoomRects": [
+            { "x": 0, "y": 0, "w": 100, "h": 29.74899791820022 }
           ]
         },
         {
           "focusY": 0.5,
           "dialogue": [
             { "text": "", "size": "small", "posX": 39.16381796816578, "posY": 25, "tailX": 9.870072641811767, "tailY": 40.79823369565217, "tailWidth": 6, "tailCurvature": -22, "width": 96, "fontSize": 8, "borderRadius": 18 }
+          ],
+          "zoomRects": [
+            { "x": 0, "y": 30.899163542050058, "w": 100, "h": 34.21742730953257 }
           ]
         },
         {
           "focusY": 0.8,
-          "dialogue": []
+          "dialogue": [],
+          "zoomRects": [
+            { "x": 0, "y": 65.11659085158263, "w": 100, "h": 34.88340914841737 }
+          ]
         }
       ]
     },
