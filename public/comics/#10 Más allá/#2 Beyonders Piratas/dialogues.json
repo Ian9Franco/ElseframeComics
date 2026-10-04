@@ -3,15 +3,10 @@
     "1": {
       "panels": [
         {
-          "focusY": 0.1300022206567018,
-          "dialogue": [
-            { "text": "hola", "size": "small", "posX": 42.1840354767184, "posY": 30.488716956802058, "tailX": 23.863636363636363, "tailY": 21.06060606060606, "tailWidth": 6, "tailCurvature": -22, "width": 205, "fontSize": 8, "borderRadius": 18, "fontFamily": "arcane", "style": "thought" },
-            { "text": "hola", "size": "small", "posX": 81.98051948051949, "posY": 17.374689140646588, "tailX": 23.863636363636363, "tailY": 21.06060606060606, "tailWidth": 6, "tailCurvature": -22, "width": 205, "fontSize": 8, "borderRadius": 18, "fontFamily": "arcane", "style": "caption" },
-            { "text": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", "style": "scream", "size": "small", "posX": 70, "posY": 40, "tailX": 44.48664543004165, "tailY": 69.80982755452095, "tailWidth": 6, "tailCurvature": -22, "width": 231, "fontSize": 8, "borderRadius": 18 }
-          ],
+          "focusY": 0.2,
+          "dialogue": [],
           "zoomRects": [
-            { "x": 18.98738054398431, "y": 50.981109103160996, "w": 29.864003920607697, "h": 8.576329331046303 },
-            { "x": -2.8340950818391413, "y": 60.472385001327794, "w": 106.49571124345529, "h": 39.527614998672206 }
+            { "x": 0, "y": 0, "w": 100, "h": 37.96346636853713 }
           ]
         },
         {
