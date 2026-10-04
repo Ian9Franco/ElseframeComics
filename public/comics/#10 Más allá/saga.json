@@ -1,7 +1,7 @@
 {
   "title": "Más Allá",
   "tagline": "Una saga de cómics original.",
-  "description": "Mientras Ian está lejos, Julián, Mati y Uandi intentan seguir con sus vidas. Obviamente, les dura poco.",
+  "description": "Todo se fue a la mierda",
   "color": "#1b4332",
   "status": "published",
   "order": 10,
@@ -9,5 +9,6 @@
   "nuevo": true,
   "proximamente": false,
   "date": "30/07/2026",
-  "estimatedTime": "20 días"
+  "estimatedTime": "20 días",
+  "color_secondary": "#1b4332"
 }
