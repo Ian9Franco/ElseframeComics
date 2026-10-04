@@ -22,7 +22,16 @@
           "zoomRects": [
             { "x": 0, "y": 59.863735910316095, "w": 100, "h": 40.136264089683905 }
           ],
-          "sounds": []
+          "sounds": [
+            {
+              "sound": "/sounds/sfx/despegue nave.mp3",
+              "soundConfig": {
+                "volume": 0.26,
+                "fadeIn": 0,
+                "fadeOut": 0
+              }
+            }
+          ]
         }
       ]
     },
