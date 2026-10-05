@@ -111,7 +111,7 @@
         {
           "focusY": 0.5474298461140567,
           "dialogue": [
-            { "text": "Sal facheros?", "size": "small", "posX": 38.5017539560737, "posY": 41.827953110692675, "tailX": 28.224667586633807, "tailY": 47.96144722333277, "tailWidth": 6, "tailCurvature": -22, "width": 96, "fontSize": 8, "borderRadius": 18 }
+            { "text": "Salimos facheros?", "size": "small", "posX": 38.5017539560737, "posY": 41.827953110692675, "tailX": 28.224667586633807, "tailY": 47.96144722333277, "tailWidth": 6, "tailCurvature": -22, "width": 96, "fontSize": 8, "borderRadius": 18 }
           ],
           "zoomRects": [
             { "x": 0, "y": 40.41737262861269, "w": 100.05045847895893, "h": 20.95719573375978 }
