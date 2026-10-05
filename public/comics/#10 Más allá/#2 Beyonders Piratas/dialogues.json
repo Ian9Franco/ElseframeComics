@@ -501,11 +501,17 @@
       "panels": [
         {
           "focusY": 0.2,
-          "dialogue": []
+          "dialogue": [],
+          "zoomRects": [
+            { "x": 0, "y": 0, "w": 100, "h": 27.396203442783634 }
+          ]
         },
         {
           "focusY": 0.45,
-          "dialogue": []
+          "dialogue": [],
+          "zoomRects": [
+            { "x": 0, "y": 26.936757228620436, "w": 100, "h": 41.962754226905176 }
+          ]
         },
         {
           "focusY": 0.8,
