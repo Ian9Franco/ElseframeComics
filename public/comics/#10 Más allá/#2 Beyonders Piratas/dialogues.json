@@ -489,7 +489,7 @@
         {
           "focusY": 0.88,
           "dialogue": [
-            { "text": "mañana voy a llegar reee tarde al labubu", "size": "small", "posX": 44.9416876745774, "posY": 75, "tailX": 34.053242384167476, "tailY": 88.5422589322735, "tailWidth": 6, "tailCurvature": -22, "width": 220.92000000000002, "fontSize": 8, "borderRadius": 18 }
+            { "text": "mañana voy a llegar reee tarde al labubu", "size": "small", "posX": 44.9416876745774, "posY": 77.02390287116643, "tailX": 35.483403133413525, "tailY": 86.80748504270227, "tailWidth": 6, "tailCurvature": -22, "width": 220.92000000000002, "fontSize": 8, "borderRadius": 18 }
           ],
           "zoomRects": [
             { "x": 0, "y": 79.25892620861597, "w": 100, "h": 20.741073791384025 }
