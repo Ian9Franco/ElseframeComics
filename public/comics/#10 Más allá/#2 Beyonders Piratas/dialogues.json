@@ -72,7 +72,7 @@
         {
           "focusY": 0.5,
           "dialogue": [
-            { "text": "", "size": "small", "posX": 39.16381796816578, "posY": 25, "tailX": 9.870072641811767, "tailY": 40.79823369565217, "tailWidth": 6, "tailCurvature": -22, "width": 96, "fontSize": 8, "borderRadius": 18 }
+            { "text": " Este es b", "size": "small", "posX": 39.16381796816578, "posY": 25, "tailX": 9.870072641811767, "tailY": 40.79823369565217, "tailWidth": 6, "tailCurvature": -22, "width": 96, "fontSize": 8, "borderRadius": 18 }
           ],
           "zoomRects": [
             { "x": 0, "y": 30.899163542050058, "w": 100, "h": 34.21742730953257 }
