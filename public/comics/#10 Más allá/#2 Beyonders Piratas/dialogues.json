@@ -63,7 +63,7 @@
           "focusY": 0.2,
           "dialogue": [
             { "text": "mati ponete unos temas de esos", "size": "small", "posX": 53.755608375173594, "posY": 2.1624292276466193, "tailX": 35, "tailY": 10, "tailWidth": 6, "tailCurvature": -22, "width": 120, "fontSize": 8, "borderRadius": 18 },
-            { "text": "", "size": "small", "posX": 85.73336182031834, "posY": 5.768322361393018, "tailX": 68.45756329451982, "tailY": 16.59542416675569, "tailWidth": 6, "tailCurvature": -22, "width": 96, "fontSize": 8, "borderRadius": 18 }
+            { "text": "tenes suerte que traje la playlist", "size": "small", "posX": 102.00653039931214, "posY": 11.284650693255315, "tailX": 68.45756329451982, "tailY": 16.59542416675569, "tailWidth": 6, "tailCurvature": -22, "width": 96, "fontSize": 8, "borderRadius": 18 }
           ],
           "zoomRects": [
             { "x": 0, "y": 0, "w": 100, "h": 29.74899791820022 }
