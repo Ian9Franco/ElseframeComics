@@ -92,7 +92,7 @@
         {
           "focusY": 0.11044842315401528,
           "dialogue": [
-            { "text": "Muchachos! Me escuchan? desde la tierra se esta transmitiendo todo ", "style": "scream", "size": "small", "posX": 62.01565046930101, "posY": 2.0038502907401625, "tailX": 83.71884473197025, "tailY": 6.46527074067579, "tailWidth": 6, "tailCurvature": -22, "width": 201, "fontSize": 8, "borderRadius": 18, "fontFamily": "marker" }
+            { "text": "Muchachos! Me escuchan? desde la tierra se esta transmitiendo la mision en vivo", "style": "scream", "size": "small", "posX": 105.10260370697263, "posY": -3.6044168466531676, "tailX": 83.71884473197025, "tailY": 6.46527074067579, "tailWidth": 6, "tailCurvature": -22, "width": 277.44, "fontSize": 8, "borderRadius": 18, "fontFamily": "marker" }
           ],
           "zoomRects": [
             { "x": 0, "y": 0, "w": 100.35272572511896, "h": 22.885872351332875 }
