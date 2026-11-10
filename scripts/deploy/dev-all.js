@@ -24,7 +24,7 @@ function getSiblingRoot(root) {
       }
     }
   } catch (e) {}
-  return path.join(root, "..", "the-boyz-comic");
+  return path.join(root, "..", "Elseframe-comic-v1");
 }
 
 const siblingRoot = getSiblingRoot(projectRoot);

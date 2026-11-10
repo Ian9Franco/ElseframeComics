@@ -8,7 +8,7 @@ const charDataDir = path.join(projectRoot, 'lib', 'characterData');
 const dataFiles = {
   secundarios: 'secundarios.ts',
   antagonistas: 'antagonistas.ts',
-  boyz: 'pibes.ts', // boyz maps to pibes.ts
+  elseframe: 'pibes.ts',
   deidades: 'deidades.ts',
   entidades: 'entidades.ts',
   matis: 'matis.ts',

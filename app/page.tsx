@@ -139,7 +139,7 @@ export default function Home() {
                             HISTORIA PRINCIPAL
                           </h2>
                           <p className="font-sans text-sm text-gray-400 max-w-2xl leading-relaxed">
-                            Acá comienza el canon oficial de <strong className="text-white">The Boyz</strong>.{" "}
+                            Acá comienza el canon oficial de <strong className="text-white">Elseframe</strong>.{" "}
                             La historia arranca tras un escape desesperado:{" "}
                             <strong className="text-[#D7263D]">Ian</strong> y <strong className="text-[#D7263D]">Uandi</strong> lograron rescatar a{" "}
                             <strong className="text-[#D7263D]">Julián</strong> de un secuestro en los <strong className="text-white">Backrooms</strong>.

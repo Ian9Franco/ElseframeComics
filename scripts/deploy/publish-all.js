@@ -24,7 +24,7 @@ function getSiblingRoot(root) {
       }
     }
   } catch (e) {}
-  return path.join(root, "..", "the-boyz-comic");
+  return path.join(root, "..", "Elseframe-comic-v1");
 }
 
 const siblingRoot = process.env.PUBLISH_ASSETS_ROOT || getSiblingRoot(projectRoot);
@@ -67,16 +67,16 @@ if (skipOptimize) {
   }
 } else {
   try {
-    console.log("⏳ Corriendo optimización de imágenes locales de cómics (convert en the-boyz-comic)...");
+    console.log("⏳ Corriendo optimización de imágenes locales de cómics (convert en Elseframe-comic-v1)...");
     execSync("npm run convert", { cwd: siblingRoot, stdio: "inherit" });
 
-    console.log("⏳ Corriendo optimización general de imágenes (compress en the-boys)...");
+    console.log("⏳ Corriendo optimización general de imágenes (compress en ElseframeComics)...");
     execSync("npm run compress", { cwd: projectRoot, stdio: "inherit" });
 
-    console.log("⏳ Corriendo compresión de audios (compress:audio en the-boys)...");
+    console.log("⏳ Corriendo compresión de audios (compress:audio en ElseframeComics)...");
     execSync("npm run compress:audio", { cwd: projectRoot, stdio: "inherit" });
 
-    console.log("⏳ Sincronizando marcadores con el proyecto principal (sync en the-boyz-comic)...");
+    console.log("⏳ Sincronizando marcadores con el proyecto principal (sync en Elseframe-comic-v1)...");
     execSync("npm run sync", { cwd: siblingRoot, stdio: "inherit" });
   } catch (error) {
     console.error("⚠️ Ocurrió un error al procesar/sincronizar los assets. Continuando con git push...", error.message);
@@ -373,14 +373,14 @@ let mainAppPushed = false;
 if (skipAssetsPush) {
   console.log("⏭️ PUBLISH_SKIP_ASSETS_PUSH=1: omitiendo push del repo de assets (PAT inválido en CI).\n");
 } else {
-  const assetsResult = publishRepo("the-boyz-comic (Assets)", siblingRoot);
+  const assetsResult = publishRepo("Elseframe-comic-v1 (Assets)", siblingRoot);
   if (assetsResult.error) {
     reportError("No se publica la app porque falló el repo de assets (páginas y diálogos quedarían desalineados).");
     process.exit(1);
   }
 }
 
-const appResult = publishRepo("the-boys (Main App)", projectRoot);
+const appResult = publishRepo("ElseframeComics (Main App)", projectRoot);
 if (appResult.error) hadError = true;
 mainAppPushed = appResult.pushed;
 

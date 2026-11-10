@@ -23,7 +23,7 @@ function getSiblingRoot(root) {
       }
     }
   } catch (e) {}
-  return path.join(root, "..", "the-boyz-comic");
+  return path.join(root, "..", "Elseframe-comic-v1");
 }
 
 const appRoot = process.env.PUBLISH_PROJECT_ROOT || projectRoot;

@@ -8,26 +8,26 @@ Documento de referencia rápida para desarrollo, publicación y control de acces
 
 | Repo | Propósito | Puerto Dev |
 |---|---|---|
-| `the-boys` | App Next.js — UI, diálogos, código | `616` con `dev:all`, `3000` con `dev` |
-| `the-boyz-comic` | Assets pesados — imágenes en alta resolución | `8080` |
+| `ElseframeComics` | App Next.js — UI, diálogos, código | `616` con `dev:all`, `3000` con `dev` |
+| `Elseframe-comic-v1` | Assets pesados — imágenes en alta resolución | `8080` |
 
 ---
 
 ## Comandos rápidos
 
-### `the-boys`
+### `ElseframeComics`
 ```bash
 npm run dev          # Levanta la web en localhost:3000
 npm run dev:all      # Levanta web + assets: localhost:616 + localhost:8080 (sin contraseñas)
-npm run sync-assets  # Sincroniza marcadores de assets desde the-boyz-comic
+npm run sync-assets  # Sincroniza marcadores de assets desde Elseframe-comic-v1
 npm run build        # Verifica que compila sin errores antes de pushear
 ```
 
-### `the-boyz-comic`
+### `Elseframe-comic-v1`
 ```bash
 npm run dev     # Servidor de imágenes en localhost:8080 (CORS habilitado)
 npm run convert # Convierte todas las imágenes a .webp optimizado
-npm run sync    # Sincroniza hacia the-boys (equivalente a sync-assets)
+npm run sync    # Sincroniza hacia ElseframeComics (equivalente a sync-assets)
 ```
 
 ---
@@ -35,14 +35,14 @@ npm run sync    # Sincroniza hacia the-boys (equivalente a sync-assets)
 ## Flujo para agregar un capítulo nuevo
 
 ```
-1. Crear carpeta en the-boyz-comic/comics/
+1. Crear carpeta en Elseframe-comic-v1/comics/
    └── #4 nombre-saga/
        └── #1 nombre-capitulo/
            ├── portada.png     ← portada del capítulo
            ├── 1.png
            ├── 2.png ...
 
-2. Convertir a WebP (en the-boyz-comic):
+2. Convertir a WebP (en Elseframe-comic-v1):
    npm run convert
 
 3. Sincronizar hacia la web (en cualquiera de los dos):
@@ -83,7 +83,7 @@ El sistema usa el campo **`"status"`** en los JSON de cada capítulo o saga.
 Editá el archivo `chapter.json` de ese capítulo:
 
 ```
-the-boys/public/comics/#3 El Silencio del Dragon/#1 Un Lugar/chapter.json
+ElseframeComics/public/comics/#3 El Silencio del Dragon/#1 Un Lugar/chapter.json
 ```
 
 ```json
@@ -109,7 +109,7 @@ the-boys/public/comics/#3 El Silencio del Dragon/#1 Un Lugar/chapter.json
 Editá el `saga.json` de esa saga:
 
 ```
-the-boys/public/comics/#3 El Silencio del Dragon/saga.json
+ElseframeComics/public/comics/#3 El Silencio del Dragon/saga.json
 ```
 
 ```json
@@ -185,7 +185,7 @@ Cualquiera que ingrese `hush` en el modal de contraseña podrá ver esa saga, si
 
 ### `.env.local` (desarrollo)
 
-Copiá `.env.example` → `.env.local`. Las claves **no van a git**; se guardan automáticamente en `%LOCALAPPDATA%\the-boys\config\` (Windows) al correr `npm run dev` o con `npm run config:save`. Se restauran solas en `npm install`.
+Copiá `.env.example` → `.env.local`. Las claves **no van a git**; se guardan automáticamente en `%LOCALAPPDATA%\ElseframeComics\config\` (Windows) al correr `npm run dev` o con `npm run config:save`. Se restauran solas en `npm install`.
 
 ```env
 OPENAI_API_KEY="sk-..."
@@ -265,7 +265,7 @@ comando para publicar: npm run publish:all
 El sistema de personajes oculta automáticamente la ficha y detalles de un personaje si el usuario no ha completado la lectura del capítulo asociado.
 
 Las reglas de desbloqueo se configuran en el archivo:
-`the-boys/lib/characterData/unlockRules.ts`
+`ElseframeComics/lib/characterData/unlockRules.ts`
 
 ### Formato de Regla
 

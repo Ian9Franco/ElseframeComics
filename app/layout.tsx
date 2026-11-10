@@ -22,7 +22,7 @@ const siteUrl = process.env.VERCEL_PROJECT_PRODUCTION_URL
   ? `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}`
   : process.env.VERCEL_URL
   ? `https://${process.env.VERCEL_URL}`
-  : "https://theboyz.vercel.app"; // Fallback URL de producción
+  : "https://elseframe-comics.vercel.app";
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),

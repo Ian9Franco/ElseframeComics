@@ -51,14 +51,14 @@ jobs:
         uses: actions/checkout@v4
         with:
           ref: editor-workspace
-          path: the-boys
+          path: elseframe
           # Default depth=1: evita bajar ~1.5GB de historial (public/comics en commits viejos).
           fetch-depth: 1
           show-progress: false
 
       - name: Record workspace commit
         id: ws
-        run: echo "sha=$(git -C the-boys rev-parse HEAD)" >> "$GITHUB_OUTPUT"
+        run: echo "sha=$(git -C elseframe rev-parse HEAD)" >> "$GITHUB_OUTPUT"
 
       - name: Checkout assets workspace
         env:
@@ -76,13 +76,13 @@ jobs:
             BRANCH=editor-workspace
           fi
           # Shallow + blobless remote: historial mínimo; blobs de HEAD bajo demanda si hace falta.
-          git clone --filter=blob:none --single-branch --depth 1 --branch "$BRANCH" "$REPO" theboyz-comic-v1
-          git -C theboyz-comic-v1 fetch --depth=64 origin main
+          git clone --filter=blob:none --single-branch --depth 1 --branch "$BRANCH" "$REPO" elseframe-comic-v1
+          git -C elseframe-comic-v1 fetch --depth=64 origin main
 
           if [ "$BRANCH" = "editor-workspace" ] && \
-             ! git -C theboyz-comic-v1 merge-base --is-ancestor origin/editor-workspace origin/main; then
+             ! git -C elseframe-comic-v1 merge-base --is-ancestor origin/editor-workspace origin/main; then
             if [ "$PAT_MODE" != "auth" ]; then
-              echo "::error::Hay cambios de páginas (subidas, borrados o renumeración) en theboyz-comic-v1/editor-workspace, pero ELSEFRAME_PUBLISH_TOKEN no es válido, así que no se pueden publicar. Corregí el secret y volvé a publicar."
+              echo "::error::Hay cambios de páginas (subidas, borrados o renumeración) en elseframe-comic-v1/editor-workspace, pero ELSEFRAME_PUBLISH_TOKEN no es válido, así que no se pueden publicar. Corregí el secret y volvé a publicar."
               exit 1
             fi
             echo "Hay cambios de páginas pendientes en assets/editor-workspace."
@@ -103,11 +103,11 @@ jobs:
       - name: Deepen refs for merge (shallow CI)
         run: |
           set -euo pipefail
-          git -C the-boys fetch --depth=64 origin main editor-workspace
-          git -C theboyz-comic-v1 fetch --depth=64 origin main || true
+          git -C elseframe fetch --depth=64 origin main editor-workspace
+          git -C elseframe-comic-v1 fetch --depth=64 origin main || true
 
       - name: Load publish scripts from main
-        working-directory: the-boys
+        working-directory: elseframe
         run: |
           set -euo pipefail
           mkdir -p "$RUNNER_TEMP/publish-tools"
@@ -116,19 +116,19 @@ jobs:
 
       - name: Publish
         id: publish
-        working-directory: the-boys
+        working-directory: elseframe
         env:
           PUBLISH_TARGET_BRANCH: main
           PUBLISH_SKIP_OPTIMIZE: "1"
           SYNC_JSON_SOURCE: web
-          PUBLISH_PROJECT_ROOT: ${{ github.workspace }}/the-boys
-          PUBLISH_ASSETS_ROOT: ${{ github.workspace }}/theboyz-comic-v1
+          PUBLISH_PROJECT_ROOT: ${{ github.workspace }}/elseframe
+          PUBLISH_ASSETS_ROOT: ${{ github.workspace }}/elseframe-comic-v1
           PAT_MODE: ${{ steps.pat.outputs.mode }}
           COMMIT_MESSAGE: ${{ inputs.message }}
         run: |
           set -euo pipefail
           if [ "$PAT_MODE" != "auth" ]; then
-            echo "Sin PAT válido: no se intentará push a theboyz-comic-v1."
+            echo "Sin PAT válido: no se intentará push a elseframe-comic-v1."
             export PUBLISH_SKIP_ASSETS_PUSH=1
           fi
           node "$RUNNER_TEMP/publish-tools/publish-all.js" "$COMMIT_MESSAGE" | tee /tmp/publish-all.log
@@ -143,7 +143,7 @@ jobs:
           fi
 
       - name: Verify main contains published workspace
-        working-directory: the-boys
+        working-directory: elseframe
         env:
           WS_SHA: ${{ steps.ws.outputs.sha }}
         run: |

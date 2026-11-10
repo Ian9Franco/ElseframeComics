@@ -241,91 +241,91 @@ export const conceptArts: Record<string, ConceptArtItem[]> = {
   "uandi": [
     {
       "name": "Aegis New Sheet Alt",
-      "path": "/personajes/GUIAS/boyz/AEGIS/aegis_new_sheet_alt.webp",
+      "path": "/personajes/GUIAS/elseframe/AEGIS/aegis_new_sheet_alt.webp",
       "section": "base",
       "sectionLabel": "Base",
       "isAlt": false
     },
     {
       "name": "Aegis Sheet",
-      "path": "/personajes/GUIAS/boyz/AEGIS/Aegis_sheet.webp",
+      "path": "/personajes/GUIAS/elseframe/AEGIS/Aegis_sheet.webp",
       "section": "base",
       "sectionLabel": "Base",
       "isAlt": false
     },
     {
       "name": "Uandi New Sheet",
-      "path": "/personajes/GUIAS/boyz/AEGIS/uandi_new_sheet.webp",
+      "path": "/personajes/GUIAS/elseframe/AEGIS/uandi_new_sheet.webp",
       "section": "base",
       "sectionLabel": "Base",
       "isAlt": false
     },
     {
       "name": "Aegis Full Sheet",
-      "path": "/personajes/GUIAS/boyz/AEGIS/old/aegis full_sheet.webp",
+      "path": "/personajes/GUIAS/elseframe/AEGIS/old/aegis full_sheet.webp",
       "section": "old",
       "sectionLabel": "Old",
       "isAlt": true
     },
     {
       "name": "Aegis Alt Sheet",
-      "path": "/personajes/GUIAS/boyz/AEGIS/old/aegis_alt_sheet.webp",
+      "path": "/personajes/GUIAS/elseframe/AEGIS/old/aegis_alt_sheet.webp",
       "section": "old",
       "sectionLabel": "Old",
       "isAlt": true
     },
     {
       "name": "Aegis Newalt Sheet",
-      "path": "/personajes/GUIAS/boyz/AEGIS/old/Aegis_newalt_sheet.webp",
+      "path": "/personajes/GUIAS/elseframe/AEGIS/old/Aegis_newalt_sheet.webp",
       "section": "old",
       "sectionLabel": "Old",
       "isAlt": true
     },
     {
       "name": "Aegis New Sheet",
-      "path": "/personajes/GUIAS/boyz/AEGIS/old/Aegis_new_sheet.webp",
+      "path": "/personajes/GUIAS/elseframe/AEGIS/old/Aegis_new_sheet.webp",
       "section": "old",
       "sectionLabel": "Old",
       "isAlt": true
     },
     {
       "name": "Aegis Sheet",
-      "path": "/personajes/GUIAS/boyz/AEGIS/old/Aegis_sheet.webp",
+      "path": "/personajes/GUIAS/elseframe/AEGIS/old/Aegis_sheet.webp",
       "section": "old",
       "sectionLabel": "Old",
       "isAlt": true
     },
     {
       "name": "Uandi Alt2 Sheet",
-      "path": "/personajes/GUIAS/boyz/AEGIS/old/uandi_alt2_sheet.webp",
+      "path": "/personajes/GUIAS/elseframe/AEGIS/old/uandi_alt2_sheet.webp",
       "section": "old",
       "sectionLabel": "Old",
       "isAlt": true
     },
     {
       "name": "Uandi Combat Sheet",
-      "path": "/personajes/GUIAS/boyz/AEGIS/old/uandi_combat_sheet.webp",
+      "path": "/personajes/GUIAS/elseframe/AEGIS/old/uandi_combat_sheet.webp",
       "section": "old",
       "sectionLabel": "Old",
       "isAlt": true
     },
     {
       "name": "Uandi Sheet",
-      "path": "/personajes/GUIAS/boyz/AEGIS/old/uandi_sheet.webp",
+      "path": "/personajes/GUIAS/elseframe/AEGIS/old/uandi_sheet.webp",
       "section": "old",
       "sectionLabel": "Old",
       "isAlt": true
     },
     {
       "name": "Uandi Sheet Alt",
-      "path": "/personajes/GUIAS/boyz/AEGIS/old/uandi_sheet_alt.webp",
+      "path": "/personajes/GUIAS/elseframe/AEGIS/old/uandi_sheet_alt.webp",
       "section": "old",
       "sectionLabel": "Old",
       "isAlt": true
     },
     {
       "name": "Uandi To Aegis Sheet",
-      "path": "/personajes/GUIAS/boyz/AEGIS/old/Uandi_to_Aegis_sheet.webp",
+      "path": "/personajes/GUIAS/elseframe/AEGIS/old/Uandi_to_Aegis_sheet.webp",
       "section": "old",
       "sectionLabel": "Old",
       "isAlt": true
@@ -334,105 +334,105 @@ export const conceptArts: Record<string, ConceptArtItem[]> = {
   "julian": [
     {
       "name": "Bandit Blueclose Sheet",
-      "path": "/personajes/GUIAS/boyz/BANDIT/Bandit_blueclose_sheet.webp",
+      "path": "/personajes/GUIAS/elseframe/BANDIT/Bandit_blueclose_sheet.webp",
       "section": "base",
       "sectionLabel": "Base",
       "isAlt": false
     },
     {
       "name": "Bandit Closemask Sheet",
-      "path": "/personajes/GUIAS/boyz/BANDIT/Bandit_closemask_sheet.webp",
+      "path": "/personajes/GUIAS/elseframe/BANDIT/Bandit_closemask_sheet.webp",
       "section": "base",
       "sectionLabel": "Base",
       "isAlt": false
     },
     {
       "name": "Bandit Close Sheet",
-      "path": "/personajes/GUIAS/boyz/BANDIT/Bandit_close_sheet.webp",
+      "path": "/personajes/GUIAS/elseframe/BANDIT/Bandit_close_sheet.webp",
       "section": "base",
       "sectionLabel": "Base",
       "isAlt": false
     },
     {
       "name": "Bandit Sheet   Copia",
-      "path": "/personajes/GUIAS/boyz/BANDIT/bandit_sheet - copia.webp",
+      "path": "/personajes/GUIAS/elseframe/BANDIT/bandit_sheet - copia.webp",
       "section": "base",
       "sectionLabel": "Base",
       "isAlt": false
     },
     {
       "name": "Bandit Sheet",
-      "path": "/personajes/GUIAS/boyz/BANDIT/bandit_sheet.webp",
+      "path": "/personajes/GUIAS/elseframe/BANDIT/bandit_sheet.webp",
       "section": "base",
       "sectionLabel": "Base",
       "isAlt": false
     },
     {
       "name": "Bandit Suits Sheet",
-      "path": "/personajes/GUIAS/boyz/BANDIT/Bandit_suits_sheet.webp",
+      "path": "/personajes/GUIAS/elseframe/BANDIT/Bandit_suits_sheet.webp",
       "section": "base",
       "sectionLabel": "Base",
       "isAlt": false
     },
     {
       "name": "Bandit Suit Sheet",
-      "path": "/personajes/GUIAS/boyz/BANDIT/Bandit_suit_sheet.webp",
+      "path": "/personajes/GUIAS/elseframe/BANDIT/Bandit_suit_sheet.webp",
       "section": "base",
       "sectionLabel": "Base",
       "isAlt": false
     },
     {
       "name": "Julian Alt Sheet",
-      "path": "/personajes/GUIAS/boyz/BANDIT/julian_alt_sheet.webp",
+      "path": "/personajes/GUIAS/elseframe/BANDIT/julian_alt_sheet.webp",
       "section": "base",
       "sectionLabel": "Base",
       "isAlt": false
     },
     {
       "name": "Julian Chef Sheet",
-      "path": "/personajes/GUIAS/boyz/BANDIT/Julian_chef_sheet.webp",
+      "path": "/personajes/GUIAS/elseframe/BANDIT/Julian_chef_sheet.webp",
       "section": "base",
       "sectionLabel": "Base",
       "isAlt": false
     },
     {
       "name": "Julian New Sheet",
-      "path": "/personajes/GUIAS/boyz/BANDIT/julian_new_sheet.webp",
+      "path": "/personajes/GUIAS/elseframe/BANDIT/julian_new_sheet.webp",
       "section": "base",
       "sectionLabel": "Base",
       "isAlt": false
     },
     {
       "name": "Julian Sheet",
-      "path": "/personajes/GUIAS/boyz/BANDIT/julian_sheet.webp",
+      "path": "/personajes/GUIAS/elseframe/BANDIT/julian_sheet.webp",
       "section": "base",
       "sectionLabel": "Base",
       "isAlt": false
     },
     {
       "name": "Alt Sheet",
-      "path": "/personajes/GUIAS/boyz/BANDIT/old/alt_Sheet.webp",
+      "path": "/personajes/GUIAS/elseframe/BANDIT/old/alt_Sheet.webp",
       "section": "old",
       "sectionLabel": "Old",
       "isAlt": true
     },
     {
       "name": "Old Accion Sheet",
-      "path": "/personajes/GUIAS/boyz/BANDIT/old/old_accion_sheet.webp",
+      "path": "/personajes/GUIAS/elseframe/BANDIT/old/old_accion_sheet.webp",
       "section": "old",
       "sectionLabel": "Old",
       "isAlt": true
     },
     {
       "name": "Old Alt Sheet",
-      "path": "/personajes/GUIAS/boyz/BANDIT/old/old_alt_sheet.webp",
+      "path": "/personajes/GUIAS/elseframe/BANDIT/old/old_alt_sheet.webp",
       "section": "old",
       "sectionLabel": "Old",
       "isAlt": true
     },
     {
       "name": "Old Sheet",
-      "path": "/personajes/GUIAS/boyz/BANDIT/old/old_sheet.webp",
+      "path": "/personajes/GUIAS/elseframe/BANDIT/old/old_sheet.webp",
       "section": "old",
       "sectionLabel": "Old",
       "isAlt": true
@@ -441,21 +441,21 @@ export const conceptArts: Record<string, ConceptArtItem[]> = {
   "sofi": [
     {
       "name": "Dusk Sheet",
-      "path": "/personajes/GUIAS/boyz/DUSK/dusk_sheet.webp",
+      "path": "/personajes/GUIAS/elseframe/DUSK/dusk_sheet.webp",
       "section": "base",
       "sectionLabel": "Base",
       "isAlt": false
     },
     {
       "name": "Dusk Sheet",
-      "path": "/personajes/GUIAS/boyz/DUSK/dusk__sheet.webp",
+      "path": "/personajes/GUIAS/elseframe/DUSK/dusk__sheet.webp",
       "section": "base",
       "sectionLabel": "Base",
       "isAlt": false
     },
     {
       "name": "Sofi Sheet",
-      "path": "/personajes/GUIAS/boyz/DUSK/sofi_sheet.webp",
+      "path": "/personajes/GUIAS/elseframe/DUSK/sofi_sheet.webp",
       "section": "base",
       "sectionLabel": "Base",
       "isAlt": false
@@ -464,70 +464,70 @@ export const conceptArts: Record<string, ConceptArtItem[]> = {
   "mati": [
     {
       "name": "Farsight Close Sheet",
-      "path": "/personajes/GUIAS/boyz/FARSIGHT/farsight_close_sheet.webp",
+      "path": "/personajes/GUIAS/elseframe/FARSIGHT/farsight_close_sheet.webp",
       "section": "base",
       "sectionLabel": "Base",
       "isAlt": false
     },
     {
       "name": "Farsight Sheet",
-      "path": "/personajes/GUIAS/boyz/FARSIGHT/farsight_sheet.webp",
+      "path": "/personajes/GUIAS/elseframe/FARSIGHT/farsight_sheet.webp",
       "section": "base",
       "sectionLabel": "Base",
       "isAlt": false
     },
     {
       "name": "Farsight Sheet 1",
-      "path": "/personajes/GUIAS/boyz/FARSIGHT/farsight_sheet_1.webp",
+      "path": "/personajes/GUIAS/elseframe/FARSIGHT/farsight_sheet_1.webp",
       "section": "base",
       "sectionLabel": "Base",
       "isAlt": false
     },
     {
       "name": "Farsight Suits Sheet",
-      "path": "/personajes/GUIAS/boyz/FARSIGHT/farsight_suits_sheet.webp",
+      "path": "/personajes/GUIAS/elseframe/FARSIGHT/farsight_suits_sheet.webp",
       "section": "base",
       "sectionLabel": "Base",
       "isAlt": false
     },
     {
       "name": "Mati Alt Sheet",
-      "path": "/personajes/GUIAS/boyz/FARSIGHT/mati_alt_sheet.webp",
+      "path": "/personajes/GUIAS/elseframe/FARSIGHT/mati_alt_sheet.webp",
       "section": "base",
       "sectionLabel": "Base",
       "isAlt": false
     },
     {
       "name": "Mati Sheet",
-      "path": "/personajes/GUIAS/boyz/FARSIGHT/mati_sheet.webp",
+      "path": "/personajes/GUIAS/elseframe/FARSIGHT/mati_sheet.webp",
       "section": "base",
       "sectionLabel": "Base",
       "isAlt": false
     },
     {
       "name": "Accion Sheet",
-      "path": "/personajes/GUIAS/boyz/FARSIGHT/old/accion_sheet.webp",
+      "path": "/personajes/GUIAS/elseframe/FARSIGHT/old/accion_sheet.webp",
       "section": "old",
       "sectionLabel": "Old",
       "isAlt": true
     },
     {
       "name": "Alt Sheet",
-      "path": "/personajes/GUIAS/boyz/FARSIGHT/old/alt_sheet.webp",
+      "path": "/personajes/GUIAS/elseframe/FARSIGHT/old/alt_sheet.webp",
       "section": "old",
       "sectionLabel": "Old",
       "isAlt": true
     },
     {
       "name": "Farsight Alt Sheet",
-      "path": "/personajes/GUIAS/boyz/FARSIGHT/old/farsight_ALT_sheet.webp",
+      "path": "/personajes/GUIAS/elseframe/FARSIGHT/old/farsight_ALT_sheet.webp",
       "section": "old",
       "sectionLabel": "Old",
       "isAlt": true
     },
     {
       "name": "Use Sheet",
-      "path": "/personajes/GUIAS/boyz/FARSIGHT/old/use_sheet.webp",
+      "path": "/personajes/GUIAS/elseframe/FARSIGHT/old/use_sheet.webp",
       "section": "old",
       "sectionLabel": "Old",
       "isAlt": true
@@ -536,28 +536,28 @@ export const conceptArts: Record<string, ConceptArtItem[]> = {
   "volvo": [
     {
       "name": "Outrider Alt Sheet",
-      "path": "/personajes/GUIAS/boyz/OUTRIDER/Outrider_alt_sheet.webp",
+      "path": "/personajes/GUIAS/elseframe/OUTRIDER/Outrider_alt_sheet.webp",
       "section": "base",
       "sectionLabel": "Base",
       "isAlt": false
     },
     {
       "name": "Outrider Old Sheet",
-      "path": "/personajes/GUIAS/boyz/OUTRIDER/outrider_old_sheet.webp",
+      "path": "/personajes/GUIAS/elseframe/OUTRIDER/outrider_old_sheet.webp",
       "section": "base",
       "sectionLabel": "Base",
       "isAlt": false
     },
     {
       "name": "Outrider Sheet",
-      "path": "/personajes/GUIAS/boyz/OUTRIDER/Outrider_sheet.webp",
+      "path": "/personajes/GUIAS/elseframe/OUTRIDER/Outrider_sheet.webp",
       "section": "base",
       "sectionLabel": "Base",
       "isAlt": false
     },
     {
       "name": "Volvo Sheet",
-      "path": "/personajes/GUIAS/boyz/OUTRIDER/volvo_sheet.webp",
+      "path": "/personajes/GUIAS/elseframe/OUTRIDER/volvo_sheet.webp",
       "section": "base",
       "sectionLabel": "Base",
       "isAlt": false
@@ -566,42 +566,42 @@ export const conceptArts: Record<string, ConceptArtItem[]> = {
   "jaz": [
     {
       "name": "Jaz Home Sheet",
-      "path": "/personajes/GUIAS/boyz/SIGIL/jaz_home_sheet.webp",
+      "path": "/personajes/GUIAS/elseframe/SIGIL/jaz_home_sheet.webp",
       "section": "base",
       "sectionLabel": "Base",
       "isAlt": false
     },
     {
       "name": "Jaz Sheet",
-      "path": "/personajes/GUIAS/boyz/SIGIL/Jaz_sheet.webp",
+      "path": "/personajes/GUIAS/elseframe/SIGIL/Jaz_sheet.webp",
       "section": "base",
       "sectionLabel": "Base",
       "isAlt": false
     },
     {
       "name": "Jaz Work Sheet",
-      "path": "/personajes/GUIAS/boyz/SIGIL/jaz_work_sheet.webp",
+      "path": "/personajes/GUIAS/elseframe/SIGIL/jaz_work_sheet.webp",
       "section": "base",
       "sectionLabel": "Base",
       "isAlt": false
     },
     {
       "name": "Sigil Sheet",
-      "path": "/personajes/GUIAS/boyz/SIGIL/SIGIL_sheet.webp",
+      "path": "/personajes/GUIAS/elseframe/SIGIL/SIGIL_sheet.webp",
       "section": "base",
       "sectionLabel": "Base",
       "isAlt": false
     },
     {
       "name": "Sigil Sheet",
-      "path": "/personajes/GUIAS/boyz/SIGIL/Sigil_sheet_.webp",
+      "path": "/personajes/GUIAS/elseframe/SIGIL/Sigil_sheet_.webp",
       "section": "base",
       "sectionLabel": "Base",
       "isAlt": false
     },
     {
       "name": "Jaz Sheet",
-      "path": "/personajes/GUIAS/boyz/SIGIL/old/JAZ_sheet.webp",
+      "path": "/personajes/GUIAS/elseframe/SIGIL/old/JAZ_sheet.webp",
       "section": "old",
       "sectionLabel": "Old",
       "isAlt": true
@@ -610,126 +610,126 @@ export const conceptArts: Record<string, ConceptArtItem[]> = {
   "ian": [
     {
       "name": "Ian 2gym Sheet",
-      "path": "/personajes/GUIAS/boyz/VESPERWING/ian_2gym_sheet.webp",
+      "path": "/personajes/GUIAS/elseframe/VESPERWING/ian_2gym_sheet.webp",
       "section": "base",
       "sectionLabel": "Base",
       "isAlt": false
     },
     {
       "name": "Ian Gym Alt Sheet",
-      "path": "/personajes/GUIAS/boyz/VESPERWING/ian_gym_alt_sheet.webp",
+      "path": "/personajes/GUIAS/elseframe/VESPERWING/ian_gym_alt_sheet.webp",
       "section": "base",
       "sectionLabel": "Base",
       "isAlt": false
     },
     {
       "name": "Ian Gym Sheet",
-      "path": "/personajes/GUIAS/boyz/VESPERWING/ian_gym_sheet.webp",
+      "path": "/personajes/GUIAS/elseframe/VESPERWING/ian_gym_sheet.webp",
       "section": "base",
       "sectionLabel": "Base",
       "isAlt": false
     },
     {
       "name": "Ian Lab Sheet",
-      "path": "/personajes/GUIAS/boyz/VESPERWING/ian_lab_sheet.webp",
+      "path": "/personajes/GUIAS/elseframe/VESPERWING/ian_lab_sheet.webp",
       "section": "base",
       "sectionLabel": "Base",
       "isAlt": false
     },
     {
       "name": "Ian Sheet",
-      "path": "/personajes/GUIAS/boyz/VESPERWING/ian_sheet.webp",
+      "path": "/personajes/GUIAS/elseframe/VESPERWING/ian_sheet.webp",
       "section": "base",
       "sectionLabel": "Base",
       "isAlt": false
     },
     {
       "name": "Vesperwing Alt Sheet",
-      "path": "/personajes/GUIAS/boyz/VESPERWING/vesperwing_alt_sheet.webp",
+      "path": "/personajes/GUIAS/elseframe/VESPERWING/vesperwing_alt_sheet.webp",
       "section": "base",
       "sectionLabel": "Base",
       "isAlt": false
     },
     {
       "name": "Vesperwing Sheet",
-      "path": "/personajes/GUIAS/boyz/VESPERWING/vesperwing_sheet.webp",
+      "path": "/personajes/GUIAS/elseframe/VESPERWING/vesperwing_sheet.webp",
       "section": "base",
       "sectionLabel": "Base",
       "isAlt": false
     },
     {
       "name": "Ian New Sheet",
-      "path": "/personajes/GUIAS/boyz/VESPERWING/alt/ian_new_sheet.webp",
+      "path": "/personajes/GUIAS/elseframe/VESPERWING/alt/ian_new_sheet.webp",
       "section": "alt",
       "sectionLabel": "Alt",
       "isAlt": true
     },
     {
       "name": "Ian Old Sheet",
-      "path": "/personajes/GUIAS/boyz/VESPERWING/alt/ian_old_sheet.webp",
+      "path": "/personajes/GUIAS/elseframe/VESPERWING/alt/ian_old_sheet.webp",
       "section": "alt",
       "sectionLabel": "Alt",
       "isAlt": true
     },
     {
       "name": "Ian Siut Sheet",
-      "path": "/personajes/GUIAS/boyz/VESPERWING/alt/IAN_SIUT_sheet.webp",
+      "path": "/personajes/GUIAS/elseframe/VESPERWING/alt/IAN_SIUT_sheet.webp",
       "section": "alt",
       "sectionLabel": "Alt",
       "isAlt": true
     },
     {
       "name": "Mk3 Spider Sheet",
-      "path": "/personajes/GUIAS/boyz/VESPERWING/alt/MK3 SPIDER_sheet.webp",
+      "path": "/personajes/GUIAS/elseframe/VESPERWING/alt/MK3 SPIDER_sheet.webp",
       "section": "alt",
       "sectionLabel": "Alt",
       "isAlt": true
     },
     {
       "name": "Suit Capucha Sheet",
-      "path": "/personajes/GUIAS/boyz/VESPERWING/alt/SUIT CAPUCHA_sheet.webp",
+      "path": "/personajes/GUIAS/elseframe/VESPERWING/alt/SUIT CAPUCHA_sheet.webp",
       "section": "alt",
       "sectionLabel": "Alt",
       "isAlt": true
     },
     {
       "name": "Suit Sheet",
-      "path": "/personajes/GUIAS/boyz/VESPERWING/alt/SUIT_sheet.webp",
+      "path": "/personajes/GUIAS/elseframe/VESPERWING/alt/SUIT_sheet.webp",
       "section": "alt",
       "sectionLabel": "Alt",
       "isAlt": true
     },
     {
       "name": "Vesperwing Alt Sheet",
-      "path": "/personajes/GUIAS/boyz/VESPERWING/alt/vesperwing_alt_sheet.webp",
+      "path": "/personajes/GUIAS/elseframe/VESPERWING/alt/vesperwing_alt_sheet.webp",
       "section": "alt",
       "sectionLabel": "Alt",
       "isAlt": true
     },
     {
       "name": "Mk3 Sheet",
-      "path": "/personajes/GUIAS/boyz/VESPERWING/mk3/MK3_sheet.webp",
+      "path": "/personajes/GUIAS/elseframe/VESPERWING/mk3/MK3_sheet.webp",
       "section": "mk3",
       "sectionLabel": "MK3",
       "isAlt": true
     },
     {
       "name": "Mkl Sheet",
-      "path": "/personajes/GUIAS/boyz/VESPERWING/MKL/MKL_sheet.webp",
+      "path": "/personajes/GUIAS/elseframe/VESPERWING/MKL/MKL_sheet.webp",
       "section": "MKL",
       "sectionLabel": "MKL",
       "isAlt": true
     },
     {
       "name": "Ian Tokyo Alt Sheet",
-      "path": "/personajes/GUIAS/boyz/VESPERWING/tokyo/ian_tokyo_alt_sheet.webp",
+      "path": "/personajes/GUIAS/elseframe/VESPERWING/tokyo/ian_tokyo_alt_sheet.webp",
       "section": "tokyo",
       "sectionLabel": "Tokyo",
       "isAlt": true
     },
     {
       "name": "Ian Tokyo Sheet",
-      "path": "/personajes/GUIAS/boyz/VESPERWING/tokyo/ian_tokyo_sheet.webp",
+      "path": "/personajes/GUIAS/elseframe/VESPERWING/tokyo/ian_tokyo_sheet.webp",
       "section": "tokyo",
       "sectionLabel": "Tokyo",
       "isAlt": true

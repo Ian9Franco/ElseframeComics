@@ -7,7 +7,7 @@
           "focusY": 0.16,
           "dialogue": [
             { "text": "Che, Sigo sin entender... ¿Qué carajo hacía la cara de el Mati metida en la pantalla de ese casino?", "posX": 50, "posY": 25, "tailX": 60, "tailY": 15, "fontSize": 10, "width": 120, "borderRadius": 18, "tailWidth": 6, "tailCurvature": -22, "size": "small", "customColor": "#1c1c1c" },
-            { "text": "Los Ángeles. Otra realidad, The boyz", "style": "caption", "posX": 50, "posY": 0, "size": "small", "customBg": "#050000", "customColor": "#fff700", "textColor": "#ffffff" },
+            { "text": "Los Ángeles. Otra realidad, Elseframe", "style": "caption", "posX": 50, "posY": 0, "size": "small", "customBg": "#050000", "customColor": "#fff700", "textColor": "#ffffff" },
             { "text": "Qué sé yo, Julián. Estaba toda rota, llena de estática. Para mí que el hdp nos hackeó desde Buenos Aires... o se volvió loco.", "size": "small", "posX": 100, "posY": 5, "tailX": 80, "tailY": 10, "tailWidth": 14, "tailCurvature": -22, "width": 120, "fontSize": 10, "borderRadius": 13 }
           ],
           "hideUntilReached": true

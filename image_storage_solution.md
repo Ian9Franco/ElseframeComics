@@ -19,10 +19,10 @@ Para que la solución sea ideal, debe cumplir lo siguiente:
 ## 3. Opciones de Almacenamiento a Coste $0
 
 ### Opción A: Repositorio de GitHub Independiente + CDN de jsDelivr (Recomendado)
-Consiste en crear un segundo repositorio público de GitHub únicamente para hospedar las imágenes (ej. `the-boys-assets`). Las imágenes se cargan a través de la red global de distribución de contenido (CDN) de **jsDelivr**, la cual es gratuita e ilimitada para proyectos open source.
+Consiste en crear un segundo repositorio público de GitHub únicamente para hospedar las imágenes (ej. `Elseframe-comic-v1`). Las imágenes se cargan a través de la red global de distribución de contenido (CDN) de **jsDelivr**, la cual es gratuita e ilimitada para proyectos open source.
 
 - **URL de carga local**: `/comics/saga/capitulo/pagina_1.jpg`
-- **URL de carga CDN**: `https://cdn.jsdelivr.net/gh/Ian9Franco/the-boys-assets@main/comics/saga/capitulo/pagina_1.jpg`
+- **URL de carga CDN**: `https://cdn.jsdelivr.net/gh/Ian9Franco/Elseframe-comic-v1@main/comics/saga/capitulo/pagina_1.jpg`
 - **Ventajas**:
   - **100% Gratuito y sin límites estrictos** de almacenamiento (GitHub permite repositorios de hasta 10GB de forma óptima).
   - Ancho de banda ilimitado y caché distribuida de jsDelivr.
@@ -53,7 +53,7 @@ NEXT_PUBLIC_ASSETS_BASE_URL=""
 En Vercel (Production) configuras la variable apuntando al CDN externo:
 ```env
 # Ejemplo con GitHub + jsDelivr
-NEXT_PUBLIC_ASSETS_BASE_URL="https://cdn.jsdelivr.net/gh/Ian9Franco/the-boys-assets@main"
+NEXT_PUBLIC_ASSETS_BASE_URL="https://cdn.jsdelivr.net/gh/Ian9Franco/Elseframe-comic-v1@main"
 ```
 
 ### Paso 2: Crear una utilidad para construir rutas
