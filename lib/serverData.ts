@@ -299,7 +299,7 @@ export function validatePreviewAccess(request: NextRequest, sagaId?: string): bo
 }
 
 function resolveSiblingAssetsSubdir(subdir: "comics" | "sounds"): string {
-  const possibleNames = ["the-boyz-comic", "theboyz-comic-v1", "theboyz-comic"];
+  const possibleNames = ["Elseframe-comic-v1", "the-boyz-comic", "theboyz-comic-v1", "theboyz-comic"];
   for (const name of possibleNames) {
     const p = path.join(process.cwd(), "..", name, subdir);
     if (fs.existsSync(p)) {
@@ -310,7 +310,7 @@ function resolveSiblingAssetsSubdir(subdir: "comics" | "sounds"): string {
     const parentDir = path.join(process.cwd(), "..");
     const files = fs.readdirSync(parentDir);
     for (const file of files) {
-      if (file.toLowerCase().includes("the-boyz-comic") || file.toLowerCase().includes("theboyz-comic")) {
+      if (file.toLowerCase().includes("elseframe-comic") || file.toLowerCase().includes("the-boyz-comic") || file.toLowerCase().includes("theboyz-comic")) {
         const p = path.join(parentDir, file, subdir);
         if (fs.existsSync(p)) {
           return p;

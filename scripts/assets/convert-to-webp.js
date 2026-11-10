@@ -14,7 +14,7 @@ const projectRoot = path.join(__dirname, "..", "..");
 const localPublicDir = path.join(projectRoot, "public");
 
 function getSiblingRoot(root) {
-  const possibleNames = ["the-boyz-comic", "theboyz-comic-v1", "theboyz-comic"];
+  const possibleNames = ["Elseframe-comic-v1", "the-boyz-comic", "theboyz-comic-v1", "theboyz-comic"];
   for (const name of possibleNames) {
     const p = path.join(root, "..", name);
     if (fsSync.existsSync(p)) {
@@ -25,7 +25,7 @@ function getSiblingRoot(root) {
     const parentDir = path.join(root, "..");
     const files = fsSync.readdirSync(parentDir);
     for (const file of files) {
-      if (file.toLowerCase().includes("the-boyz-comic") || file.toLowerCase().includes("theboyz-comic")) {
+      if (file.toLowerCase().includes("elseframe-comic") || file.toLowerCase().includes("the-boyz-comic") || file.toLowerCase().includes("theboyz-comic")) {
         const p = path.join(parentDir, file);
         if (fsSync.statSync(p).isDirectory()) {
           return p;

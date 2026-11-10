@@ -1,12 +1,13 @@
 /**
- * List audio files from the assets repo (theboyz-comic-v1/sounds) via GitHub API.
+ * List audio files from the assets repo (Elseframe-comic-v1/sounds) via GitHub API.
  * Used in production where the sibling sounds folder is not on disk.
  */
 
+import { resolveAssetsRepo } from "@/lib/assetsRepo";
 import { AUDIO_FILE_NAME_REGEX } from "@/lib/serverData";
 
 const GITHUB_OWNER = process.env.GITHUB_OWNER || "Ian9Franco";
-const GITHUB_REPO = process.env.GITHUB_ASSETS_REPO || "theboyz-comic-v1";
+const GITHUB_REPO = resolveAssetsRepo();
 const GITHUB_BRANCH = process.env.GITHUB_ASSETS_BRANCH || "main";
 
 type SoundEntry = { name: string; path: string };

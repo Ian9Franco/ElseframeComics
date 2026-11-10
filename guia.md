@@ -196,9 +196,9 @@ PREVIEW_PASSWORD="tu_contraseña_secreta"
 ### Vercel (producción)
 | Variable | Valor |
 |---|---|
-| `NEXT_PUBLIC_ASSETS_BASE_URL` | `https://cdn.jsdelivr.net/gh/Ian9Franco/theboyz-comic-v1@main` |
+| `NEXT_PUBLIC_ASSETS_BASE_URL` | `https://ian9franco.github.io/Elseframe-comic-v1` |
 | `PREVIEW_PASSWORD` | `tu_contraseña_secreta` |
-| `GITHUB_EDITOR_TOKEN` | PAT fine-grained (ElseframeComics + theboyz-comic-v1, Contents + Actions read/write) |
+| `GITHUB_EDITOR_TOKEN` | PAT fine-grained (ElseframeComics + Elseframe-comic-v1, Contents + Actions read/write) |
 
 En **GitHub Actions** del repo ElseframeComics, el secret `ELSEFRAME_PUBLISH_TOKEN` debe llevar **el mismo valor** que `GITHUB_EDITOR_TOKEN` en Vercel (no es otra app: es el mismo PAT pegado en otro lugar).
 

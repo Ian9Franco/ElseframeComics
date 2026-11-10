@@ -4,6 +4,7 @@ import OpenAI from "openai";
 import { zodTextFormat } from "openai/helpers/zod";
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
+import { getAssetsBaseUrl, rewriteLegacyAssetsUrl } from "@/lib/assetsRepo";
 import { findLocalChapter } from "@/lib/chapterFiles";
 import { getPageDialogueContext } from "@/lib/dialogueContext";
 import { validateEditorAccess } from "@/lib/editorAccess";
@@ -132,11 +133,12 @@ function getImageDataUrl(
 }
 
 function getAllowedRemoteImageUrl(imageUrl: string): string | null {
-  const assetsBaseUrl = (process.env.NEXT_PUBLIC_ASSETS_BASE_URL || "").replace(/\/$/, "");
-  if (!assetsBaseUrl || !imageUrl.startsWith(`${assetsBaseUrl}/`)) return null;
+  const assetsBase = getAssetsBaseUrl();
+  const normalized = rewriteLegacyAssetsUrl(imageUrl);
+  if (!assetsBase || !normalized.startsWith(`${assetsBase}/`)) return null;
 
   try {
-    const parsed = new URL(imageUrl);
+    const parsed = new URL(normalized);
     return parsed.protocol === "https:" ? parsed.toString() : null;
   } catch {
     return null;

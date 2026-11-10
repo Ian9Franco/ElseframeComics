@@ -128,14 +128,14 @@ Para optimizar rendimiento, despliegue y costes, el proyecto utiliza una arquite
 graph TD
     A["Lector en Producción (Next.js en Vercel)"] -->|getComicPageUrl| B("Resolver URL de Asset")
     B -->|NEXT_PUBLIC_ASSETS_BASE_URL| C["jsDelivr CDN"]
-    C -->|Fetch sin límites| D["GitHub: Ian9Franco/theboyz-comic-v1"]
+    C -->|Fetch sin límites| D["GitHub: Ian9Franco/Elseframe-comic-v1"]
     D -->|Entrega WebP HD| C
     C -->|Cache Global Edge| A
 ```
 
 1. **Repositorio Web (`theboyz`)**: Código fuente, componentes UI, páginas y archivos `dialogues.json`. Las imágenes en `public/comics/` son marcadores vacíos de 0 bytes para que Next.js indexe la estructura.
-2. **Repositorio de Assets (`theboyz-comic-v1`)**: Repositorio dedicado exclusivamente a alojar las imágenes reales `.webp` de alta fidelidad.
-3. **Modo Producción**: Las imágenes se sirven directamente a través de `https://cdn.jsdelivr.net/gh/Ian9Franco/theboyz-comic-v1@main/comics/...` sin consumir bandwidth ni almacenamiento de Vercel.
+2. **Repositorio de Assets (`Elseframe-comic-v1`)**: Repositorio dedicado exclusivamente a alojar las imágenes reales `.webp` de alta fidelidad. El nombre anterior `theboyz-comic-v1` redirige en la API de GitHub, pero GitHub Pages y jsDelivr no sirven las fotos con ese slug.
+3. **Modo Producción**: Las imágenes se sirven desde `https://ian9franco.github.io/Elseframe-comic-v1/comics/...` (o `https://cdn.jsdelivr.net/gh/Ian9Franco/Elseframe-comic-v1@main/comics/...`) sin consumir bandwidth ni almacenamiento de Vercel.
 
 ---
 

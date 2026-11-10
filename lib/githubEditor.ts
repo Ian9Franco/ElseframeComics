@@ -3,9 +3,11 @@
  * Never import this from client components.
  */
 
+import { resolveAssetsRepo } from "@/lib/assetsRepo";
+
 export const GITHUB_OWNER = process.env.GITHUB_OWNER || "Ian9Franco";
 export const GITHUB_MAIN_REPO = process.env.GITHUB_MAIN_REPO || "ElseframeComics";
-export const GITHUB_ASSETS_REPO = process.env.GITHUB_ASSETS_REPO || "theboyz-comic-v1";
+export const GITHUB_ASSETS_REPO = resolveAssetsRepo();
 export const GITHUB_EDITOR_BRANCH = process.env.GITHUB_EDITOR_BRANCH || "editor-workspace";
 
 export class GithubConflictError extends Error {
@@ -62,7 +64,7 @@ export function formatGithubApiAuthError(message: string): string {
   if (/resource not accessible by personal access token/i.test(message)) {
     return (
       "El PAT inicia sesión pero no puede usar ElseframeComics ni Actions. " +
-      "Fine-grained: Repository access → seleccioná ElseframeComics (no solo theboyz-comic-v1). " +
+      "Fine-grained: Repository access → seleccioná ElseframeComics (no solo Elseframe-comic-v1). " +
       "Permissions del repo → Contents Read and write + Actions Read and write. " +
       "Classic PAT alternativo: scopes repo y workflow."
     );
