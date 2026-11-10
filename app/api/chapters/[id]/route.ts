@@ -25,6 +25,7 @@ import {
   resolveChapterFolders,
 } from "@/lib/editorStorage";
 import { GITHUB_EDITOR_BRANCH } from "@/lib/githubEditor";
+import { getAssetsBaseUrl } from "@/lib/assetsRepo";
 import fs from "fs";
 import path from "path";
 
@@ -112,7 +113,7 @@ export async function GET(
         });
 
         // Construir URLs de asset relativas o absolutas
-        const baseUrl = (process.env.NEXT_PUBLIC_ASSETS_BASE_URL || "").replace(/\/$/, "");
+        const baseUrl = getAssetsBaseUrl();
         pages = imageFiles.map(f => {
           const relPath = `/comics/${actualSagaFolder}/${actualChFolder}/${f}`;
           return baseUrl ? `${baseUrl}${relPath.split("/").map(encodeURIComponent).join("/")}` : relPath;

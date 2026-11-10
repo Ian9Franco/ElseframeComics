@@ -2,14 +2,16 @@
  * githubComics.ts
  *
  * Módulo servidor que usa la GitHub API para listar archivos
- * del repo de imágenes (theboyz-comic-v1) en lugar de `fs`.
+ * del repo de imágenes (Elseframe-comic-v1) en lugar de `fs`.
  *
  * Funciona tanto en local como en producción (Vercel), ya que
  * no depende del filesystem sino de solicitudes HTTP autenticadas.
  */
 
+import { getAssetsBaseUrl, resolveAssetsRepo } from "@/lib/assetsRepo";
+
 const GITHUB_OWNER = process.env.GITHUB_OWNER || "Ian9Franco";
-const GITHUB_REPO  = process.env.GITHUB_ASSETS_REPO || "theboyz-comic-v1";
+const GITHUB_REPO  = resolveAssetsRepo();
 const GITHUB_BRANCH = "main";
 const SUPPORTED_FORMATS = [".jpg", ".jpeg", ".png", ".webp", ".gif"];
 
@@ -104,7 +106,7 @@ function buildAssetUrl(
   ref: string = GITHUB_BRANCH,
   blobSha?: string
 ): string {
-  const baseUrl = process.env.NEXT_PUBLIC_ASSETS_BASE_URL?.replace(/\/$/, "");
+  const baseUrl = getAssetsBaseUrl();
   const encodedPath = githubPath.split("/").map(encodeURIComponent).join("/");
 
   if (ref === GITHUB_BRANCH && baseUrl) {

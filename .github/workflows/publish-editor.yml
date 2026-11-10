@@ -35,16 +35,16 @@ jobs:
           code=$(curl -s -o /dev/null -w "%{http_code}" \
             -H "Authorization: Bearer ${PUBLISH_TOKEN}" \
             -H "Accept: application/vnd.github+json" \
-            "https://api.github.com/repos/Ian9Franco/theboyz-comic-v1")
+            "https://api.github.com/repos/Ian9Franco/Elseframe-comic-v1")
           if [ "$code" = "200" ]; then
             echo "mode=auth" >> "$GITHUB_OUTPUT"
-            echo "PAT OK para theboyz-comic-v1"
+            echo "PAT OK para Elseframe-comic-v1"
           elif [ "$code" = "401" ]; then
             echo "mode=public" >> "$GITHUB_OUTPUT"
             echo "::warning::HTTP 401 con ELSEFRAME_PUBLISH_TOKEN: GitHub no acepta el valor guardado en el secret de Actions (aunque el PAT esté activo). Pegá en el secret exactamente el mismo github_pat_... que GITHUB_EDITOR_TOKEN de Vercel."
           else
             echo "mode=public" >> "$GITHUB_OUTPUT"
-            echo "::warning::ELSEFRAME_PUBLISH_TOKEN no accede a theboyz-comic-v1 (HTTP ${code}). Incluí ese repo en el fine-grained token."
+            echo "::warning::ELSEFRAME_PUBLISH_TOKEN no accede a Elseframe-comic-v1 (HTTP ${code}). Incluí ese repo en el fine-grained token."
           fi
 
       - name: Checkout main app workspace
@@ -67,9 +67,9 @@ jobs:
         run: |
           set -euo pipefail
           if [ "$PAT_MODE" = "auth" ]; then
-            REPO="https://x-access-token:${GH_TOKEN}@github.com/Ian9Franco/theboyz-comic-v1.git"
+            REPO="https://x-access-token:${GH_TOKEN}@github.com/Ian9Franco/Elseframe-comic-v1.git"
           else
-            REPO="https://github.com/Ian9Franco/theboyz-comic-v1.git"
+            REPO="https://github.com/Ian9Franco/Elseframe-comic-v1.git"
           fi
           BRANCH=main
           if git ls-remote --exit-code "$REPO" refs/heads/editor-workspace >/dev/null 2>&1; then
