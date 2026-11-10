@@ -298,11 +298,11 @@ export const characterImages: Record<string, CharacterImages> = {
       "/personajes/PORTADAS/Ian/MARK-3.webp",
       "/personajes/PORTADAS/Ian/MARK-L.webp",
     ],
-    "ficha": "/personajes/Fichas/Boyz/VESPERWING/Vesperwing_Ficha.webp",
+    "ficha": "/personajes/Fichas/elseframe/VESPERWING/Vesperwing_Ficha.webp",
     "fichas": [
-      "/personajes/Fichas/Boyz/VESPERWING/Vesperwing_Ficha.webp",
-      "/personajes/Fichas/Boyz/VESPERWING/Vesperwing_ficha2.webp",
-      "/personajes/Fichas/Boyz/VESPERWING/Vesperwing_ficha3.webp",
+      "/personajes/Fichas/elseframe/VESPERWING/Vesperwing_Ficha.webp",
+      "/personajes/Fichas/elseframe/VESPERWING/Vesperwing_ficha2.webp",
+      "/personajes/Fichas/elseframe/VESPERWING/Vesperwing_ficha3.webp",
     ]
   },
   "invoker": {
@@ -328,10 +328,10 @@ export const characterImages: Record<string, CharacterImages> = {
       "/personajes/PORTADAS/Jaz/Sigil.webp",
       "/personajes/PORTADAS/Jaz/sigil1.webp",
     ],
-    "ficha": "/personajes/Fichas/Boyz/SIGIL/Sigil_Ficha.webp",
+    "ficha": "/personajes/Fichas/elseframe/SIGIL/Sigil_Ficha.webp",
     "fichas": [
-      "/personajes/Fichas/Boyz/SIGIL/Sigil_Ficha.webp",
-      "/personajes/Fichas/Boyz/SIGIL/Sigil_ficha_alt.webp",
+      "/personajes/Fichas/elseframe/SIGIL/Sigil_Ficha.webp",
+      "/personajes/Fichas/elseframe/SIGIL/Sigil_ficha_alt.webp",
     ]
   },
   "john_wick": {
@@ -374,9 +374,9 @@ export const characterImages: Record<string, CharacterImages> = {
     "portadas": [
       "/personajes/PORTADAS/Julián/Bandit.webp",
     ],
-    "ficha": "/personajes/Fichas/Boyz/BANDIT/Bandit_ficha.webp",
+    "ficha": "/personajes/Fichas/elseframe/BANDIT/Bandit_ficha.webp",
     "fichas": [
-      "/personajes/Fichas/Boyz/BANDIT/Bandit_ficha.webp",
+      "/personajes/Fichas/elseframe/BANDIT/Bandit_ficha.webp",
     ]
   },
   "kenji": {
@@ -496,9 +496,9 @@ export const characterImages: Record<string, CharacterImages> = {
     "portadas": [
       "/personajes/PORTADAS/Mati/Farsight.webp",
     ],
-    "ficha": "/personajes/Fichas/Boyz/FARSIGHT/Farsight_ficha.webp",
+    "ficha": "/personajes/Fichas/elseframe/FARSIGHT/Farsight_ficha.webp",
     "fichas": [
-      "/personajes/Fichas/Boyz/FARSIGHT/Farsight_ficha.webp",
+      "/personajes/Fichas/elseframe/FARSIGHT/Farsight_ficha.webp",
       "/personajes/Fichas/matis/Matisvariantes.webp",
     ]
   },
@@ -623,9 +623,9 @@ export const characterImages: Record<string, CharacterImages> = {
       "/personajes/PORTADAS/Sofi/Dusk.webp",
       "/personajes/PORTADAS/Sofi/Dusk_alt.webp",
     ],
-    "ficha": "/personajes/Fichas/Boyz/DUSK/Dusk_Ficha.webp",
+    "ficha": "/personajes/Fichas/elseframe/DUSK/Dusk_Ficha.webp",
     "fichas": [
-      "/personajes/Fichas/Boyz/DUSK/Dusk_Ficha.webp",
+      "/personajes/Fichas/elseframe/DUSK/Dusk_Ficha.webp",
     ]
   },
   "soldados_espaciales": {
@@ -693,9 +693,9 @@ export const characterImages: Record<string, CharacterImages> = {
     "portadas": [
       "/personajes/PORTADAS/Uandi/Uandi.webp",
     ],
-    "ficha": "/personajes/Fichas/Boyz/AEGIS/Aegis_Ficha.webp",
+    "ficha": "/personajes/Fichas/elseframe/AEGIS/Aegis_Ficha.webp",
     "fichas": [
-      "/personajes/Fichas/Boyz/AEGIS/Aegis_Ficha.webp",
+      "/personajes/Fichas/elseframe/AEGIS/Aegis_Ficha.webp",
     ]
   },
   "valery": {
@@ -739,10 +739,10 @@ export const characterImages: Record<string, CharacterImages> = {
     "portadas": [
       "/personajes/PORTADAS/Volvo/Outrider.webp",
     ],
-    "ficha": "/personajes/Fichas/Boyz/OUTRIDER/OUTRIDER_Old_ficha.webp",
+    "ficha": "/personajes/Fichas/elseframe/OUTRIDER/OUTRIDER_Old_ficha.webp",
     "fichas": [
-      "/personajes/Fichas/Boyz/OUTRIDER/OUTRIDER_Old_ficha.webp",
-      "/personajes/Fichas/Boyz/OUTRIDER/OUTRIDER_ficha.webp",
+      "/personajes/Fichas/elseframe/OUTRIDER/OUTRIDER_Old_ficha.webp",
+      "/personajes/Fichas/elseframe/OUTRIDER/OUTRIDER_ficha.webp",
     ]
   },
   "volvo_carnicero": {

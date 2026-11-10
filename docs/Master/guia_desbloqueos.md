@@ -36,7 +36,7 @@ El ID del capítulo se define en el archivo `chapter.json` dentro de su carpeta 
 ---
 
 ### Paso B: Vincular Desbloqueo de Personajes
-Edita el archivo [unlockRules.ts](file:///d:/.CodeProjects/the-boys/lib/characterData/unlockRules.ts) y añade o actualiza el personaje con el ID del capítulo que gatilla su desbloqueo:
+Edita el archivo [unlockRules.ts](file:///d:/.CodeProjects/ElseframeComics/lib/characterData/unlockRules.ts) y añade o actualiza el personaje con el ID del capítulo que gatilla su desbloqueo:
 
 ```typescript
 export const UNLOCK_RULES: Record<string, string[]> = {
@@ -58,7 +58,7 @@ export const UNLOCK_RULES: Record<string, string[]> = {
 ---
 
 ### Paso C: Desbloquear Esquemas de Tecnología (Blueprints)
-Edita el archivo [BlueprintsTab.tsx](file:///d:/.CodeProjects/the-boys/components/lore/BlueprintsTab.tsx). Localiza la definición de los planos y su propiedad de visibilidad condicional.
+Edita el archivo [BlueprintsTab.tsx](file:///d:/.CodeProjects/ElseframeComics/components/lore/BlueprintsTab.tsx). Localiza la definición de los planos y su propiedad de visibilidad condicional.
 
 1. Añade tu blueprint al arreglo estático con su estructura.
 2. En la sección de lógica de renderizado condicional, implementa la verificación de lectura del capítulo:
@@ -71,7 +71,7 @@ const isNuevoPlanoDesbloqueado =
 ---
 
 ### Paso D: Configurar Hitos del Timeline
-Edita el archivo [TimelineTab.tsx](file:///d:/.CodeProjects/the-boys/components/lore/TimelineTab.tsx). En el arreglo `TIMELINE_EVENTS`, añade el campo `unlockChapter` con el ID del cómic correspondiente:
+Edita el archivo [TimelineTab.tsx](file:///d:/.CodeProjects/ElseframeComics/components/lore/TimelineTab.tsx). En el arreglo `TIMELINE_EVENTS`, añade el campo `unlockChapter` con el ID del cómic correspondiente:
 
 ```typescript
   {
@@ -104,7 +104,7 @@ Si deseas que un hito quede **permanentemente bloqueado** (por ejemplo, porque l
 ### Paso E: Notificación V.O.P.S. (Popup de Información Clasificada)
 Para mostrar el popup holográfico V.O.P.S. inmediatamente cuando el usuario termina de leer el cómic en el lector cinematográfico:
 
-1. Abre [UnlockNotificationModal.tsx](file:///d:/.CodeProjects/the-boys/components/UnlockNotificationModal.tsx).
+1. Abre [UnlockNotificationModal.tsx](file:///d:/.CodeProjects/ElseframeComics/components/UnlockNotificationModal.tsx).
 2. Añade la regla en el método selector de contenidos a notificar:
 
 ```typescript

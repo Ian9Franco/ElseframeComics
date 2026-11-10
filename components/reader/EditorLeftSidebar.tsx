@@ -213,7 +213,7 @@ export function EditorLeftSidebar({
   // ─── ACTIONS: Episodes ───
   const handleCreateSaga = async () => {
     const values = await requestForm("Nueva Saga", [
-      { key: "name", label: "Nombre corto de la saga (ej: The Boys)", required: true },
+      { key: "name", label: "Nombre corto de la saga (ej: Elseframe)", required: true },
       { key: "title", label: "Título completo", required: true },
       { key: "number", label: "Número de orden", type: "number", required: true },
       { key: "color", label: "Color Hex", type: "color", defaultValue: "#e8185a", required: true }

@@ -1,6 +1,6 @@
 # Bitácora de Análisis y Continuidad: Saga "Mativerse Part 1" (Mativersal War)
 
-Este documento contiene un desglose exhaustivo, página por página y viñeta por viñeta, de los 3 capítulos de la saga **Mativerse Part 1** (compuesta por: *The First Incursion*, *Casino*, y *Worlds*). El objetivo es servir como guía de referencia visual y narrativa para rehacer la saga con coherencia artística, corregir los errores grotescos de generación de la IA y reescribir los diálogos manuales para integrarla con el canon de "The Boyz".
+Este documento contiene un desglose exhaustivo, página por página y viñeta por viñeta, de los 3 capítulos de la saga **Mativerse Part 1** (compuesta por: *The First Incursion*, *Casino*, y *Worlds*). El objetivo es servir como guía de referencia visual y narrativa para rehacer la saga con coherencia artística, corregir los errores grotescos de generación de la IA y reescribir los diálogos manuales para integrarla con el canon de Elseframe.
 
 ---
 

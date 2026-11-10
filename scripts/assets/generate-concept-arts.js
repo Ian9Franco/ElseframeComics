@@ -50,7 +50,7 @@ targetFiles.forEach((filename) => {
 });
 
 const categoryFolders = {
-  pibes: 'boyz',
+  pibes: 'elseframe',
   secundarios: 'Secundarios',
   independientes: 'Secundarios',
   taberna_resistencia: 'Secundarios',

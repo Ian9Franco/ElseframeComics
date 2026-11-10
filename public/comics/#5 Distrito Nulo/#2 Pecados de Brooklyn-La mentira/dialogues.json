@@ -1055,7 +1055,7 @@
         {
           "focusY": 0.8,
           "dialogue": [
-            { "text": "pero siguen siendo the boyz", "style": "caption", "posX": 80, "posY": 65, "tailX": 50, "tailY": 95, "tailWidth": 6, "tailCurvature": -22, "width": 200, "fontSize": 9, "borderRadius": 4, "tail": "none" },
+            { "text": "pero siguen siendo Elseframe", "style": "caption", "posX": 80, "posY": 65, "tailX": 50, "tailY": 95, "tailWidth": 6, "tailCurvature": -22, "width": 200, "fontSize": 9, "borderRadius": 4, "tail": "none" },
             { "text": "pe, donde dejo esto?", "size": "small", "posX": 25, "posY": 65, "tailX": 20, "tailY": 80, "tailWidth": 6, "tailCurvature": -22, "width": 170, "fontSize": 9, "borderRadius": 18 }
           ]
         }

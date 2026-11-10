@@ -133,8 +133,8 @@ graph TD
     C -->|Cache Global Edge| A
 ```
 
-1. **Repositorio Web (`theboyz`)**: Código fuente, componentes UI, páginas y archivos `dialogues.json`. Las imágenes en `public/comics/` son marcadores vacíos de 0 bytes para que Next.js indexe la estructura.
-2. **Repositorio de Assets (`Elseframe-comic-v1`)**: Repositorio dedicado exclusivamente a alojar las imágenes reales `.webp` de alta fidelidad. El nombre anterior `theboyz-comic-v1` redirige en la API de GitHub, pero GitHub Pages y jsDelivr no sirven las fotos con ese slug.
+1. **Repositorio Web (`ElseframeComics`)**: Código fuente, componentes UI, páginas y archivos `dialogues.json`. Las imágenes en `public/comics/` son marcadores vacíos de 0 bytes para que Next.js indexe la estructura.
+2. **Repositorio de Assets (`Elseframe-comic-v1`)**: Repositorio dedicado exclusivamente a alojar las imágenes reales `.webp` de alta fidelidad. GitHub Pages y jsDelivr sirven esas fotos solo con este nombre.
 3. **Modo Producción**: Las imágenes se sirven desde `https://ian9franco.github.io/Elseframe-comic-v1/comics/...` (o `https://cdn.jsdelivr.net/gh/Ian9Franco/Elseframe-comic-v1@main/comics/...`) sin consumir bandwidth ni almacenamiento de Vercel.
 
 ---
@@ -143,7 +143,7 @@ graph TD
 
 ### Requisitos Previos
 - Node.js 18+ instalado
-- Repositorio web (`theboyz`) y opcionalmente repositorio de assets (`the-boyz-comic`) clonados en la misma carpeta raíz.
+- Repositorio web (`ElseframeComics`) y opcionalmente repositorio de assets (`Elseframe-comic-v1`) clonados en la misma carpeta raíz.
 
 ### 🚀 Comandos Rápidos
 ```bash
@@ -166,8 +166,8 @@ Copiá `.env.example` → `.env.local` y completá tus claves. El archivo **no s
 
 **Persistencia automática:** al correr `npm install` o `npm run dev`, la config se restaura desde:
 
-- Windows: `%LOCALAPPDATA%\the-boys\config\.env.local`
-- macOS/Linux: `~/.config/the-boys/.env.local`
+- Windows: `%LOCALAPPDATA%\elseframe\config\.env.local`
+- macOS/Linux: `~/.config/elseframe/.env.local`
 
 Después de editar `.env.local`, guardala con `npm run config:save` (o simplemente corré `npm run dev`, que sincroniza si el archivo local es más reciente).
 

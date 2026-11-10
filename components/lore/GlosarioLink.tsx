@@ -4,13 +4,13 @@ import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 
 export const GLOSARIO_CHARS: Record<string, { name: string; role: string; color: string; image: string; tag: string }> = {
-  ian:    { name: "Ian",    role: "Vesperwing",  color: "#10b981", image: "/personajes/CLOSEUP/boyz/VESPERWING/IAN_FACE.webp",    tag: "Humano / Nexo Estratégico sin poderes biológicos" },
-  jaz:    { name: "Jaz",   role: "Sigil",       color: "#f5e642", image: "/personajes/CLOSEUP/boyz/ORACLE/JAZ_FACE.webp",    tag: "Enlace Dimensional / Soporte Defensivo" },
-  julian: { name: "Julián",role: "Bandit",      color: "#3b82f6", image: "/personajes/CLOSEUP/boyz/WILDCARD/JULIAN_FACE.webp", tag: "Hostigador Energético / Constructos Glitch" },
-  mati:   { name: "Mati",  role: "Farsight",    color: "#a855f7", image: "/personajes/CLOSEUP/boyz/SWAPFIRE/MATI_FACE.webp",   tag: "Nexo Multiversal / Plasma Violeta" },
-  uandi:  { name: "Uandi", role: "Aegis",       color: "#ef4444", image: "/personajes/CLOSEUP/boyz/AEGIS/UANDI_FACE.webp",  tag: "Tanque y protector / Ira Regenerativa" },
-  volvo:  { name: "Volvo", role: "Outrider",    color: "#f97316", image: "/personajes/CLOSEUP/boyz/VECTOR/VOLVO_FACE.webp",  tag: "Movilidad Absoluta / Portales y Velocidad" },
-  sofi:   { name: "Sofi",  role: "Dusk",        color: "#06b6d4", image: "/personajes/CLOSEUP/boyz/HUSH/SOFI_FACE.webp",   tag: "Duelista Acústica / Reconocimiento Avanzado" },
+  ian:    { name: "Ian",    role: "Vesperwing",  color: "#10b981", image: "/personajes/CLOSEUP/elseframe/VESPERWING/IAN_FACE.webp",    tag: "Humano / Nexo Estratégico sin poderes biológicos" },
+  jaz:    { name: "Jaz",   role: "Sigil",       color: "#f5e642", image: "/personajes/CLOSEUP/elseframe/ORACLE/JAZ_FACE.webp",    tag: "Enlace Dimensional / Soporte Defensivo" },
+  julian: { name: "Julián",role: "Bandit",      color: "#3b82f6", image: "/personajes/CLOSEUP/elseframe/WILDCARD/JULIAN_FACE.webp", tag: "Hostigador Energético / Constructos Glitch" },
+  mati:   { name: "Mati",  role: "Farsight",    color: "#a855f7", image: "/personajes/CLOSEUP/elseframe/SWAPFIRE/MATI_FACE.webp",   tag: "Nexo Multiversal / Plasma Violeta" },
+  uandi:  { name: "Uandi", role: "Aegis",       color: "#ef4444", image: "/personajes/CLOSEUP/elseframe/AEGIS/UANDI_FACE.webp",  tag: "Tanque y protector / Ira Regenerativa" },
+  volvo:  { name: "Volvo", role: "Outrider",    color: "#f97316", image: "/personajes/CLOSEUP/elseframe/VECTOR/VOLVO_FACE.webp",  tag: "Movilidad Absoluta / Portales y Velocidad" },
+  sofi:   { name: "Sofi",  role: "Dusk",        color: "#06b6d4", image: "/personajes/CLOSEUP/elseframe/HUSH/SOFI_FACE.webp",   tag: "Duelista Acústica / Reconocimiento Avanzado" },
 };
 
 export function GlosarioLink({ id, children }: { id: string; children: React.ReactNode }) {

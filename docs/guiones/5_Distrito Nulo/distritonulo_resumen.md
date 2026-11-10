@@ -41,14 +41,14 @@
 ## 3. Fichas de Personajes y Mecánicas de Poder
 
 ### 🛡️ Uandi / "Aegis" (La Batería Cinética)
-*Basado estrictamente en las especificaciones de [Aegis Ficha](file:///d:/.CodeProjects/the-boys/public/personajes/LosPibes/FULLBODY%20SUIT/AEGIS/Aegis_Ficha.webp)*
+*Basado estrictamente en las especificaciones de [Aegis Ficha](file:///d:/.CodeProjects/ElseframeComics/public/personajes/LosPibes/FULLBODY%20SUIT/AEGIS/Aegis_Ficha.webp)*
 * **Diseño Visual:** Contextura imponente y muy musculosa, cabello rizado oscuro y anteojos redondos. Brazos y torso cubiertos por Runas Cinéticas (cicatrices/tatuajes) que se iluminan en rojo vivo.
 * **Mecánica de Poder:** Acumulación Cinética. Absorbe la fuerza de los impactos físicos recibidos y la almacena en sus runas para aumentar su resistencia, fuerza y capacidad de respuesta. Sus puños son su mejor arma en el combate cuerpo a cuerpo. Puede realizar Súper Saltos (Impulso Cinético) y liberar ondas de choque a corta distancia.
 * **El Costo / Limitación:** Sobrecarga Crítica. Al recibir daño o al estallar por frustración emocional y traumas domésticos, su temperatura corporal se eleva a niveles extremos, emanando vapor denso y distorsionando térmicamente el aire a su alrededor. Si se pasa del límite, sus runas se agrietan y entra en la fase de Sobrecarga Cinética, donde su musculatura crece de forma masiva y su piel se torna roja por la energía acumulada. En este estado de furia protectora pierde el juicio, y su deseo de proteger se convierte en una obsesión violenta e incontrolable.
 * **Rigidez de Continuidad:** La sobrecarga en la base (Págs. 14-16) es disparada por su frustración interna y estrés post-traumático acumulado en la cocina, demostrando que su poder reacciona también a desencadenantes psicológicos y no solo a impactos físicos directos.
 
 ### 🃏 Julián / "Wildcard" (El Espectro Glitch)
-*Basado en las especificaciones de [Wildcard Ficha](file:///d:/.CodeProjects/the-boys/public/personajes/LosPibes/FULLBODY%20SUIT/WILDCARD/Wildcard_ficha.webp)*
+*Basado en las especificaciones de [Wildcard Ficha](file:///d:/.CodeProjects/ElseframeComics/public/personajes/LosPibes/FULLBODY%20SUIT/WILDCARD/Wildcard_ficha.webp)*
 * **Diseño Visual:** Estética urbana, contextura ágil y delgada, corte fade, barba prolija y mirada cínica que esconde un miedo profundo (diferenciándose claramente de la contextura imponente y lentes redondos de Uandi).
 * **Mecánica de Poder:** Desfase Arcano. Proyecta réplicas de interferencia sólida (Ecos de estática roja y azul) para evadir ataques y confundir al rival en combate. Capaz de imbuir objetos pequeños (como sus naipes o listones de madera rota) con energía electromagnética inestable para generar explosiones de fragmentación geométrica o impactos cargados.
 * **El Costo / Limitación:** Desintegración molecular. Cada desfase le provoca migrañas agudas, arritmias y una pérdida temporal de la tangibilidad física. Su mayor pánico es convertirse de forma permanente en ruido visual y desaparecer.

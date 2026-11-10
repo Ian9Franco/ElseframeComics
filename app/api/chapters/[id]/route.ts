@@ -6,7 +6,7 @@
  * para no depender del filesystem de Vercel.
  *
  * Los dialogues.json SÍ se leen desde el filesystem local porque
- * viven en el repo principal (the-boys), no en el de imágenes.
+ * viven en el repo principal (ElseframeComics), no en el de imágenes.
  */
 
 import { NextRequest, NextResponse } from "next/server";

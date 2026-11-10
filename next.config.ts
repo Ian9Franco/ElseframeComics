@@ -11,24 +11,13 @@ const nextConfig: NextConfig = {
       },
       {
         protocol: "https",
-        hostname: "raw.githubusercontent.com",
-        pathname: "/Ian9Franco/theboyz-comic-v1/**",
-      },
-      {
-        protocol: "https",
         hostname: "cdn.jsdelivr.net",
         pathname: "/gh/Ian9Franco/Elseframe-comic-v1/**",
       },
-      // GitHub Pages del repo de imágenes (el sitio viejo theboyz-comic-v1 ya no existe)
       {
         protocol: "https",
         hostname: "ian9franco.github.io",
         pathname: "/Elseframe-comic-v1/**",
-      },
-      {
-        protocol: "https",
-        hostname: "ian9franco.github.io",
-        pathname: "/theboyz-comic-v1/**",
       },
     ],
   },

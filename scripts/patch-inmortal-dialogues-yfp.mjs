@@ -6,7 +6,7 @@ const ROOT = path.join(
   "public/comics/#11 Inmortal/#1 La noche que volvio"
 );
 const DIALOGUES_PATH = path.join(ROOT, "dialogues.json");
-// Páginas reales: D:/.CodeProjects/the-boyz-comic/comics/#11 Inmortal/#1 La noche que volvio
+// Páginas reales: D:/.CodeProjects/Elseframe-comic-v1/comics/#11 Inmortal/#1 La noche que volvio
 // (public/… en este repo = placeholders de peso)
 
 function L(text, speaker, opts = {}) {

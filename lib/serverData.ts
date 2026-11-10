@@ -318,7 +318,7 @@ function resolveSiblingAssetsSubdir(subdir: "comics" | "sounds"): string {
       }
     }
   } catch (e) {}
-  return path.join(process.cwd(), "..", "the-boyz-comic", subdir);
+  return path.join(process.cwd(), "..", "Elseframe-comic-v1", subdir);
 }
 
 export function getPublicComicsDir(): string {
@@ -344,5 +344,5 @@ export function getAssetsSoundsDir(): string {
   return resolveSiblingAssetsSubdir("sounds");
 }
 
-/** Matches audio files under public/sounds or the-boyz-comic/sounds (incl. .mpeg voice lines). */
+/** Matches audio files under public/sounds or Elseframe-comic-v1/sounds (incl. .mpeg voice lines). */
 export const AUDIO_FILE_NAME_REGEX = /\.(mp3|wav|ogg|m4a|mpeg|aac|webm|flac)$/i;
