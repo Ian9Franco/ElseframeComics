@@ -3,8 +3,10 @@
  * fresh clones, npm install, and project folder renames.
  *
  * Storage:
- *   Windows: %LOCALAPPDATA%\the-boys\config\.env.local
- *   macOS/Linux: ~/.config/the-boys/.env.local
+ *   Windows: %LOCALAPPDATA%\elseframe\config\.env.local
+ *   macOS/Linux: ~/.config/elseframe/.env.local
+ *
+ * Si todavía existe la carpeta vieja "the-boys", la primera restauración la copia.
  */
 
 const fs = require("fs");
@@ -15,12 +17,20 @@ const projectRoot = path.join(__dirname, "..", "..");
 const envLocalPath = path.join(projectRoot, ".env.local");
 const envExamplePath = path.join(projectRoot, ".env.example");
 
-function getPersistDir() {
+function configHome(folderName) {
   if (process.platform === "win32") {
     const base = process.env.LOCALAPPDATA || path.join(os.homedir(), "AppData", "Local");
-    return path.join(base, "the-boys", "config");
+    return path.join(base, folderName, "config");
   }
-  return path.join(os.homedir(), ".config", "the-boys");
+  return path.join(os.homedir(), ".config", folderName);
+}
+
+function getPersistDir() {
+  return configHome("elseframe");
+}
+
+function getLegacyPersistPath() {
+  return path.join(configHome("the-boys"), ".env.local");
 }
 
 function getPersistPath() {
@@ -67,6 +77,11 @@ function save() {
 
 function restore() {
   const persistPath = getPersistPath();
+  const legacyPath = getLegacyPersistPath();
+  if (!fs.existsSync(persistPath) && fs.existsSync(legacyPath)) {
+    copyFile(legacyPath, persistPath);
+    console.log(`♻️  Config movida desde la carpeta anterior hacia: ${persistPath}`);
+  }
 
   if (!fs.existsSync(persistPath)) {
     if (!fs.existsSync(envLocalPath) && fs.existsSync(envExamplePath)) {

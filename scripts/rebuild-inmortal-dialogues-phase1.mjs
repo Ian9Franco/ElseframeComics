@@ -1,5 +1,5 @@
 /**
- * Fase 1: págs. 16–28 — investigación (arte en the-boyz-comic).
+ * Fase 1: págs. 16–28 — investigación (arte en Elseframe-comic-v1).
  * Reemplazo total de panels en dialogues.json.
  */
 import fs from "fs";

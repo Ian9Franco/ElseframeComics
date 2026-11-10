@@ -99,7 +99,7 @@ const imageExtensions = ['.webp', '.png', '.jpg', '.jpeg', '.gif'];
 
 // Category and alias definitions
 const categoryFolders = {
-  pibes: 'boyz',
+  pibes: 'elseframe',
   secundarios: 'Secundarios',
   independientes: 'Secundarios',
   taberna_resistencia: 'Secundarios',

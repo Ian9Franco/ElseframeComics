@@ -4,7 +4,7 @@
 
 **Repos actuales involucrados**
 - App principal: `Ian9Franco/ElseframeComics`
-- Assets: `Ian9Franco/theboyz-comic-v1`
+- Assets: `Ian9Franco/Elseframe-comic-v1`
 - Rama pública objetivo: `main`
 
 ---
@@ -65,7 +65,7 @@ Ya existe una decisión arquitectónica correcta:
 
 `lib/githubComics.ts`
 
-lee las páginas del repo `theboyz-comic-v1` usando GitHub API en producción.
+lee las páginas del repo `Elseframe-comic-v1` usando GitHub API en producción.
 
 Esto es importante: **GitHub ya forma parte de la arquitectura de producción.** No estamos agregando un sistema completamente ajeno.
 
@@ -184,7 +184,7 @@ GITHUB_EDITOR_TOKEN=
 GITHUB_EDITOR_BRANCH=editor-workspace
 GITHUB_OWNER=Ian9Franco
 GITHUB_MAIN_REPO=ElseframeComics
-GITHUB_ASSETS_REPO=theboyz-comic-v1
+GITHUB_ASSETS_REPO=Elseframe-comic-v1
 ```
 
 Para una primera versión, usar un **fine-grained PAT** limitado solamente a estos dos repos.
@@ -358,16 +358,16 @@ jobs:
         with:
           repository: Ian9Franco/ElseframeComics
           ref: editor-workspace
-          path: the-boys
+          path: elseframe
           token: ${{ secrets.ELSEFRAME_PUBLISH_TOKEN }}
           fetch-depth: 0
 
       - name: Checkout assets workspace
         uses: actions/checkout@v4
         with:
-          repository: Ian9Franco/theboyz-comic-v1
+          repository: Ian9Franco/Elseframe-comic-v1
           ref: editor-workspace
-          path: theboyz-comic-v1
+          path: Elseframe-comic-v1
           token: ${{ secrets.ELSEFRAME_PUBLISH_TOKEN }}
           fetch-depth: 0
 
@@ -377,11 +377,11 @@ jobs:
           node-version: 20
 
       - name: Install app dependencies
-        working-directory: the-boys
+        working-directory: elseframe
         run: npm ci
 
       - name: Install asset dependencies
-        working-directory: theboyz-comic-v1
+        working-directory: Elseframe-comic-v1
         run: npm ci
 
       - name: Configure Git
@@ -390,7 +390,7 @@ jobs:
           git config --global user.email "actions@github.com"
 
       - name: Publish
-        working-directory: the-boys
+        working-directory: elseframe
         env:
           PUBLISH_TARGET_BRANCH: main
         run: npm run publish:all "${{ inputs.message }}"
@@ -401,14 +401,14 @@ jobs:
 Usar exactamente:
 
 ```text
-the-boys
-theboyz-comic-v1
+elseframe
+Elseframe-comic-v1
 ```
 
 El motivo es que hoy hay scripts que buscan el repo hermano por esos nombres, y el `package.json` del repo de assets ejecuta:
 
 ```text
-node ../the-boys/scripts/deploy/sync-placeholders.js
+node ../elseframe/scripts/deploy/sync-placeholders.js
 ```
 
 Por lo tanto los paths del checkout importan.
@@ -475,7 +475,7 @@ Fine-grained token limitado a:
 
 ```text
 Ian9Franco/ElseframeComics
-Ian9Franco/theboyz-comic-v1
+Ian9Franco/Elseframe-comic-v1
 ```
 
 Permiso:
@@ -1498,8 +1498,8 @@ Implementá esta migración incrementalmente. No reescribas el editor.
 5. Añadí control de conflictos por SHA.
 6. Creá GitHub Action publish-editor.yml que haga checkout de ambos repos
    en carpetas hermanas llamadas exactamente:
-   - the-boys
-   - theboyz-comic-v1
+   - elseframe
+   - Elseframe-comic-v1
 7. Adaptá publish-all.js para que pueda publicar HEAD hacia main mediante
    PUBLISH_TARGET_BRANCH sin romper el uso local actual.
 8. Cambiá /api/editor/publish para disparar GitHub Actions en producción.

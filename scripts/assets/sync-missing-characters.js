@@ -9,7 +9,7 @@ const unlockRulesPath = path.join(charDataDir, 'unlockRules.ts');
 const dataFiles = {
   Secundarios: { filename: 'secundarios.ts', categoryName: 'secundarios' },
   antagonistas: { filename: 'antagonistas.ts', categoryName: 'antagonistas' },
-  boyz: { filename: 'pibes.ts', categoryName: 'pibes' },
+  elseframe: { filename: 'pibes.ts', categoryName: 'pibes' },
   deidades: { filename: 'deidades.ts', categoryName: 'deidades' },
   entidades: { filename: 'entidades.ts', categoryName: 'entidades' },
   matis: { filename: 'matis.ts', categoryName: 'matis' },

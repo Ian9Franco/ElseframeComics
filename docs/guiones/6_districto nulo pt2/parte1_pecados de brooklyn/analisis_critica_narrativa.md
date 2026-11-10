@@ -1,7 +1,7 @@
 # 🔍 Análisis Editorial y Crítica Narrativa: Fuego Púrpura — Parte 1
 ## Aplicando la Guía Universal de Creación de Cómics con IA
 
-Este análisis evalúa el guion final de la Parte 1 ([parte1_v3.md](file:///d:/Dev/CodeProjects/boyz/theboyz/docs/guiones/6_Pecadores/parte1_v3.md)) siguiendo los lineamientos de la **Guía Universal de Creación de Cómics con IA** (Cohesión Narrativa, Ritmo de Lectura, Costo de las Acciones y Claridad Visual). Todos los problemas detectados han sido resueltos en el borrador v3.
+Este análisis evalúa el guion final de la Parte 1 ([parte1_v3.md](file:///d:/Dev/CodeProjects/ElseframeComics/docs/guiones/6_Pecadores/parte1_v3.md)) siguiendo los lineamientos de la **Guía Universal de Creación de Cómics con IA** (Cohesión Narrativa, Ritmo de Lectura, Costo de las Acciones y Claridad Visual). Todos los problemas detectados han sido resueltos en el borrador v3.
 
 ---
 
