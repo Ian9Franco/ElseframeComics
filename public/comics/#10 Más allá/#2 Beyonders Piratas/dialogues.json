@@ -5,10 +5,21 @@
         {
           "focusY": 0.21611020704618994,
           "dialogue": [
-            { "text": "hola\n", "size": "small", "posX": 80, "posY": 5, "tailX": 55, "tailY": 10, "tailWidth": 6, "tailCurvature": -22, "width": 72, "fontSize": 8, "borderRadius": 18 }
+            { "text": "hola\n", "size": "small", "posX": 80, "posY": 5, "tailX": 55, "tailY": 10, "tailWidth": 6, "tailCurvature": -22, "width": 72, "fontSize": 8, "borderRadius": 18 },
+            { "text": "Nuevo diálogo", "size": "small", "posX": 50, "posY": 22, "tailX": 50, "tailY": 37, "tailWidth": 6, "tailCurvature": -22, "width": 72, "fontSize": 8, "borderRadius": 18 }
           ],
           "zoomRects": [
-            { "x": 0, "y": 0, "w": 100, "h": 37.96346636853713 }
+            { "x": 0, "y": 0, "w": 100, "h": 40 }
+          ],
+          "sounds": [
+            {
+              "sound": "",
+              "soundStartTime": 0,
+              "soundConfig": {
+                "volume": 1,
+                "playbackRate": 1
+              }
+            }
           ]
         },
         {
