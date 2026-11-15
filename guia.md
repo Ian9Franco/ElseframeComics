@@ -9,7 +9,7 @@ Documento de referencia rápida para desarrollo, publicación y control de acces
 | Repo | Propósito | Puerto Dev |
 |---|---|---|
 | `ElseframeComics` | App Next.js — UI, diálogos, código | `616` con `dev:all`, `3000` con `dev` |
-| `Elseframe-comic-v1` | Assets pesados — imágenes en alta resolución | `8080` |
+| `ElseframeComics-assets-v1` | Assets pesados — imágenes en alta resolución | `8080` |
 
 ---
 
@@ -19,11 +19,11 @@ Documento de referencia rápida para desarrollo, publicación y control de acces
 ```bash
 npm run dev          # Levanta la web en localhost:3000
 npm run dev:all      # Levanta web + assets: localhost:616 + localhost:8080 (sin contraseñas)
-npm run sync-assets  # Sincroniza marcadores de assets desde Elseframe-comic-v1
+npm run sync-assets  # Sincroniza marcadores de assets desde ElseframeComics-assets-v1
 npm run build        # Verifica que compila sin errores antes de pushear
 ```
 
-### `Elseframe-comic-v1`
+### `ElseframeComics-assets-v1`
 ```bash
 npm run dev     # Servidor de imágenes en localhost:8080 (CORS habilitado)
 npm run convert # Convierte todas las imágenes a .webp optimizado
@@ -35,14 +35,14 @@ npm run sync    # Sincroniza hacia ElseframeComics (equivalente a sync-assets)
 ## Flujo para agregar un capítulo nuevo
 
 ```
-1. Crear carpeta en Elseframe-comic-v1/comics/
+1. Crear carpeta en ElseframeComics-assets-v1/comics/
    └── #4 nombre-saga/
        └── #1 nombre-capitulo/
            ├── portada.png     ← portada del capítulo
            ├── 1.png
            ├── 2.png ...
 
-2. Convertir a WebP (en Elseframe-comic-v1):
+2. Convertir a WebP (en ElseframeComics-assets-v1):
    npm run convert
 
 3. Sincronizar hacia la web (en cualquiera de los dos):
@@ -196,9 +196,9 @@ PREVIEW_PASSWORD="tu_contraseña_secreta"
 ### Vercel (producción)
 | Variable | Valor |
 |---|---|
-| `NEXT_PUBLIC_ASSETS_BASE_URL` | `https://ian9franco.github.io/Elseframe-comic-v1` |
+| `NEXT_PUBLIC_ASSETS_BASE_URL` | `https://ian9franco.github.io/ElseframeComics-assets-v1` |
 | `PREVIEW_PASSWORD` | `tu_contraseña_secreta` |
-| `GITHUB_EDITOR_TOKEN` | PAT fine-grained (ElseframeComics + Elseframe-comic-v1, Contents + Actions read/write) |
+| `GITHUB_EDITOR_TOKEN` | PAT fine-grained (ElseframeComics + ElseframeComics-assets-v1, Contents + Actions read/write) |
 
 En **GitHub Actions** del repo ElseframeComics, el secret `ELSEFRAME_PUBLISH_TOKEN` debe llevar **el mismo valor** que `GITHUB_EDITOR_TOKEN` en Vercel (no es otra app: es el mismo PAT pegado en otro lugar).
 

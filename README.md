@@ -128,14 +128,14 @@ Para optimizar rendimiento, despliegue y costes, el proyecto utiliza una arquite
 graph TD
     A["Lector en Producción (Next.js en Vercel)"] -->|getComicPageUrl| B("Resolver URL de Asset")
     B -->|NEXT_PUBLIC_ASSETS_BASE_URL| C["jsDelivr CDN"]
-    C -->|Fetch sin límites| D["GitHub: Ian9Franco/Elseframe-comic-v1"]
+    C -->|Fetch sin límites| D["GitHub: Ian9Franco/ElseframeComics-assets-v1"]
     D -->|Entrega WebP HD| C
     C -->|Cache Global Edge| A
 ```
 
 1. **Repositorio Web (`ElseframeComics`)**: Código fuente, componentes UI, páginas y archivos `dialogues.json`. Las imágenes en `public/comics/` son marcadores vacíos de 0 bytes para que Next.js indexe la estructura.
-2. **Repositorio de Assets (`Elseframe-comic-v1`)**: Repositorio dedicado exclusivamente a alojar las imágenes reales `.webp` de alta fidelidad. GitHub Pages y jsDelivr sirven esas fotos solo con este nombre.
-3. **Modo Producción**: Las imágenes se sirven desde `https://ian9franco.github.io/Elseframe-comic-v1/comics/...` (o `https://cdn.jsdelivr.net/gh/Ian9Franco/Elseframe-comic-v1@main/comics/...`) sin consumir bandwidth ni almacenamiento de Vercel.
+2. **Repositorio de Assets (`ElseframeComics-assets-v1`)**: Repositorio dedicado exclusivamente a alojar las imágenes reales `.webp` de alta fidelidad. GitHub Pages y jsDelivr sirven esas fotos solo con este nombre. `git push` sigue yendo al `origin` de la carpeta local; GitHub redirige el nombre anterior.
+3. **Modo Producción**: Las imágenes se sirven desde `https://ian9franco.github.io/ElseframeComics-assets-v1/comics/...` (o `https://cdn.jsdelivr.net/gh/Ian9Franco/ElseframeComics-assets-v1@main/comics/...`) sin consumir bandwidth ni almacenamiento de Vercel.
 
 ---
 
@@ -143,7 +143,7 @@ graph TD
 
 ### Requisitos Previos
 - Node.js 18+ instalado
-- Repositorio web (`ElseframeComics`) y opcionalmente repositorio de assets (`Elseframe-comic-v1`) clonados en la misma carpeta raíz.
+- Repositorio web (`ElseframeComics`) y opcionalmente repositorio de assets (`ElseframeComics-assets-v1`) clonados en la misma carpeta raíz.
 
 ### 🚀 Comandos Rápidos
 ```bash

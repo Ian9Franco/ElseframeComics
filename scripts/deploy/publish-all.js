@@ -5,7 +5,7 @@ const fs = require("fs");
 const projectRoot = process.env.PUBLISH_PROJECT_ROOT || path.join(__dirname, "..", "..");
 
 function getSiblingRoot(root) {
-  const possibleNames = ["Elseframe-comic-v1", "the-boyz-comic", "theboyz-comic-v1", "theboyz-comic"];
+  const possibleNames = ["ElseframeComics-assets-v1", "Elseframe-comic-v1", "the-boyz-comic", "theboyz-comic-v1", "theboyz-comic"];
   for (const name of possibleNames) {
     const p = path.join(root, "..", name);
     if (fs.existsSync(p)) {
@@ -16,7 +16,7 @@ function getSiblingRoot(root) {
     const parentDir = path.join(root, "..");
     const files = fs.readdirSync(parentDir);
     for (const file of files) {
-      if (file.toLowerCase().includes("elseframe-comic") || file.toLowerCase().includes("the-boyz-comic") || file.toLowerCase().includes("theboyz-comic")) {
+      if (file.toLowerCase().includes("elseframecomics-assets") || file.toLowerCase().includes("elseframe-comic") || file.toLowerCase().includes("the-boyz-comic") || file.toLowerCase().includes("theboyz-comic")) {
         const p = path.join(parentDir, file);
         if (fs.statSync(p).isDirectory()) {
           return p;
@@ -24,7 +24,7 @@ function getSiblingRoot(root) {
       }
     }
   } catch (e) {}
-  return path.join(root, "..", "Elseframe-comic-v1");
+  return path.join(root, "..", "ElseframeComics-assets-v1");
 }
 
 const siblingRoot = process.env.PUBLISH_ASSETS_ROOT || getSiblingRoot(projectRoot);
@@ -67,7 +67,7 @@ if (skipOptimize) {
   }
 } else {
   try {
-    console.log("⏳ Corriendo optimización de imágenes locales de cómics (convert en Elseframe-comic-v1)...");
+    console.log("⏳ Corriendo optimización de imágenes locales de cómics (convert en el repo de fotos)...");
     execSync("npm run convert", { cwd: siblingRoot, stdio: "inherit" });
 
     console.log("⏳ Corriendo optimización general de imágenes (compress en ElseframeComics)...");
@@ -76,7 +76,7 @@ if (skipOptimize) {
     console.log("⏳ Corriendo compresión de audios (compress:audio en ElseframeComics)...");
     execSync("npm run compress:audio", { cwd: projectRoot, stdio: "inherit" });
 
-    console.log("⏳ Sincronizando marcadores con el proyecto principal (sync en Elseframe-comic-v1)...");
+    console.log("⏳ Sincronizando marcadores con el proyecto principal (sync en el repo de fotos)...");
     execSync("npm run sync", { cwd: siblingRoot, stdio: "inherit" });
   } catch (error) {
     console.error("⚠️ Ocurrió un error al procesar/sincronizar los assets. Continuando con git push...", error.message);
@@ -373,7 +373,7 @@ let mainAppPushed = false;
 if (skipAssetsPush) {
   console.log("⏭️ PUBLISH_SKIP_ASSETS_PUSH=1: omitiendo push del repo de assets (PAT inválido en CI).\n");
 } else {
-  const assetsResult = publishRepo("Elseframe-comic-v1 (Assets)", siblingRoot);
+  const assetsResult = publishRepo("ElseframeComics-assets-v1 (Assets)", siblingRoot);
   if (assetsResult.error) {
     reportError("No se publica la app porque falló el repo de assets (páginas y diálogos quedarían desalineados).");
     process.exit(1);
