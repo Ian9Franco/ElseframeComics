@@ -7,12 +7,27 @@ const nextConfig: NextConfig = {
       {
         protocol: "https",
         hostname: "raw.githubusercontent.com",
+        pathname: "/Ian9Franco/ElseframeComics-assets-v1/**",
+      },
+      {
+        protocol: "https",
+        hostname: "raw.githubusercontent.com",
         pathname: "/Ian9Franco/Elseframe-comic-v1/**",
       },
       {
         protocol: "https",
         hostname: "cdn.jsdelivr.net",
+        pathname: "/gh/Ian9Franco/ElseframeComics-assets-v1/**",
+      },
+      {
+        protocol: "https",
+        hostname: "cdn.jsdelivr.net",
         pathname: "/gh/Ian9Franco/Elseframe-comic-v1/**",
+      },
+      {
+        protocol: "https",
+        hostname: "ian9franco.github.io",
+        pathname: "/ElseframeComics-assets-v1/**",
       },
       {
         protocol: "https",

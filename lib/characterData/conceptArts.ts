@@ -238,6 +238,51 @@ export const conceptArts: Record<string, ConceptArtItem[]> = {
       "isAlt": false
     }
   ],
+  "archon": [
+    {
+      "name": "Archon Sheet",
+      "path": "/personajes/GUIAS/deidades/ARCHON/Archon_sheet.webp",
+      "section": "base",
+      "sectionLabel": "Base",
+      "isAlt": false
+    }
+  ],
+  "celestial": [
+    {
+      "name": "Celestial Sheet",
+      "path": "/personajes/GUIAS/deidades/Celestial/Celestial_sheet.webp",
+      "section": "base",
+      "sectionLabel": "Base",
+      "isAlt": false
+    }
+  ],
+  "lucifer": [
+    {
+      "name": "Lucifer Sheet",
+      "path": "/personajes/GUIAS/deidades/Lucifer Morningstar/Lucifer_sheet.webp",
+      "section": "base",
+      "sectionLabel": "Base",
+      "isAlt": false
+    }
+  ],
+  "mars": [
+    {
+      "name": "Mars Sheet",
+      "path": "/personajes/GUIAS/deidades/Mars/Mars_sheet.webp",
+      "section": "base",
+      "sectionLabel": "Base",
+      "isAlt": false
+    }
+  ],
+  "zeus": [
+    {
+      "name": "Zeus Sheet",
+      "path": "/personajes/GUIAS/deidades/Zeus/Zeus_sheet.webp",
+      "section": "base",
+      "sectionLabel": "Base",
+      "isAlt": false
+    }
+  ],
   "uandi": [
     {
       "name": "Aegis New Sheet Alt",
@@ -248,7 +293,7 @@ export const conceptArts: Record<string, ConceptArtItem[]> = {
     },
     {
       "name": "Aegis Sheet",
-      "path": "/personajes/GUIAS/elseframe/AEGIS/Aegis_sheet.webp",
+      "path": "/personajes/GUIAS/elseframe/AEGIS/aegis_sheet.webp",
       "section": "base",
       "sectionLabel": "Base",
       "isAlt": false
@@ -550,7 +595,7 @@ export const conceptArts: Record<string, ConceptArtItem[]> = {
     },
     {
       "name": "Outrider Sheet",
-      "path": "/personajes/GUIAS/elseframe/OUTRIDER/Outrider_sheet.webp",
+      "path": "/personajes/GUIAS/elseframe/OUTRIDER/outrider_sheet.webp",
       "section": "base",
       "sectionLabel": "Base",
       "isAlt": false
@@ -573,7 +618,7 @@ export const conceptArts: Record<string, ConceptArtItem[]> = {
     },
     {
       "name": "Jaz Sheet",
-      "path": "/personajes/GUIAS/elseframe/SIGIL/Jaz_sheet.webp",
+      "path": "/personajes/GUIAS/elseframe/SIGIL/JAZ_sheet.webp",
       "section": "base",
       "sectionLabel": "Base",
       "isAlt": false
@@ -733,51 +778,6 @@ export const conceptArts: Record<string, ConceptArtItem[]> = {
       "section": "tokyo",
       "sectionLabel": "Tokyo",
       "isAlt": true
-    }
-  ],
-  "archon": [
-    {
-      "name": "Archon Sheet",
-      "path": "/personajes/GUIAS/deidades/ARCHON/Archon_sheet.webp",
-      "section": "base",
-      "sectionLabel": "Base",
-      "isAlt": false
-    }
-  ],
-  "celestial": [
-    {
-      "name": "Celestial Sheet",
-      "path": "/personajes/GUIAS/deidades/Celestial/Celestial_sheet.webp",
-      "section": "base",
-      "sectionLabel": "Base",
-      "isAlt": false
-    }
-  ],
-  "lucifer": [
-    {
-      "name": "Lucifer Sheet",
-      "path": "/personajes/GUIAS/deidades/Lucifer Morningstar/Lucifer_sheet.webp",
-      "section": "base",
-      "sectionLabel": "Base",
-      "isAlt": false
-    }
-  ],
-  "mars": [
-    {
-      "name": "Mars Sheet",
-      "path": "/personajes/GUIAS/deidades/Mars/Mars_sheet.webp",
-      "section": "base",
-      "sectionLabel": "Base",
-      "isAlt": false
-    }
-  ],
-  "zeus": [
-    {
-      "name": "Zeus Sheet",
-      "path": "/personajes/GUIAS/deidades/Zeus/Zeus_sheet.webp",
-      "section": "base",
-      "sectionLabel": "Base",
-      "isAlt": false
     }
   ],
   "doom": [

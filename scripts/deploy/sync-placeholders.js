@@ -4,7 +4,7 @@ const path = require('path');
 const projectRoot = path.join(__dirname, "..", "..");
 
 function getSiblingRoot(root) {
-  const possibleNames = ["Elseframe-comic-v1", "the-boyz-comic", "theboyz-comic-v1", "theboyz-comic"];
+  const possibleNames = ["ElseframeComics-assets-v1", "Elseframe-comic-v1", "the-boyz-comic", "theboyz-comic-v1", "theboyz-comic"];
   for (const name of possibleNames) {
     const p = path.join(root, "..", name);
     if (fs.existsSync(p)) {
@@ -15,7 +15,8 @@ function getSiblingRoot(root) {
     const parentDir = path.join(root, "..");
     const files = fs.readdirSync(parentDir);
     for (const file of files) {
-      if (file.toLowerCase().includes("elseframe-comic") || file.toLowerCase().includes("the-boyz-comic") || file.toLowerCase().includes("theboyz-comic")) {
+      const n = file.toLowerCase();
+      if (n.includes("elseframecomics-assets") || n.includes("elseframe-comic") || n.includes("the-boyz-comic") || n.includes("theboyz-comic")) {
         const p = path.join(parentDir, file);
         if (fs.statSync(p).isDirectory()) {
           return p;
@@ -23,7 +24,7 @@ function getSiblingRoot(root) {
       }
     }
   } catch (e) {}
-  return path.join(root, "..", "Elseframe-comic-v1");
+  return path.join(root, "..", "ElseframeComics-assets-v1");
 }
 
 const appRoot = process.env.PUBLISH_PROJECT_ROOT || projectRoot;

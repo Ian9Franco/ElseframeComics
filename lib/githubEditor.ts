@@ -64,7 +64,7 @@ export function formatGithubApiAuthError(message: string): string {
   if (/resource not accessible by personal access token/i.test(message)) {
     return (
       "El PAT inicia sesión pero no puede usar ElseframeComics ni Actions. " +
-      "Fine-grained: Repository access → seleccioná ElseframeComics (no solo Elseframe-comic-v1). " +
+      "Fine-grained: Repository access → seleccioná ElseframeComics (no solo ElseframeComics-assets-v1). " +
       "Permissions del repo → Contents Read and write + Actions Read and write. " +
       "Classic PAT alternativo: scopes repo y workflow."
     );

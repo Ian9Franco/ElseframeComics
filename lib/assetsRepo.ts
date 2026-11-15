@@ -1,13 +1,14 @@
 /**
- * El repo de fotos pasó de theboyz-comic-v1 a Elseframe-comic-v1.
- * GitHub API redirige el nombre viejo; GitHub Pages y jsDelivr no.
- * NEXT_PUBLIC_ASSETS_BASE_URL en Vercel sigue con el slug viejo, así que
- * las URLs se corrigen acá hasta que se actualice la variable.
+ * El repo de fotos pasó de Elseframe-comic-v1 a ElseframeComics-assets-v1.
+ * La API de GitHub redirige el nombre viejo. GitHub Pages no: el sitio
+ * https://ian9franco.github.io/Elseframe-comic-v1 responde 404.
+ * NEXT_PUBLIC_ASSETS_BASE_URL en Vercel puede seguir con un slug viejo;
+ * las URLs se corrigen acá.
  */
 
-export const ASSETS_REPO = "Elseframe-comic-v1";
+export const ASSETS_REPO = "ElseframeComics-assets-v1";
 
-const LEGACY_ASSETS_REPOS = ["theboyz-comic-v1", "the-boyz-comic"];
+const LEGACY_ASSETS_REPOS = ["Elseframe-comic-v1", "theboyz-comic-v1", "the-boyz-comic"];
 
 export function rewriteLegacyAssetsUrl(url: string): string {
   let out = url;

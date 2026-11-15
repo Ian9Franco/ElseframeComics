@@ -299,7 +299,7 @@ export function validatePreviewAccess(request: NextRequest, sagaId?: string): bo
 }
 
 function resolveSiblingAssetsSubdir(subdir: "comics" | "sounds"): string {
-  const possibleNames = ["Elseframe-comic-v1", "the-boyz-comic", "theboyz-comic-v1", "theboyz-comic"];
+  const possibleNames = ["ElseframeComics-assets-v1", "Elseframe-comic-v1", "the-boyz-comic", "theboyz-comic-v1", "theboyz-comic"];
   for (const name of possibleNames) {
     const p = path.join(process.cwd(), "..", name, subdir);
     if (fs.existsSync(p)) {
@@ -310,7 +310,8 @@ function resolveSiblingAssetsSubdir(subdir: "comics" | "sounds"): string {
     const parentDir = path.join(process.cwd(), "..");
     const files = fs.readdirSync(parentDir);
     for (const file of files) {
-      if (file.toLowerCase().includes("elseframe-comic") || file.toLowerCase().includes("the-boyz-comic") || file.toLowerCase().includes("theboyz-comic")) {
+      const n = file.toLowerCase();
+      if (n.includes("elseframecomics-assets") || n.includes("elseframe-comic") || n.includes("the-boyz-comic") || n.includes("theboyz-comic")) {
         const p = path.join(parentDir, file, subdir);
         if (fs.existsSync(p)) {
           return p;
@@ -318,7 +319,7 @@ function resolveSiblingAssetsSubdir(subdir: "comics" | "sounds"): string {
       }
     }
   } catch (e) {}
-  return path.join(process.cwd(), "..", "Elseframe-comic-v1", subdir);
+  return path.join(process.cwd(), "..", "ElseframeComics-assets-v1", subdir);
 }
 
 export function getPublicComicsDir(): string {
