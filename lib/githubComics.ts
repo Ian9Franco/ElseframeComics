@@ -2,7 +2,7 @@
  * githubComics.ts
  *
  * Módulo servidor que usa la GitHub API para listar archivos
- * del repo de imágenes (Elseframe-comic-v1) en lugar de `fs`.
+ * del repo de imágenes (ElseframeComics-assets-v1) en lugar de `fs`.
  *
  * Funciona tanto en local como en producción (Vercel), ya que
  * no depende del filesystem sino de solicitudes HTTP autenticadas.

@@ -4,7 +4,7 @@
 
 **Repos actuales involucrados**
 - App principal: `Ian9Franco/ElseframeComics`
-- Assets: `Ian9Franco/Elseframe-comic-v1`
+- Assets: `Ian9Franco/ElseframeComics-assets-v1`
 - Rama pública objetivo: `main`
 
 ---
@@ -65,7 +65,7 @@ Ya existe una decisión arquitectónica correcta:
 
 `lib/githubComics.ts`
 
-lee las páginas del repo `Elseframe-comic-v1` usando GitHub API en producción.
+lee las páginas del repo `ElseframeComics-assets-v1` usando GitHub API en producción.
 
 Esto es importante: **GitHub ya forma parte de la arquitectura de producción.** No estamos agregando un sistema completamente ajeno.
 
@@ -184,7 +184,7 @@ GITHUB_EDITOR_TOKEN=
 GITHUB_EDITOR_BRANCH=editor-workspace
 GITHUB_OWNER=Ian9Franco
 GITHUB_MAIN_REPO=ElseframeComics
-GITHUB_ASSETS_REPO=Elseframe-comic-v1
+GITHUB_ASSETS_REPO=ElseframeComics-assets-v1
 ```
 
 Para una primera versión, usar un **fine-grained PAT** limitado solamente a estos dos repos.
@@ -365,9 +365,9 @@ jobs:
       - name: Checkout assets workspace
         uses: actions/checkout@v4
         with:
-          repository: Ian9Franco/Elseframe-comic-v1
+          repository: Ian9Franco/ElseframeComics-assets-v1
           ref: editor-workspace
-          path: Elseframe-comic-v1
+          path: ElseframeComics-assets-v1
           token: ${{ secrets.ELSEFRAME_PUBLISH_TOKEN }}
           fetch-depth: 0
 
@@ -381,7 +381,7 @@ jobs:
         run: npm ci
 
       - name: Install asset dependencies
-        working-directory: Elseframe-comic-v1
+        working-directory: ElseframeComics-assets-v1
         run: npm ci
 
       - name: Configure Git
@@ -402,7 +402,7 @@ Usar exactamente:
 
 ```text
 elseframe
-Elseframe-comic-v1
+ElseframeComics-assets-v1
 ```
 
 El motivo es que hoy hay scripts que buscan el repo hermano por esos nombres, y el `package.json` del repo de assets ejecuta:
@@ -475,7 +475,7 @@ Fine-grained token limitado a:
 
 ```text
 Ian9Franco/ElseframeComics
-Ian9Franco/Elseframe-comic-v1
+Ian9Franco/ElseframeComics-assets-v1
 ```
 
 Permiso:
@@ -1499,7 +1499,7 @@ Implementá esta migración incrementalmente. No reescribas el editor.
 6. Creá GitHub Action publish-editor.yml que haga checkout de ambos repos
    en carpetas hermanas llamadas exactamente:
    - elseframe
-   - Elseframe-comic-v1
+   - ElseframeComics-assets-v1
 7. Adaptá publish-all.js para que pueda publicar HEAD hacia main mediante
    PUBLISH_TARGET_BRANCH sin romper el uso local actual.
 8. Cambiá /api/editor/publish para disparar GitHub Actions en producción.

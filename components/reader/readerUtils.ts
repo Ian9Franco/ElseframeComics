@@ -308,7 +308,7 @@ export function getEffectiveIndexes(
  * Devuelve la URL absoluta de un asset del cómic (páginas, portadas o sonidos).
  * Si NEXT_PUBLIC_ASSETS_BASE_URL está configurado, la cargará del CDN/servidor de assets externo.
  * De lo contrario, usará la ruta local relativa en /public.
- * Un slug viejo del repo de fotos (theboyz-comic-v1) se reescribe a Elseframe-comic-v1.
+ * Un slug viejo del repo de fotos se reescribe a ElseframeComics-assets-v1.
  */
 export function getComicAssetUrl(relativePath: string | null | undefined): string {
   if (!relativePath) return "";

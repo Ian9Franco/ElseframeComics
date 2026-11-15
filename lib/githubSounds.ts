@@ -1,5 +1,5 @@
 /**
- * List audio files from the assets repo (Elseframe-comic-v1/sounds) via GitHub API.
+ * List audio files from the assets repo (ElseframeComics-assets-v1/sounds) via GitHub API.
  * Used in production where the sibling sounds folder is not on disk.
  */
 

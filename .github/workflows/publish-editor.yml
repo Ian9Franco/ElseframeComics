@@ -32,19 +32,34 @@ jobs:
             echo "::warning::Falta el secret ELSEFRAME_PUBLISH_TOKEN (ElseframeComics → Settings → Secrets and variables → Actions). Sin él no se puede publicar el repo de assets."
             exit 0
           fi
-          code=$(curl -s -o /dev/null -w "%{http_code}" \
-            -H "Authorization: Bearer ${PUBLISH_TOKEN}" \
-            -H "Accept: application/vnd.github+json" \
-            "https://api.github.com/repos/Ian9Franco/Elseframe-comic-v1")
-          if [ "$code" = "200" ]; then
+          # El nombre nuevo se prueba primero. Si el repo todavía no se renombró,
+          # se usa Elseframe-comic-v1. curl -L porque GitHub responde 301 al slug viejo.
+          repo_name=""
+          auth_code=""
+          for candidate in ElseframeComics-assets-v1 Elseframe-comic-v1; do
+            code=$(curl -sL -o /dev/null -w "%{http_code}" \
+              -H "Authorization: Bearer ${PUBLISH_TOKEN}" \
+              -H "Accept: application/vnd.github+json" \
+              "https://api.github.com/repos/Ian9Franco/${candidate}")
+            if [ "$code" = "200" ]; then
+              repo_name="$candidate"
+              break
+            fi
+            auth_code="$code"
+            if [ "$code" = "401" ]; then
+              break
+            fi
+          done
+          if [ -n "$repo_name" ]; then
             echo "mode=auth" >> "$GITHUB_OUTPUT"
-            echo "PAT OK para Elseframe-comic-v1"
-          elif [ "$code" = "401" ]; then
+            echo "repo=$repo_name" >> "$GITHUB_OUTPUT"
+            echo "PAT OK para $repo_name"
+          elif [ "$auth_code" = "401" ]; then
             echo "mode=public" >> "$GITHUB_OUTPUT"
             echo "::warning::HTTP 401 con ELSEFRAME_PUBLISH_TOKEN: GitHub no acepta el valor guardado en el secret de Actions (aunque el PAT esté activo). Pegá en el secret exactamente el mismo github_pat_... que GITHUB_EDITOR_TOKEN de Vercel."
           else
             echo "mode=public" >> "$GITHUB_OUTPUT"
-            echo "::warning::ELSEFRAME_PUBLISH_TOKEN no accede a Elseframe-comic-v1 (HTTP ${code}). Incluí ese repo en el fine-grained token."
+            echo "::warning::ELSEFRAME_PUBLISH_TOKEN no accede a ElseframeComics-assets-v1 (HTTP ${auth_code}). Incluí ese repo en el fine-grained token."
           fi
 
       - name: Checkout main app workspace
@@ -64,13 +79,26 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.ELSEFRAME_PUBLISH_TOKEN }}
           PAT_MODE: ${{ steps.pat.outputs.mode }}
+          REPO_NAME: ${{ steps.pat.outputs.repo }}
         run: |
           set -euo pipefail
+          NAME="${REPO_NAME:-}"
           if [ "$PAT_MODE" = "auth" ]; then
-            REPO="https://x-access-token:${GH_TOKEN}@github.com/Ian9Franco/Elseframe-comic-v1.git"
+            NAME="${NAME:-ElseframeComics-assets-v1}"
+            REPO="https://x-access-token:${GH_TOKEN}@github.com/Ian9Franco/${NAME}.git"
           else
-            REPO="https://github.com/Ian9Franco/Elseframe-comic-v1.git"
+            if [ -z "$NAME" ]; then
+              for candidate in ElseframeComics-assets-v1 Elseframe-comic-v1; do
+                if git ls-remote --exit-code "https://github.com/Ian9Franco/${candidate}.git" HEAD >/dev/null 2>&1; then
+                  NAME="$candidate"
+                  break
+                fi
+              done
+            fi
+            NAME="${NAME:-ElseframeComics-assets-v1}"
+            REPO="https://github.com/Ian9Franco/${NAME}.git"
           fi
+          echo "Clonando assets desde Ian9Franco/${NAME}"
           BRANCH=main
           if git ls-remote --exit-code "$REPO" refs/heads/editor-workspace >/dev/null 2>&1; then
             BRANCH=editor-workspace
@@ -128,7 +156,7 @@ jobs:
         run: |
           set -euo pipefail
           if [ "$PAT_MODE" != "auth" ]; then
-            echo "Sin PAT válido: no se intentará push a elseframe-comic-v1."
+            echo "Sin PAT válido: no se intentará push al repo de fotos."
             export PUBLISH_SKIP_ASSETS_PUSH=1
           fi
           node "$RUNNER_TEMP/publish-tools/publish-all.js" "$COMMIT_MESSAGE" | tee /tmp/publish-all.log
