@@ -9,7 +9,7 @@ export function NewsTicker({ sagas }: { sagas: any[] }) {
   const loadingItems = [
     "CARGANDO ÚLTIMAS NOVEDADES...",
     "PREPARATE PIBE...",
-    "THE BOYZ COMIX...",
+    "ELSEFRAME COMICS...",
   ];
 
   const scrollItems = items.length > 0 ? items : loadingItems;
