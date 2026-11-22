@@ -956,7 +956,6 @@
           "focusY": 0.7119169331070992,
           "dialogue": [
             { "text": "El Sheriff no dice nada.", "size": "small", "posX": 22, "posY": 80, "tailX": 40, "tailY": 24, "tailWidth": 6, "tailCurvature": -22, "width": 170, "fontSize": 8, "borderRadius": 18, "speaker": "Narración", "style": "caption", "tail": "none" },
-            { "text": "Otra vez.", "size": "small", "posX": 38, "posY": 86, "tailX": 40, "tailY": 24, "tailWidth": 6, "tailCurvature": -22, "width": 90, "fontSize": 8, "borderRadius": 18, "speaker": "Narración", "style": "caption", "tail": "none" },
             { "text": "Dos investigaciones separadas por años.", "size": "small", "posX": 10, "posY": 90, "tailX": 40, "tailY": 24, "tailWidth": 6, "tailCurvature": -22, "width": 230, "fontSize": 8, "borderRadius": 18, "speaker": "Narración", "style": "caption", "tail": "none" }
           ],
           "zoomRects": [
