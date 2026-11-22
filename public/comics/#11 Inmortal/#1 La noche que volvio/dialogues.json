@@ -39,8 +39,8 @@
         {
           "focusY": 0.15,
           "dialogue": [
-            { "text": "Horas después.", "size": "small", "posX": 43.96181197388964, "posY": 3.781036168132946, "tailX": 40, "tailY": 24, "tailWidth": 6, "tailCurvature": -22, "width": 120, "fontSize": 8, "borderRadius": 18, "speaker": "Narración", "style": "caption", "tail": "none" },
-            { "text": "La YPF está casi vacía. Asfalto húmedo.", "size": "small", "posX": 7.588840553524853, "posY": 3.781036168132946, "tailX": 40, "tailY": 24, "tailWidth": 6, "tailCurvature": -22, "width": 220, "fontSize": 8, "borderRadius": 18, "speaker": "Narración", "style": "caption", "tail": "none" }
+            { "text": "Horas después.", "size": "small", "posX": 12.508114318540873, "posY": 3.781036168132946, "tailX": 40, "tailY": 24, "tailWidth": 6, "tailCurvature": -22, "width": 120, "fontSize": 8, "borderRadius": 18, "speaker": "Narración", "style": "caption", "tail": "none" },
+            { "text": "La YPF está casi vacía. Asfalto húmedo.", "size": "small", "posX": 82.19529031331507, "posY": 5.817530140110788, "tailX": 40, "tailY": 24, "tailWidth": 6, "tailCurvature": -22, "width": 220, "fontSize": 8, "borderRadius": 18, "speaker": "Narración", "style": "caption", "tail": "none" }
           ],
           "zoomRects": [
             { "x": 0, "y": 0, "w": 100, "h": 24 }
@@ -49,8 +49,7 @@
         {
           "focusY": 0.38,
           "dialogue": [
-            { "text": "Uandi maneja hacia la estación.", "size": "small", "posX": 12, "posY": 32, "tailX": 40, "tailY": 24, "tailWidth": 6, "tailCurvature": -22, "width": 190, "fontSize": 8, "borderRadius": 18, "speaker": "Narración", "style": "caption", "tail": "none" },
-            { "text": "...", "size": "small", "posX": 45, "posY": 36, "tailX": 40, "tailY": 24, "tailWidth": 6, "tailCurvature": -22, "width": 60, "fontSize": 8, "borderRadius": 18, "speaker": "Uandi", "style": "thought", "tail": "none" }
+            { "text": "...", "size": "small", "posX": 41.999647282478655, "posY": 47.322591967753254, "tailX": 40, "tailY": 24, "tailWidth": 6, "tailCurvature": -22, "width": 60, "fontSize": 8, "borderRadius": 18, "speaker": "Uandi", "style": "thought", "tail": "none" }
           ],
           "zoomRects": [
             { "x": 0, "y": 24, "w": 100, "h": 24 }
