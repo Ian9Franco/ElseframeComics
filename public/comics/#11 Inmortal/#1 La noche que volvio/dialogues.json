@@ -39,8 +39,8 @@
         {
           "focusY": 0.15,
           "dialogue": [
-            { "text": "Horas después.", "size": "small", "posX": 38, "posY": 8, "tailX": 40, "tailY": 24, "tailWidth": 6, "tailCurvature": -22, "width": 120, "fontSize": 8, "borderRadius": 18, "speaker": "Narración", "style": "caption", "tail": "none" },
-            { "text": "La YPF está casi vacía. Asfalto húmedo.", "size": "small", "posX": 10, "posY": 16, "tailX": 40, "tailY": 24, "tailWidth": 6, "tailCurvature": -22, "width": 220, "fontSize": 8, "borderRadius": 18, "speaker": "Narración", "style": "caption", "tail": "none" }
+            { "text": "Horas después.", "size": "small", "posX": 43.96181197388964, "posY": 3.781036168132946, "tailX": 40, "tailY": 24, "tailWidth": 6, "tailCurvature": -22, "width": 120, "fontSize": 8, "borderRadius": 18, "speaker": "Narración", "style": "caption", "tail": "none" },
+            { "text": "La YPF está casi vacía. Asfalto húmedo.", "size": "small", "posX": 7.588840553524853, "posY": 3.781036168132946, "tailX": 40, "tailY": 24, "tailWidth": 6, "tailCurvature": -22, "width": 220, "fontSize": 8, "borderRadius": 18, "speaker": "Narración", "style": "caption", "tail": "none" }
           ],
           "zoomRects": [
             { "x": 0, "y": 0, "w": 100, "h": 24 }
