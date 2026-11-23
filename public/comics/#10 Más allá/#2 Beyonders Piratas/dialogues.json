@@ -3,10 +3,23 @@
     "1": {
       "panels": [
         {
-          "focusY": 0.2,
-          "dialogue": [],
+          "focusY": 0.15603750612594955,
+          "dialogue": [
+            { "text": "hola\n", "size": "small", "posX": 80, "posY": 5, "tailX": 55, "tailY": 10, "tailWidth": 6, "tailCurvature": -22, "width": 72, "fontSize": 8, "borderRadius": 18 },
+            { "text": "Nuevo diálogo", "size": "small", "posX": 50, "posY": 22, "tailX": 50, "tailY": 37, "tailWidth": 6, "tailCurvature": -22, "width": 72, "fontSize": 8, "borderRadius": 18 }
+          ],
           "zoomRects": [
-            { "x": 0, "y": 0, "w": 100, "h": 37.96346636853713 }
+            { "x": 0, "y": 0, "w": 100, "h": 40 }
+          ],
+          "sounds": [
+            {
+              "sound": "",
+              "soundStartTime": 0,
+              "soundConfig": {
+                "volume": 1,
+                "playbackRate": 1
+              }
+            }
           ]
         },
         {
@@ -17,7 +30,7 @@
           ]
         },
         {
-          "focusY": 0.8,
+          "focusY": 0.7677430402324211,
           "dialogue": [],
           "zoomRects": [
             { "x": 0, "y": 59.863735910316095, "w": 100, "h": 40.136264089683905 }
@@ -63,7 +76,7 @@
           "focusY": 0.2,
           "dialogue": [
             { "text": "mati ponete unos temas de esos", "size": "small", "posX": 53.755608375173594, "posY": 2.1624292276466193, "tailX": 35, "tailY": 10, "tailWidth": 6, "tailCurvature": -22, "width": 120, "fontSize": 8, "borderRadius": 18 },
-            { "text": "", "size": "small", "posX": 85.73336182031834, "posY": 5.768322361393018, "tailX": 68.45756329451982, "tailY": 16.59542416675569, "tailWidth": 6, "tailCurvature": -22, "width": 96, "fontSize": 8, "borderRadius": 18 }
+            { "text": "tenes suerte que traje la playlist", "size": "small", "posX": 102.00653039931214, "posY": 11.284650693255315, "tailX": 68.45756329451982, "tailY": 16.59542416675569, "tailWidth": 6, "tailCurvature": -22, "width": 96, "fontSize": 8, "borderRadius": 18 }
           ],
           "zoomRects": [
             { "x": 0, "y": 0, "w": 100, "h": 29.74899791820022 }
@@ -72,7 +85,7 @@
         {
           "focusY": 0.5,
           "dialogue": [
-            { "text": "", "size": "small", "posX": 39.16381796816578, "posY": 25, "tailX": 9.870072641811767, "tailY": 40.79823369565217, "tailWidth": 6, "tailCurvature": -22, "width": 96, "fontSize": 8, "borderRadius": 18 }
+            { "text": "a ver si te acordas de este", "size": "small", "posX": 39.16381796816578, "posY": 25, "tailX": 9.870072641811767, "tailY": 40.79823369565217, "tailWidth": 6, "tailCurvature": -22, "width": 96, "fontSize": 8, "borderRadius": 18 }
           ],
           "zoomRects": [
             { "x": 0, "y": 30.899163542050058, "w": 100, "h": 34.21742730953257 }
@@ -92,7 +105,8 @@
         {
           "focusY": 0.11044842315401528,
           "dialogue": [
-            { "text": "", "style": "scream", "size": "small", "posX": 62.01565046930101, "posY": 2.0038502907401625, "tailX": 83.71884473197025, "tailY": 6.46527074067579, "tailWidth": 6, "tailCurvature": -22, "width": 201, "fontSize": 8, "borderRadius": 18, "fontFamily": "marker" }
+            { "text": "Muchachos! Me escuchan? desde la tierra se esta transmitiendo la mision en vivo", "style": "scream", "size": "small", "posX": 105.10260370697263, "posY": -3.6044168466531676, "tailX": 83.71884473197025, "tailY": 6.46527074067579, "tailWidth": 6, "tailCurvature": -22, "width": 277.44, "fontSize": 8, "borderRadius": 18, "fontFamily": "marker" },
+            { "text": "solamente queria desearles buena suerte de parte de todos aca abajo", "style": "scream", "size": "small", "posX": 54.17586054721978, "posY": 0, "tailX": 83.71884473197025, "tailY": 6.46527074067579, "tailWidth": 6, "tailCurvature": -22, "width": 237.12, "fontSize": 8, "borderRadius": 18, "fontFamily": "marker" }
           ],
           "zoomRects": [
             { "x": 0, "y": 0, "w": 100.35272572511896, "h": 22.885872351332875 }
@@ -110,7 +124,7 @@
         {
           "focusY": 0.5474298461140567,
           "dialogue": [
-            { "text": "", "size": "small", "posX": 38.5017539560737, "posY": 41.827953110692675, "tailX": 28.224667586633807, "tailY": 47.96144722333277, "tailWidth": 6, "tailCurvature": -22, "width": 96, "fontSize": 8, "borderRadius": 18 }
+            { "text": "Salimos facheros?", "size": "small", "posX": 38.5017539560737, "posY": 41.827953110692675, "tailX": 28.224667586633807, "tailY": 47.96144722333277, "tailWidth": 6, "tailCurvature": -22, "width": 96, "fontSize": 8, "borderRadius": 18 }
           ],
           "zoomRects": [
             { "x": 0, "y": 40.41737262861269, "w": 100.05045847895893, "h": 20.95719573375978 }
@@ -357,7 +371,12 @@
         },
         {
           "focusY": 0.6589044611897797,
-          "dialogue": [],
+          "dialogue": [
+            { "text": "Mati ponele voluntad, yo no pienso morir aca con voos!", "size": "small", "posX": 44.517472068031466, "posY": 32.38963416296141, "tailX": 28.17638762185699, "tailY": 47.1873064770669, "tailWidth": 6, "tailCurvature": -22, "width": 96, "fontSize": 8, "borderRadius": 18 },
+            { "text": "Esa licuadora galactica es muy fuerte", "size": "small", "posX": 90.09237589258902, "posY": 50, "tailX": 73.6344138407904, "tailY": 57.89916970905651, "tailWidth": 6, "tailCurvature": -22, "width": 96, "fontSize": 8, "borderRadius": 18 },
+            { "text": "-Que- las luces rojas son el modo frutifantastico?", "size": "small", "posX": 63.89657642195605, "posY": 77.70419691360992, "tailX": 30.59778893522506, "tailY": 76.1605712807074, "tailWidth": 6, "tailCurvature": -22, "width": 96, "fontSize": 8, "borderRadius": 18 },
+            { "text": "ma-mati?!", "size": "small", "posX": 46.66279495423726, "posY": 63.89657642195605, "tailX": 55.819311753213846, "tailY": 76.92058096097979, "tailWidth": 6, "tailCurvature": -22, "width": 96, "fontSize": 8, "borderRadius": 18 }
+          ],
           "zoomRects": [
             { "x": 0, "y": 36.567228921096216, "w": 100.16656214284328, "h": 63.24359910129691 }
           ]
@@ -368,19 +387,24 @@
       "panels": [
         {
           "focusY": 0.1,
-          "dialogue": []
+          "dialogue": [],
+          "zoomRects": [
+            { "x": -0.01862891207156636, "y": -0.6009326474688717, "w": 100.2439786548724, "h": 19.38342056872265 }
+          ]
         },
         {
-          "focusY": 0.35,
-          "dialogue": []
+          "focusY": 0.525772799384645,
+          "dialogue": [],
+          "zoomRects": [
+            { "x": 0, "y": 18.482021597519342, "w": 100.69467814047402, "h": 56.63790202394117 }
+          ]
         },
         {
-          "focusY": 0.6,
-          "dialogue": []
-        },
-        {
-          "focusY": 0.88,
-          "dialogue": []
+          "focusY": 0.9239673723619056,
+          "dialogue": [],
+          "zoomRects": [
+            { "x": -0.6946781404740434, "y": 74.66922413585884, "w": 100.69467814047404, "h": 25.180542702273925 }
+          ]
         }
       ]
     },
@@ -388,7 +412,10 @@
       "panels": [
         {
           "focusY": 0.45,
-          "dialogue": []
+          "dialogue": [],
+          "zoomRects": [
+            { "x": -0.3113571599615703, "y": -0.3004663237344358, "w": 100.31135715996157, "h": 100.30046632373444 }
+          ]
         }
       ]
     },
@@ -396,23 +423,32 @@
       "panels": [
         {
           "focusY": 0.1,
-          "dialogue": []
+          "dialogue": [],
+          "zoomRects": [
+            { "x": 0, "y": 0, "w": 27.71801836450171, "h": 35.15790256478053 },
+            { "x": 27.26731887890005, "y": 0, "w": 29.276837652035926, "h": 35.30813572664775 },
+            { "x": 55.85007932310949, "y": -0.1502331618672179, "w": 44.14992067689051, "h": 35.30813572664775 }
+          ]
         },
         {
-          "focusY": 0.2,
-          "dialogue": []
-        },
-        {
-          "focusY": 0.3,
-          "dialogue": []
-        },
-        {
-          "focusY": 0.5,
-          "dialogue": []
+          "focusY": 0.48910806174957117,
+          "dialogue": [
+            { "text": "pache-", "size": "small", "posX": 90.20154373927957, "posY": 40.566994915461905, "tailX": 76.64788042146532, "tailY": 46.0717731560892, "tailWidth": 6, "tailCurvature": -22, "width": 96, "fontSize": 8, "borderRadius": 18 }
+          ],
+          "zoomRects": [
+            { "x": 0, "y": 34.44104539328596, "w": 31.242342563097278, "h": 23.73805439843175 },
+            { "x": 31.242342563097278, "y": 34.44104539328596, "w": 68.14812545944623, "h": 24.50379808870374 }
+          ]
         },
         {
           "focusY": 0.8,
-          "dialogue": []
+          "dialogue": [
+            { "text": "Estas bien?", "size": "small", "posX": 94.96580122092837, "posY": 60.656114163728, "tailX": 74.83007148716746, "tailY": 68.10521551356766, "tailWidth": 6, "tailCurvature": -22, "width": 96, "fontSize": 8, "borderRadius": 18 },
+            { "text": "-Que?! que paso?", "size": "small", "posX": 50, "posY": 56.116131810336746, "tailX": 37.45512076110927, "tailY": 68.63790677636555, "tailWidth": 6, "tailCurvature": -22, "width": 72, "fontSize": 8, "borderRadius": 18 }
+          ],
+          "zoomRects": [
+            { "x": 0, "y": 58.94484348198971, "w": 100, "h": 41.05515651801029 }
+          ]
         }
       ]
     },
@@ -420,35 +456,58 @@
       "panels": [
         {
           "focusY": 0.2,
-          "dialogue": []
+          "dialogue": [],
+          "zoomRects": [
+            { "x": 0, "y": 0, "w": 100, "h": 36.77804260623703 }
+          ]
         },
         {
           "focusY": 0.5,
-          "dialogue": []
+          "dialogue": [],
+          "zoomRects": [
+            { "x": 0, "y": 37.12624657019096, "w": 100, "h": 24.374277476774807 }
+          ]
         },
         {
           "focusY": 0.8,
-          "dialogue": []
+          "dialogue": [],
+          "zoomRects": [
+            { "x": 0.28988557588679953, "y": 60.10770819115005, "w": 99.7101144241132, "h": 39.89229180884995 }
+          ]
         }
       ]
     },
     "17": {
       "panels": [
         {
-          "focusY": 0.1,
-          "dialogue": []
+          "focusY": 0.11928180899289387,
+          "dialogue": [],
+          "zoomRects": [
+            { "x": -0.2022206897580361, "y": 0, "w": 100.20222068975804, "h": 20.58655828237949 }
+          ]
         },
         {
           "focusY": 0.3,
-          "dialogue": []
+          "dialogue": [],
+          "zoomRects": [
+            { "x": 0, "y": 20.238354318425564, "w": 100, "h": 17.75840216165021 }
+          ]
         },
         {
           "focusY": 0.6,
-          "dialogue": []
+          "dialogue": [],
+          "zoomRects": [
+            { "x": 0, "y": 39.38957233589148, "w": 99.65151879307953, "h": 39.52114990877057 }
+          ]
         },
         {
           "focusY": 0.88,
-          "dialogue": []
+          "dialogue": [
+            { "text": "mañana voy a llegar reee tarde al labubu", "size": "small", "posX": 44.9416876745774, "posY": 77.02390287116643, "tailX": 35.483403133413525, "tailY": 86.80748504270227, "tailWidth": 6, "tailCurvature": -22, "width": 157.92000000000002, "fontSize": 8, "borderRadius": 18 }
+          ],
+          "zoomRects": [
+            { "x": 0, "y": 79.25892620861597, "w": 100, "h": 20.741073791384025 }
+          ]
         }
       ]
     },
@@ -456,15 +515,24 @@
       "panels": [
         {
           "focusY": 0.2,
-          "dialogue": []
+          "dialogue": [],
+          "zoomRects": [
+            { "x": 0, "y": 0, "w": 100, "h": 27.396203442783634 }
+          ]
         },
         {
           "focusY": 0.45,
-          "dialogue": []
+          "dialogue": [],
+          "zoomRects": [
+            { "x": 0, "y": 26.936757228620436, "w": 100, "h": 41.962754226905176 }
+          ]
         },
         {
           "focusY": 0.8,
-          "dialogue": []
+          "dialogue": [],
+          "zoomRects": [
+            { "x": 0, "y": 69.6652551457976, "w": 100, "h": 30.3347448542024 }
+          ]
         }
       ]
     },
@@ -472,19 +540,31 @@
       "panels": [
         {
           "focusY": 0.1,
-          "dialogue": []
+          "dialogue": [],
+          "zoomRects": [
+            { "x": 0, "y": 0, "w": 100, "h": 20.351361492281306 }
+          ]
         },
         {
           "focusY": 0.3,
-          "dialogue": []
+          "dialogue": [],
+          "zoomRects": [
+            { "x": 0, "y": 20.504510230335704, "w": 100, "h": 22.66601323205097 }
+          ]
         },
         {
           "focusY": 0.5,
-          "dialogue": []
+          "dialogue": [],
+          "zoomRects": [
+            { "x": 0, "y": 43.936267152658665, "w": 100, "h": 14.855427591276644 }
+          ]
         },
         {
           "focusY": 0.88,
-          "dialogue": []
+          "dialogue": [],
+          "zoomRects": [
+            { "x": 0, "y": 59.5574384342073, "w": 100, "h": 40.4425615657927 }
+          ]
         }
       ]
     },
@@ -492,15 +572,24 @@
       "panels": [
         {
           "focusY": 0.15,
-          "dialogue": []
+          "dialogue": [],
+          "zoomRects": [
+            { "x": 0, "y": 0, "w": 100, "h": 22.80174130115168 }
+          ]
         },
         {
           "focusY": 0.35,
-          "dialogue": []
+          "dialogue": [],
+          "zoomRects": [
+            { "x": 0, "y": 23.414336253369274, "w": 100, "h": 23.738054398431753 }
+          ]
         },
         {
           "focusY": 0.7,
-          "dialogue": []
+          "dialogue": [],
+          "zoomRects": [
+            { "x": 0, "y": 46.692944437637834, "w": 100, "h": 53.307055562362166 }
+          ]
         }
       ]
     },
@@ -508,11 +597,17 @@
       "panels": [
         {
           "focusY": 0.2,
-          "dialogue": []
+          "dialogue": [],
+          "zoomRects": [
+            { "x": 0, "y": 0, "w": 100, "h": 66.14283417054644 }
+          ]
         },
         {
           "focusY": 0.85,
-          "dialogue": []
+          "dialogue": [],
+          "zoomRects": [
+            { "x": -0.4594462141631953, "y": 66.17154955893163, "w": 100.4594462141632, "h": 33.82845044106837 }
+          ]
         }
       ]
     },
@@ -520,15 +615,24 @@
       "panels": [
         {
           "focusY": 0.2,
-          "dialogue": []
+          "dialogue": [],
+          "zoomRects": [
+            { "x": 0, "y": 0, "w": 100, "h": 49.449621722617 }
+          ]
         },
         {
           "focusY": 0.6,
-          "dialogue": []
+          "dialogue": [],
+          "zoomRects": [
+            { "x": 0, "y": 50.521662888997795, "w": 100, "h": 19.756187209017398 }
+          ]
         },
         {
           "focusY": 0.85,
-          "dialogue": []
+          "dialogue": [],
+          "zoomRects": [
+            { "x": 0, "y": 69.49088199024109, "w": 99.29421563433203, "h": 30.509118009758904 }
+          ]
         }
       ]
     },
@@ -536,27 +640,53 @@
       "panels": [
         {
           "focusY": 0.1,
-          "dialogue": []
+          "dialogue": [],
+          "zoomRects": [
+            { "x": 0, "y": 0, "w": 100, "h": 22.713930475799835 }
+          ]
         },
         {
-          "focusY": 0.45,
-          "dialogue": []
+          "focusY": 0.619795340016833,
+          "dialogue": [],
+          "zoomRects": [
+            { "x": 0, "y": 22.713930475799827, "w": 100.26940860616003, "h": 77.78546758307323 }
+          ]
         }
       ]
     },
     "24": {
       "panels": [
         {
-          "focusY": 0.45,
-          "dialogue": []
+          "focusY": 0.28373775143027596,
+          "dialogue": [],
+          "zoomRects": [
+            { "x": 0, "y": 0, "w": 100, "h": 26.37618290753545 }
+          ]
+        },
+        {
+          "focusY": 0.5,
+          "dialogue": [],
+          "zoomRects": [
+            { "x": 0, "y": 26.875580966408492, "w": 100, "h": 73.12441903359151 }
+          ]
         }
       ]
     },
     "25": {
       "panels": [
         {
-          "focusY": 0.45,
-          "dialogue": []
+          "focusY": 0.14890027553455568,
+          "dialogue": [],
+          "zoomRects": [
+            { "x": 0, "y": 0, "w": 100, "h": 22.2145324169268 }
+          ]
+        },
+        {
+          "focusY": 0.5,
+          "dialogue": [],
+          "zoomRects": [
+            { "x": 0, "y": 21.881600377678097, "w": 100.35930025675718, "h": 78.1183996223219 }
+          ]
         }
       ]
     },
@@ -564,27 +694,53 @@
       "panels": [
         {
           "focusY": 0.2,
-          "dialogue": []
+          "dialogue": [],
+          "zoomRects": [
+            { "x": 0, "y": 0, "w": 100, "h": 28.540241162651945 }
+          ]
         },
         {
           "focusY": 0.65,
-          "dialogue": []
+          "dialogue": [],
+          "zoomRects": [
+            { "x": 0, "y": 28.54024116265195, "w": 100.49939805887303, "h": 71.2932928177237 }
+          ]
         }
       ]
     },
     "27": {
       "panels": [
         {
+          "focusY": 0.11394241141344288,
+          "dialogue": [],
+          "zoomRects": [
+            { "x": 0, "y": 0, "w": 100, "h": 24.21212465241895 }
+          ]
+        },
+        {
           "focusY": 0.5,
-          "dialogue": []
+          "dialogue": [],
+          "zoomRects": [
+            { "x": 0, "y": 25.044454750540684, "w": 100, "h": 74.95554524945932 }
+          ]
         }
       ]
     },
     "28": {
       "panels": [
         {
-          "focusY": 0.4,
-          "dialogue": []
+          "focusY": 0.11546349466776043,
+          "dialogue": [],
+          "zoomRects": [
+            { "x": 0, "y": 0, "w": 100.01970957672351, "h": 21.54866833842941 }
+          ]
+        },
+        {
+          "focusY": 0.5,
+          "dialogue": [],
+          "zoomRects": [
+            { "x": 0, "y": 22.380998436551145, "w": 100, "h": 77.61900156344885 }
+          ]
         }
       ]
     },
@@ -1022,23 +1178,95 @@
       "panels": [
         {
           "focusY": 0.2,
-          "dialogue": []
+          "dialogue": [],
+          "zoomRects": [
+            { "x": 0, "y": 0, "w": 100, "h": 20.963956444498898 }
+          ]
         },
         {
           "focusY": 0.35,
-          "dialogue": []
+          "dialogue": [],
+          "zoomRects": [
+            { "x": 0, "y": 19.891915278118105, "w": 100, "h": 18.37784856652781 }
+          ]
         },
         {
           "focusY": 0.5,
-          "dialogue": []
+          "dialogue": [],
+          "zoomRects": [
+            { "x": 0, "y": 36.58512772604754, "w": 99.56711892239032, "h": 18.37784856652781 }
+          ]
         },
         {
           "focusY": 0.65,
-          "dialogue": []
+          "dialogue": [],
+          "zoomRects": [
+            { "x": 0, "y": 55.116125030629746, "w": 100, "h": 44.883874969370254 }
+          ]
         },
         {
           "focusY": 0.9,
-          "dialogue": []
+          "dialogue": [],
+          "zoomRects": [
+            { "x": 54.75945631762497, "y": 69.22322960058808, "w": 45.024103143570194, "h": 29.54028577554521 }
+          ]
+        }
+      ]
+    },
+    "52": {
+      "panels": [
+        {
+          "focusY": 0.2,
+          "dialogue": [],
+          "zoomRects": [
+            { "x": 0, "y": 0, "w": 100, "h": 25.711567324185253 }
+          ]
+        },
+        {
+          "focusY": 0.5,
+          "dialogue": [],
+          "zoomRects": [
+            { "x": 0, "y": 24.63952615780446, "w": 101.29864323282905, "h": 41.35015927468758 }
+          ]
+        },
+        {
+          "focusY": 0.8,
+          "dialogue": [],
+          "zoomRects": [
+            { "x": 0.21867607488639074, "y": 65.83653669443764, "w": 99.78132392511361, "h": 33.857165829453564 }
+          ]
+        }
+      ]
+    },
+    "53": {
+      "panels": [
+        {
+          "focusY": 0.2,
+          "dialogue": [],
+          "zoomRects": [
+            { "x": 0, "y": 0, "w": 100, "h": 20.8108077064445 }
+          ]
+        },
+        {
+          "focusY": 0.5,
+          "dialogue": [],
+          "zoomRects": [
+            { "x": 0, "y": 20.657658968390102, "w": 100, "h": 41.96275422690516 }
+          ]
+        },
+        {
+          "focusY": 0.8,
+          "dialogue": [],
+          "zoomRects": [
+            { "x": 0, "y": 61.854669505023274, "w": 100, "h": 15.008576329331042 }
+          ]
+        },
+        {
+          "focusY": 0.88,
+          "dialogue": [],
+          "zoomRects": [
+            { "x": 0, "y": 75.94435340602793, "w": 100, "h": 24.05564659397207 }
+          ]
         }
       ]
     }

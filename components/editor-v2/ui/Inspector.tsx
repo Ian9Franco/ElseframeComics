@@ -120,6 +120,7 @@ export function Inspector({
   onUpdateAudioTracks,
   onUpdatePage,
   onUpdateMask,
+  onReorderBubbles,
   viewMode = "full",
   showHeader = true,
 }: {
@@ -137,6 +138,7 @@ export function Inspector({
   onUpdateAudioTracks: (tracks: NonNullable<Dialogues["audioTracks"]>) => void;
   onUpdatePage: (u: Partial<PageData>) => void;
   onUpdateMask: (pIdx: number, rIdx: number, rect: ZoomRect) => void;
+  onReorderBubbles?: (panelIdx: number, from: number, to: number) => void;
   viewMode?: InspectorViewMode;
   showHeader?: boolean;
 }) {
@@ -254,6 +256,12 @@ export function Inspector({
         onTextLive={(text) => onUpdateBubbleLive(selectedBubble.panelIdx, selectedBubble.bubbleIdx, { text })}
         onTextCommit={(fields) => onUpdateBubble(selectedBubble.panelIdx, selectedBubble.bubbleIdx, fields)}
         onFitWidth={(width) => onUpdateBubble(selectedBubble.panelIdx, selectedBubble.bubbleIdx, { width })}
+        dialogueCount={(panels[selectedBubble.panelIdx]?.dialogue || []).length}
+        onReorder={
+          onReorderBubbles
+            ? (from, to) => onReorderBubbles(selectedBubble.panelIdx, from, to)
+            : undefined
+        }
       />
     ) : null;
 

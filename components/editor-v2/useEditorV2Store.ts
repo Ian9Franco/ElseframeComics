@@ -24,6 +24,7 @@ export function useEditorV2Store(
   const [activeTool, setActiveTool] = useState<import("./types").EditorV2Tool>("stops");
   const [pendingBubbleStyle, setPendingBubbleStyle] = useState<BubbleStylePreset>("normal");
   const clipboardRef = useRef<{ panelIdx: number; line: DialogueLine }[]>([]);
+  const [clipboardCount, setClipboardCount] = useState(0);
 
   const patchLive = useCallback(
     (recipe: (d: Dialogues) => Dialogues) => {
@@ -233,6 +234,43 @@ export function useEditorV2Store(
     [updatePages]
   );
 
+  const reorderBubbles = useCallback(
+    (panelIdx: number, startIndex: number, endIndex: number) => {
+      if (startIndex === endIndex) return;
+      updatePages((page) => {
+        const panels = [...(page.panels || [])];
+        const panel = { ...panels[panelIdx] };
+        const dialoguesCopy = [...(panel.dialogue || [])];
+        if (
+          startIndex < 0 ||
+          startIndex >= dialoguesCopy.length ||
+          endIndex < 0 ||
+          endIndex >= dialoguesCopy.length
+        ) {
+          return page;
+        }
+        const [removed] = dialoguesCopy.splice(startIndex, 1);
+        dialoguesCopy.splice(endIndex, 0, removed);
+        const mapIndex = (oldIdx: number) => {
+          if (oldIdx === startIndex) return endIndex;
+          if (startIndex < endIndex) {
+            if (oldIdx > startIndex && oldIdx <= endIndex) return oldIdx - 1;
+          } else if (oldIdx >= endIndex && oldIdx < startIndex) {
+            return oldIdx + 1;
+          }
+          return oldIdx;
+        };
+        panel.dialogue = dialoguesCopy.map((bub) =>
+          bub.linkedTo === undefined ? bub : { ...bub, linkedTo: mapIndex(bub.linkedTo) }
+        );
+        panels[panelIdx] = panel;
+        setSelection({ kind: "bubble", panelIdx, bubbleIdx: endIndex });
+        return { ...page, panels };
+      });
+    },
+    [updatePages]
+  );
+
   const duplicateBubble = useCallback(
     (panelIdx: number, bubbleIdx: number) => {
       updatePages((page) => {
@@ -300,21 +338,55 @@ export function useEditorV2Store(
     [updatePages]
   );
 
-  const assignBubbleToPanelByPosition = useCallback(
-    (bubblePanelIdx: number, bubbleIdx: number, targetPanelIdx: number) => {
-      if (bubblePanelIdx === targetPanelIdx) return;
+  const moveBubblesToPanel = useCallback(
+    (items: { panelIdx: number; bubbleIdx: number }[], targetPanelIdx: number) => {
+      const moving = items.filter((item) => item.panelIdx !== targetPanelIdx);
+      if (moving.length === 0) return;
       updatePages((page) => {
         const panels = (page.panels || []).map((p) => ({ ...p, dialogue: [...(p.dialogue || [])] }));
-        const from = panels[bubblePanelIdx];
         const to = panels[targetPanelIdx];
-        if (!from?.dialogue?.[bubbleIdx] || !to) return page;
-        const [line] = from.dialogue.splice(bubbleIdx, 1);
-        to.dialogue.push(line);
-        setSelection({ kind: "bubble", panelIdx: targetPanelIdx, bubbleIdx: to.dialogue.length - 1 });
+        if (!to) return page;
+        const ordered = [...moving].sort((a, b) => a.panelIdx - b.panelIdx || b.bubbleIdx - a.bubbleIdx);
+        let lastIdx = to.dialogue.length;
+        let movedAny = false;
+        for (const item of ordered) {
+          const from = panels[item.panelIdx];
+          if (!from?.dialogue?.[item.bubbleIdx]) continue;
+          movedAny = true;
+          const [line] = from.dialogue.splice(item.bubbleIdx, 1);
+          from.dialogue = from.dialogue.map((bub) => {
+            if (bub.linkedTo === undefined) return bub;
+            if (bub.linkedTo === item.bubbleIdx) return { ...bub, linkedTo: undefined };
+            if (bub.linkedTo > item.bubbleIdx) return { ...bub, linkedTo: bub.linkedTo - 1 };
+            return bub;
+          });
+          to.dialogue.push({ ...line, linkedTo: undefined });
+          lastIdx = to.dialogue.length - 1;
+        }
+        if (!movedAny) return page;
+        setSelection({ kind: "bubble", panelIdx: targetPanelIdx, bubbleIdx: lastIdx });
         return { ...page, panels };
       });
     },
     [updatePages]
+  );
+
+  const assignBubbleToPanelByPosition = useCallback(
+    (bubblePanelIdx: number, bubbleIdx: number, targetPanelIdx: number) => {
+      moveBubblesToPanel([{ panelIdx: bubblePanelIdx, bubbleIdx }], targetPanelIdx);
+    },
+    [moveBubblesToPanel]
+  );
+
+  const moveSelectionToPanel = useCallback(
+    (targetPanelIdx: number) => {
+      if (selection.kind === "bubble") {
+        moveBubblesToPanel([{ panelIdx: selection.panelIdx, bubbleIdx: selection.bubbleIdx }], targetPanelIdx);
+      } else if (selection.kind === "bubbles") {
+        moveBubblesToPanel(selection.items, targetPanelIdx);
+      }
+    },
+    [moveBubblesToPanel, selection]
   );
 
   const findPanelForPoint = useCallback(
@@ -342,21 +414,25 @@ export function useEditorV2Store(
   );
 
   const copySelection = useCallback(() => {
+    let copied: { panelIdx: number; line: DialogueLine }[] = [];
     if (selection.kind === "bubble") {
       const line = getPage().panels?.[selection.panelIdx]?.dialogue?.[selection.bubbleIdx];
-      if (line) clipboardRef.current = [{ panelIdx: selection.panelIdx, line: JSON.parse(JSON.stringify(line)) as DialogueLine }];
+      if (line) copied = [{ panelIdx: selection.panelIdx, line: JSON.parse(JSON.stringify(line)) as DialogueLine }];
     } else if (selection.kind === "bubbles") {
-      clipboardRef.current = selection.items
+      copied = selection.items
         .map(({ panelIdx, bubbleIdx }) => {
           const line = getPage().panels?.[panelIdx]?.dialogue?.[bubbleIdx];
           return line ? { panelIdx, line: JSON.parse(JSON.stringify(line)) as DialogueLine } : null;
         })
         .filter(Boolean) as { panelIdx: number; line: DialogueLine }[];
     }
+    if (copied.length === 0) return;
+    clipboardRef.current = copied;
+    setClipboardCount(copied.length);
   }, [getPage, selection]);
 
   const pasteClipboard = useCallback(
-    (panelIdx: number, pos: { posX: number; posY: number }) => {
+    (panelIdx: number) => {
       const items = clipboardRef.current;
       if (items.length === 0) return;
       updatePages((page) => {
@@ -367,10 +443,13 @@ export function useEditorV2Store(
         const pIdx = Math.min(panelIdx >= 0 ? panelIdx : 0, panels.length - 1);
         const panel = { ...panels[pIdx], dialogue: [...(panels[pIdx].dialogue || [])] };
         let lastIdx = panel.dialogue.length;
-        items.forEach((item, i) => {
+        items.forEach((item) => {
           const line = JSON.parse(JSON.stringify(item.line)) as DialogueLine;
-          line.posX = pos.posX + i * 3;
-          line.posY = pos.posY + i * 3;
+          line.linkedTo = undefined;
+          if (item.panelIdx === pIdx) {
+            line.posX = Math.min(120, (line.posX ?? 50) + 4);
+            line.posY = Math.min(120, (line.posY ?? 50) + 4);
+          }
           panel.dialogue.push(line);
           lastIdx = panel.dialogue.length - 1;
         });
@@ -468,6 +547,7 @@ export function useEditorV2Store(
     updateBubble,
     updateBubbleLive,
     removeBubble,
+    reorderBubbles,
     duplicateBubble,
     reorderPanels,
     updatePanel,
@@ -475,9 +555,11 @@ export function useEditorV2Store(
     updateMaskRect,
     updateMaskLive,
     assignBubbleToPanelByPosition,
+    moveSelectionToPanel,
     findPanelForPoint,
     copySelection,
     pasteClipboard,
+    clipboardCount,
     updateSettings,
     updateAudioTracks,
     commitDialogues: commit,

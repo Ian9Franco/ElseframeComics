@@ -118,6 +118,15 @@ export function useDialogueEditor({
         );
         setHasLocalBackup(true);
         setBackupTimestamp(now);
+        const savedPass = sessionStorage.getItem("editor_password") || "";
+        void fetch(`/api/chapters/${encodeURIComponent(chapterId)}/dialogues/backup`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "x-editor-password": savedPass,
+          },
+          body: JSON.stringify({ dialogues: localDialogues }),
+        }).catch((err) => console.error("Error saving dialogues backup to disk:", err));
       } catch (e) {
         console.error("Error saving dialogues backup to localStorage:", e);
       }

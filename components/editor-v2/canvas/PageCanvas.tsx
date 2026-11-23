@@ -22,7 +22,7 @@ type StoreApi = {
   updatePanel: (pIdx: number, u: Partial<PanelStop>) => void;
   updatePanelLive: (pIdx: number, u: Partial<PanelStop>) => void;
   updateMaskLive: (pIdx: number, rIdx: number, rect: { x: number; y: number; w: number; h: number }) => void;
-  findPanelForPoint: (x: number, y: number) => number;
+  reorderBubbles: (panelIdx: number, startIndex: number, endIndex: number) => void;
 };
 
 export function PageCanvas({
@@ -204,8 +204,8 @@ export function PageCanvas({
   const handleDoubleClick = (e: React.MouseEvent) => {
     if (tool !== "bubble") return;
     const { posX, posY } = clientToPercent(e.clientX, e.clientY);
-    const pIdx = store.findPanelForPoint(posX, posY);
-    store.addBubble(pIdx >= 0 ? pIdx : 0, { posX, posY }, store.pendingBubbleStyle);
+    const pIdx = panels.length === 0 ? 0 : Math.min(Math.max(0, activePanelIdx), panels.length - 1);
+    store.addBubble(pIdx, { posX, posY }, store.pendingBubbleStyle);
   };
 
   const handleDragOver = (e: React.DragEvent) => {
@@ -216,8 +216,8 @@ export function PageCanvas({
     e.preventDefault();
     if (!dragBubbleStyle || tool !== "bubble") return;
     const { posX, posY } = clientToPercent(e.clientX, e.clientY);
-    const pIdx = store.findPanelForPoint(posX, posY);
-    store.addBubble(pIdx >= 0 ? pIdx : 0, { posX, posY }, dragBubbleStyle);
+    const pIdx = panels.length === 0 ? 0 : Math.min(Math.max(0, activePanelIdx), panels.length - 1);
+    store.addBubble(pIdx, { posX, posY }, dragBubbleStyle);
     onDropBubbleStyle();
   };
 
@@ -442,6 +442,8 @@ export function PageCanvas({
                 }}
                 onTextChange={(text) => store.updateBubbleLive(pIdx, bIdx, { text })}
                 onResizeWidth={(width) => store.updateBubble(pIdx, bIdx, { width })}
+                dialogueCount={(panel.dialogue || []).length}
+                onReorderBubble={(from, to) => store.reorderBubbles(pIdx, from, to)}
               />
             );
           })

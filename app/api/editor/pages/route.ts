@@ -10,7 +10,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getDynamicSagas, parsePrefix, getAssetsComicsDir } from "@/lib/serverData";
 import { validateEditorApiAccess } from "@/lib/editorAccess";
-import { useGithubEditorStorage } from "@/lib/editorStorage";
+import { backupDialoguesFile, useGithubEditorStorage } from "@/lib/editorStorage";
 import { applyChapterPageLayout, uploadChapterPage } from "@/lib/editorPages";
 import { formatGithubApiAuthError } from "@/lib/githubEditor";
 import fs from "fs";
@@ -241,6 +241,7 @@ export async function POST(request: NextRequest) {
 
     const dialoguesPath = path.join(chapterPath, "dialogues.json");
     if (fs.existsSync(dialoguesPath)) {
+      backupDialoguesFile(dialoguesPath);
       const dialogues = JSON.parse(fs.readFileSync(dialoguesPath, "utf-8"));
       const remapped = remapDialogues(dialogues, pageMap);
       const { formatDialoguesJson } = await import("@/lib/formatDialoguesJson");

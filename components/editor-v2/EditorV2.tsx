@@ -11,6 +11,7 @@ import { BubblePalette, BubbleStyleSelect } from "./ui/BubblePalette";
 import { PageStrip } from "./ui/PageStrip";
 import { StopsTimeline } from "./ui/StopsTimeline";
 import { FloatingToolbar } from "./ui/FloatingToolbar";
+import { BubbleTransferBar } from "./ui/BubbleTransferBar";
 import { Inspector, type InspectorViewMode } from "./ui/Inspector";
 import { MetaPanel } from "./ui/MetaPanel";
 import { PageManager } from "./PageManager";
@@ -77,6 +78,10 @@ export function EditorV2({
   const panels = pageData.panels || [];
 
   useEffect(() => {
+    canvas.resetView();
+  }, [pageIdx]);
+
+  useEffect(() => {
     if (store.selection.kind === "bubble" || store.selection.kind === "stop" || store.selection.kind === "mask") {
       setActivePanelIdx(store.selection.panelIdx);
     }
@@ -95,6 +100,28 @@ export function EditorV2({
     });
     return [...set].sort();
   }, [localDialogues]);
+
+  const selectedPanelIdx =
+    store.selection.kind === "bubble"
+      ? store.selection.panelIdx
+      : store.selection.kind === "bubbles"
+        ? store.selection.items[0]?.panelIdx ?? null
+        : null;
+
+  const renderBubbleTransfer = () => (
+    <BubbleTransferBar
+      panelCount={panels.length}
+      activePanelIdx={activePanelIdx}
+      selectedPanelIdx={selectedPanelIdx}
+      clipboardCount={store.clipboardCount}
+      onMoveToPanel={store.moveSelectionToPanel}
+      onCopy={store.copySelection}
+      onPaste={(panelIdx) => {
+        store.pasteClipboard(panelIdx);
+        setActivePanelIdx(panelIdx);
+      }}
+    />
+  );
 
   const selectedLine = useMemo(() => {
     if (store.selection.kind !== "bubble") return null;
@@ -135,7 +162,7 @@ export function EditorV2({
       }
       if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === "v") {
         if (typing) return;
-        store.pasteClipboard(activePanelIdx, { posX: 50, posY: 50 });
+        store.pasteClipboard(activePanelIdx);
       }
       if ((e.key === "Delete" || e.key === "Backspace") && !typing) {
         deleteSelection();
@@ -183,6 +210,16 @@ export function EditorV2({
     onUpdateAudioTracks: store.updateAudioTracks,
     onUpdatePage: store.updatePage,
     onUpdateMask: store.updateMaskRect,
+    onReorderBubbles: store.reorderBubbles,
+  };
+
+  const selectedBubbleDialogueCount =
+    store.selection.kind === "bubble"
+      ? (panels[store.selection.panelIdx]?.dialogue || []).length
+      : 0;
+  const reorderSelectedBubble = (from: number, to: number) => {
+    if (store.selection.kind !== "bubble") return;
+    store.reorderBubbles(store.selection.panelIdx, from, to);
   };
 
   const scrollInspectorSection = (id: string) => {
@@ -392,6 +429,7 @@ export function EditorV2({
               setDragStyle(s);
             }}
           />
+          {renderBubbleTransfer()}
           {selectedLine && store.selection.kind === "bubble" && (
             <div className="px-3 pb-3 pt-1 flex items-center gap-3 flex-wrap">
               <span className="text-xs font-bold text-zinc-400 uppercase tracking-wider">Globo</span>
@@ -407,6 +445,9 @@ export function EditorV2({
                   const { panelIdx, bubbleIdx } = store.selection as { kind: "bubble"; panelIdx: number; bubbleIdx: number };
                   store.removeBubble(panelIdx, bubbleIdx);
                 }}
+                bubbleIdx={store.selection.bubbleIdx}
+                dialogueCount={selectedBubbleDialogueCount}
+                onReorder={reorderSelectedBubble}
               />
             </div>
           )}
@@ -487,6 +528,7 @@ export function EditorV2({
                   )}
                 </select>
               </div>
+              {renderBubbleTransfer()}
               <div>
                 <span className="text-xs font-bold text-zinc-400 uppercase tracking-wider block mb-1">Tipo de globo</span>
                 <BubbleStyleSelect activeStyle={store.pendingBubbleStyle} onStyleChange={store.setPendingBubbleStyle} />
@@ -518,6 +560,9 @@ export function EditorV2({
                       const { panelIdx, bubbleIdx } = store.selection as { kind: "bubble"; panelIdx: number; bubbleIdx: number };
                       store.removeBubble(panelIdx, bubbleIdx);
                     }}
+                    bubbleIdx={store.selection.bubbleIdx}
+                    dialogueCount={selectedBubbleDialogueCount}
+                    onReorder={reorderSelectedBubble}
                   />
                   <button
                     type="button"

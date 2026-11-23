@@ -26,6 +26,8 @@ export function BubbleNode({
   editingText,
   interactive = true,
   onResizeWidth,
+  dialogueCount = 1,
+  onReorderBubble,
 }: {
   line: DialogueLine;
   panel: PanelStop;
@@ -46,6 +48,8 @@ export function BubbleNode({
   editingText: boolean;
   interactive?: boolean;
   onResizeWidth: (width: number) => void;
+  dialogueCount?: number;
+  onReorderBubble?: (from: number, to: number) => void;
 }) {
   const dragRef = useRef<{ startX: number; startY: number; origX: number; origY: number } | null>(null);
   const posX = line.posX ?? 50;
@@ -131,9 +135,46 @@ export function BubbleNode({
         <div
           className={`relative ${isSelected ? "outline-dashed outline-2 outline-[#e8185a] outline-offset-2" : ""}`}
         >
-          <span className="absolute -top-6 left-1/2 -translate-x-1/2 text-[9px] font-mono font-bold bg-black/70 text-white px-1.5 rounded whitespace-nowrap">
-            P{pIdx + 1}·#{bIdx + 1}
-          </span>
+          <div
+            onPointerDown={(e) => e.stopPropagation()}
+            className={`absolute bottom-full mb-1.5 left-1/2 -translate-x-1/2 whitespace-nowrap flex items-center gap-1 px-2 py-0.5 rounded-full shadow-md border text-[10px] font-mono font-bold select-none z-40 ${
+              isSelected
+                ? "bg-[#e8185a] text-white border-white/40"
+                : "bg-black/75 text-white border-white/15"
+            }`}
+          >
+            <span>P{pIdx + 1}·#{bIdx + 1}</span>
+            {isSelected && onReorderBubble && dialogueCount > 1 && (
+              <span className="flex items-center gap-0.5 border-l border-white/30 pl-1">
+                {bIdx > 0 && (
+                  <button
+                    type="button"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      onReorderBubble(bIdx, bIdx - 1);
+                    }}
+                    className="w-4 h-4 rounded-full bg-white/20 hover:bg-white/40 flex items-center justify-center text-[8px] font-bold"
+                    title="Subir en el orden de la parada"
+                  >
+                    ▲
+                  </button>
+                )}
+                {bIdx < dialogueCount - 1 && (
+                  <button
+                    type="button"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      onReorderBubble(bIdx, bIdx + 1);
+                    }}
+                    className="w-4 h-4 rounded-full bg-white/20 hover:bg-white/40 flex items-center justify-center text-[8px] font-bold"
+                    title="Bajar en el orden de la parada"
+                  >
+                    ▼
+                  </button>
+                )}
+              </span>
+            )}
+          </div>
           <DialogueBubble
             line={line}
             index={0}

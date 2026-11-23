@@ -8,7 +8,7 @@ const TOOLS: { id: EditorV2Tool; label: string; Icon: typeof MapPin }[] = [
   { id: "stops", label: "Paradas", Icon: MapPin },
   { id: "bubble", label: "Diálogos", Icon: MessageSquare },
   { id: "mask", label: "Máscaras", Icon: Square },
-  { id: "hand", label: "Mano", Icon: Hand },
+  { id: "hand", label: "Mover", Icon: Hand },
 ];
 
 export function MobileToolNav({

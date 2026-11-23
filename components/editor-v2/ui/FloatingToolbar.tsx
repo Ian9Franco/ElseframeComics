@@ -17,12 +17,18 @@ export function FloatingToolbar({
   speakers,
   variant = "default",
   hideStyleSelect = false,
+  bubbleIdx,
+  dialogueCount,
+  onReorder,
 }: {
   line: DialogueLine;
   onUpdate: (fields: Partial<DialogueLine>) => void;
   onDuplicate: () => void;
   onDelete: () => void;
   speakers: string[];
+  bubbleIdx?: number;
+  dialogueCount?: number;
+  onReorder?: (from: number, to: number) => void;
   variant?: "default" | "compact";
   hideStyleSelect?: boolean;
 }) {
@@ -100,8 +106,35 @@ export function FloatingToolbar({
     </div>
   );
 
+  const reorderButtons =
+    onReorder && bubbleIdx !== undefined && (dialogueCount ?? 0) > 1 ? (
+      <span className="inline-flex items-center gap-0.5 mr-1">
+        {bubbleIdx > 0 && (
+          <button
+            type="button"
+            title="Subir orden"
+            onClick={() => onReorder(bubbleIdx, bubbleIdx - 1)}
+            className="text-sm w-7 h-7 rounded bg-zinc-800 text-white font-bold"
+          >
+            ▲
+          </button>
+        )}
+        {bubbleIdx < (dialogueCount ?? 1) - 1 && (
+          <button
+            type="button"
+            title="Bajar orden"
+            onClick={() => onReorder(bubbleIdx, bubbleIdx + 1)}
+            className="text-sm w-7 h-7 rounded bg-zinc-800 text-white font-bold"
+          >
+            ▼
+          </button>
+        )}
+      </span>
+    ) : null;
+
   const actionButtons = (
-    <div className="flex flex-wrap gap-2">
+    <div className="flex flex-wrap gap-2 items-center">
+      {reorderButtons}
       <button type="button" onClick={onDuplicate} className="text-sm px-3 py-1.5 rounded bg-zinc-800 text-white font-bold">
         Duplicar
       </button>

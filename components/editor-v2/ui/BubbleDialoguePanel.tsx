@@ -12,6 +12,8 @@ export function BubbleDialoguePanel({
   onTextLive,
   onTextCommit,
   onFitWidth,
+  dialogueCount,
+  onReorder,
 }: {
   panelIdx: number;
   bubbleIdx: number;
@@ -19,6 +21,8 @@ export function BubbleDialoguePanel({
   onTextLive: (text: string) => void;
   onTextCommit: (fields: Partial<DialogueLine>) => void;
   onFitWidth: (width: number) => void;
+  dialogueCount?: number;
+  onReorder?: (from: number, to: number) => void;
 }) {
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const focusKeyRef = useRef(`${panelIdx}-${bubbleIdx}`);
@@ -59,7 +63,33 @@ export function BubbleDialoguePanel({
     <div className="p-4 border-b border-[#e8185a]/40 bg-[#161622] space-y-2 sticky top-0 z-10 shadow-lg shadow-black/30">
       <div className="flex items-start justify-between gap-2">
         <div>
-          <div className="text-sm font-bold text-white">Diálogo seleccionado</div>
+          <div className="flex items-center gap-2">
+            <div className="text-sm font-bold text-white">Diálogo seleccionado</div>
+            {onReorder && (dialogueCount ?? 0) > 1 && (
+              <span className="flex items-center gap-0.5">
+                {bubbleIdx > 0 && (
+                  <button
+                    type="button"
+                    title="Subir en el orden de lectura"
+                    onClick={() => onReorder(bubbleIdx, bubbleIdx - 1)}
+                    className="text-[10px] w-5 h-5 rounded bg-zinc-800 hover:bg-zinc-700 border border-white/10 font-bold"
+                  >
+                    ▲
+                  </button>
+                )}
+                {bubbleIdx < (dialogueCount ?? 1) - 1 && (
+                  <button
+                    type="button"
+                    title="Bajar en el orden de lectura"
+                    onClick={() => onReorder(bubbleIdx, bubbleIdx + 1)}
+                    className="text-[10px] w-5 h-5 rounded bg-zinc-800 hover:bg-zinc-700 border border-white/10 font-bold"
+                  >
+                    ▼
+                  </button>
+                )}
+              </span>
+            )}
+          </div>
           <div className="text-[11px] text-zinc-400 font-mono">
             Parada {panelIdx + 1} · Globo #{bubbleIdx + 1} · {styleLabel}
             {line.speaker ? ` · ${line.speaker}` : ""}

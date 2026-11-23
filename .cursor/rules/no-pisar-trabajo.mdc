@@ -1,0 +1,11 @@
+---
+description: No pisar trabajo sin commit ni dialogues.json sin copia
+alwaysApply: true
+---
+
+# No pisar trabajo
+
+- Prohibido `git checkout`, `git restore`, `git reset`, `git clean` y borrar o reescribir `dialogues.json` para “arreglar” un script. Aunque el comando haya fallado a medias.
+- Si el usuario no lo pidió en este mensaje, no se descarta trabajo sin commit.
+- Antes de reescribir un `dialogues.json` a mano, copiar el archivo actual a `.dialogues-backups/` al lado (el guardado del editor ya lo hace).
+- Si hace falta deshacer un cambio propio, parar y decir qué archivo está en riesgo. No restaurar desde git.

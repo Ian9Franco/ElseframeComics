@@ -23,6 +23,7 @@ import {
   loadEditorTextFile,
   loadMainBranchTextFile,
   resolveChapterFolders,
+  useGithubEditorStorage,
 } from "@/lib/editorStorage";
 import { GITHUB_EDITOR_BRANCH } from "@/lib/githubEditor";
 import { getAssetsBaseUrl } from "@/lib/assetsRepo";
@@ -172,9 +173,11 @@ export async function GET(
           return JSON.parse(loaded.content);
         }
 
-        const mainContent = await loadMainBranchTextFile(foundChapter.id);
-        if (mainContent?.trim()) {
-          return JSON.parse(mainContent);
+        if (useGithubEditorStorage()) {
+          const mainContent = await loadMainBranchTextFile(foundChapter.id);
+          if (mainContent?.trim()) {
+            return JSON.parse(mainContent);
+          }
         }
       }
 
