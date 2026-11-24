@@ -76,6 +76,14 @@ export function CinematicReader({
     durationMs: number;
     direction: "in" | "out";
   } | null>(null);
+  const [softCover, setSoftCover] = useState<
+    | { kind: "in" | "out"; type?: SceneFadeType; durationMs: number }
+    | { kind: "hold" }
+    | null
+  >(null);
+  const softBusyRef = useRef(false);
+  const softTimerRef = useRef<number | null>(null);
+  const softGenRef = useRef(0);
   const logicPosRef = useRef({ pageIdx: 0, panelIdx: 0, zoomIdx: 0 });
   const prevPageFadeOutRef = useRef(0);
   const [zoomedOut, setZoomedOut] = useState(false);
@@ -492,8 +500,20 @@ export function CinematicReader({
   }, [pageIdx, pages]);
 
   const resetPage = useCallback(
-    (idx: number, options?: { fromPageFlip?: boolean }) => {
+    (idx: number, options?: { fromPageFlip?: boolean; fromSoftFade?: boolean; deferFocus?: boolean }) => {
       const fromPageFlip = options?.fromPageFlip === true && mode === "read";
+      const fromSoftFade = options?.fromSoftFade === true && mode === "read";
+      const deferFocus = options?.deferFocus === true && mode === "read";
+
+      if (!fromSoftFade) {
+        softGenRef.current += 1;
+        softBusyRef.current = false;
+        if (softTimerRef.current !== null) {
+          window.clearTimeout(softTimerRef.current);
+          softTimerRef.current = null;
+        }
+        setSoftCover(null);
+      }
 
       if (pageLandTimerRef.current !== null) {
         window.clearTimeout(pageLandTimerRef.current);
@@ -511,6 +531,10 @@ export function CinematicReader({
       setActiveBubbleIdx(null);
       setActiveReadingBubbleIdx(0);
       setBubbleOffsets({});
+
+      if (fromSoftFade) {
+        skipPageChangeOverlayRef.current = true;
+      }
 
       if (fromPageFlip) {
         skipViewResetRef.current = true;
@@ -547,7 +571,7 @@ export function CinematicReader({
 
       if (mode === "read") {
         setZoomedOut(true);
-        setFocusInToken((n) => n + 1);
+        if (!deferFocus) setFocusInToken((n) => n + 1);
       } else {
         setZoomedOut(false);
       }
@@ -632,8 +656,6 @@ export function CinematicReader({
     : [];
   const activeZoomRect = activePanelRects[zoomIdx] || null;
   const sceneTransitionMs = Math.max(
-    currentPageData.fadeIn ?? 0,
-    currentPageData.fadeOut ?? 0,
     activePanel.fadeIn ?? 0,
     activePanel.fadeOut ?? 0,
     0
@@ -674,7 +696,6 @@ export function CinematicReader({
     }
 
     const wait = Math.max(
-      sceneFadeDurationMs(currentPageData.fadeOutType, currentPageData.fadeOut ?? 0),
       sceneFadeDurationMs(prevPanel?.fadeOutType, prevPanel?.fadeOut ?? 0),
       sceneFadeDurationMs(prevMask?.fadeOutType, prevMask?.fadeOut ?? 0)
     );
@@ -798,11 +819,75 @@ export function CinematicReader({
     forcePageFit: true,
   });
 
+  const pageFadeOf = useCallback(
+    (idx: number) => {
+      const src = pages[idx];
+      if (!src) return undefined;
+      const key = getPageKeyFromUrl(src);
+      return key ? localDialogues.pages?.[key] : undefined;
+    },
+    [pages, localDialogues.pages]
+  );
+
+  const needsSoftTurn = useCallback(
+    (dir: "next" | "prev") => {
+      const dest = dir === "next" ? pageIdx + 1 : pageIdx - 1;
+      if (dest < 0 || dest >= pages.length) return false;
+      const leaving = pageFadeOf(pageIdx);
+      const entering = pageFadeOf(dest);
+      return (leaving?.fadeOut ?? 0) > 0 || (entering?.fadeIn ?? 0) > 0;
+    },
+    [pageIdx, pages.length, pageFadeOf]
+  );
+
+  const beginSoftTurn = useCallback(
+    (dir: "next" | "prev") => {
+      if (softBusyRef.current) return;
+      const dest = dir === "next" ? pageIdx + 1 : pageIdx - 1;
+      if (dest < 0 || dest >= pages.length) return;
+      const leaving = pageFadeOf(pageIdx);
+      const entering = pageFadeOf(dest);
+      const outMs = sceneFadeDurationMs(leaving?.fadeOutType, leaving?.fadeOut ?? 0);
+      const inMs = sceneFadeDurationMs(entering?.fadeInType, entering?.fadeIn ?? 0);
+      if (outMs <= 0 && inMs <= 0) return;
+
+      softBusyRef.current = true;
+      const gen = ++softGenRef.current;
+      if (outMs > 0) {
+        setSoftCover({ kind: "in", type: leaving?.fadeOutType, durationMs: outMs });
+      } else {
+        setSoftCover({ kind: "hold" });
+      }
+
+      softTimerRef.current = window.setTimeout(() => {
+        softTimerRef.current = null;
+        if (softGenRef.current !== gen) return;
+        resetPage(dest, { fromSoftFade: true, deferFocus: inMs > 0 });
+        if (inMs > 0) {
+          setSoftCover({ kind: "out", type: entering?.fadeInType, durationMs: inMs });
+          softTimerRef.current = window.setTimeout(() => {
+            softTimerRef.current = null;
+            if (softGenRef.current !== gen) return;
+            softBusyRef.current = false;
+            setSoftCover(null);
+            setFocusInToken((n) => n + 1);
+          }, inMs + 40);
+        } else {
+          softBusyRef.current = false;
+          setSoftCover(null);
+        }
+      }, outMs > 0 ? outMs : 32);
+    },
+    [pageIdx, pages.length, pageFadeOf, resetPage]
+  );
+
   const pageFlip = usePageFlipGesture({
     enabled: mode === "read",
     canNext: pageIdx < pages.length - 1,
     canPrev: pageIdx > 0,
     pageWidth: imgWidth > 0 ? imgWidth : containerSize.w,
+    blocksCurl: (dir) => softBusyRef.current || needsSoftTurn(dir),
+    onSoftTurn: beginSoftTurn,
     onCommit: (dir) =>
       resetPage(dir === "next" ? pageIdx + 1 : pageIdx - 1, { fromPageFlip: true }),
   });
@@ -1174,6 +1259,7 @@ export function CinematicReader({
           pageFadeInType={currentPageData.fadeInType}
           pageFadeInMs={currentPageData.fadeIn ?? 0}
           stopCover={stopCover}
+          softCover={softCover}
           renderedDialogues={dialoguesNode}
           undoStack={undoStack}
           handleMouseDown={handleMouseDown}

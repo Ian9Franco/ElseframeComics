@@ -31,12 +31,17 @@ export function usePageFlipGesture({
   canPrev,
   pageWidth,
   onCommit,
+  blocksCurl,
+  onSoftTurn,
 }: {
   enabled: boolean;
   canNext: boolean;
   canPrev: boolean;
   pageWidth: number;
   onCommit: (dir: FlipDirection) => void;
+  /** When true, this direction fades instead of curling the page. */
+  blocksCurl?: (dir: FlipDirection) => boolean;
+  onSoftTurn?: (dir: FlipDirection) => void;
 }) {
   const [direction, setDirection] = useState<FlipDirection | null>(null);
   const progressRef = useRef(0);
@@ -50,8 +55,8 @@ export function usePageFlipGesture({
   const animFrame = useRef<number | null>(null);
   const suppressClickUntil = useRef(0);
 
-  const latest = useRef({ canNext, canPrev, pageWidth, onCommit });
-  latest.current = { canNext, canPrev, pageWidth, onCommit };
+  const latest = useRef({ canNext, canPrev, pageWidth, onCommit, blocksCurl, onSoftTurn });
+  latest.current = { canNext, canPrev, pageWidth, onCommit, blocksCurl, onSoftTurn };
   const zoneRef = useRef<FlipDirection | null>(null);
 
   useEffect(() => {
@@ -91,6 +96,10 @@ export function usePageFlipGesture({
       if (isAnimating() || dirRef.current) return;
       const allowed = dir === "next" ? latest.current.canNext : latest.current.canPrev;
       if (!allowed) return;
+      if (latest.current.blocksCurl?.(dir)) {
+        latest.current.onSoftTurn?.(dir);
+        return;
+      }
       dirRef.current = dir;
       progressRef.current = 0;
       setDirection(dir);
@@ -128,8 +137,14 @@ export function usePageFlipGesture({
     if (axis.current === "undecided") {
       if (Math.hypot(dx, dy) < AXIS_LOCK_PX) return false;
       if (Math.abs(dx) > Math.abs(dy) * 1.15) {
-        axis.current = "x";
         const dir = zoneRef.current ?? (dx < 0 ? "next" : "prev");
+        if (latest.current.blocksCurl?.(dir)) {
+          tracking.current = false;
+          axis.current = "undecided";
+          latest.current.onSoftTurn?.(dir);
+          return true;
+        }
+        axis.current = "x";
         dirRef.current = dir;
         setDirection(dir);
       } else {

@@ -56,6 +56,10 @@ interface ReaderCanvasProps {
     durationMs: number;
     direction: "in" | "out";
   } | null;
+  softCover?:
+    | { kind: "in" | "out"; type?: SceneFadeType; durationMs: number }
+    | { kind: "hold" }
+    | null;
   renderedDialogues: React.ReactNode;
   undoStack: any[];
   handleMouseDown: (e: React.MouseEvent) => void;
@@ -126,6 +130,7 @@ export function ReaderCanvas({
   pageFadeInType,
   pageFadeInMs = 0,
   stopCover,
+  softCover,
   renderedDialogues,
   undoStack,
   handleMouseDown,
@@ -291,7 +296,8 @@ export function ReaderCanvas({
     : { left: imgLeft, top: imgTop, width: imgWidth, height: imgHeight };
 
   const renderReadSpoilerMasks = () => {
-    if (mode !== "read" || zoomedOut || !imgSize || imgWidth <= 0 || imgHeight <= 0) return null;
+    const fadingPageIn = softCover?.kind === "out";
+    if (mode !== "read" || (zoomedOut && !fadingPageIn) || !imgSize || imgWidth <= 0 || imgHeight <= 0) return null;
 
     const processedMasks = computeSpoilerMasks(currentPanels, revealPanel, revealZoom);
     if (processedMasks.length === 0) return null;
@@ -767,6 +773,22 @@ export function ReaderCanvas({
           direction={stopCover.direction}
           zIndex={90}
         />
+      )}
+
+      {mode === "read" && softCover?.kind === "hold" && (
+        <div className="absolute inset-0 z-[110] brand-grain pointer-events-auto" />
+      )}
+      {mode === "read" && softCover && softCover.kind !== "hold" && (
+        <div className="absolute inset-0 z-[110] pointer-events-auto">
+          <SceneFadeLayer
+            key={`soft-cover-${softCover.kind}-${softCover.type ?? "fade"}`}
+            show
+            type={softCover.type}
+            durationMs={softCover.durationMs}
+            direction={softCover.kind === "in" ? "in" : "out"}
+            zIndex={110}
+          />
+        </div>
       )}
 
       {/* Page Preload Overlay Mask — 1A: animated entrance + exit */}
