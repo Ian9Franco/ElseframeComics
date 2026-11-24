@@ -88,7 +88,7 @@ export function ReaderTopBar({
   setZoomScale,
   panOffset,
   setPanOffset,
-  bubbleOpacity = 0.90,
+  bubbleOpacity = 1,
   setBubbleOpacity,
   pageFlipSoundEnabled = true,
   setPageFlipSoundEnabled,
@@ -284,8 +284,8 @@ export function ReaderTopBar({
                             className="w-full h-1 bg-zinc-700 rounded-lg appearance-none cursor-pointer accent-[#e8185a] transition-all hover:accent-pink-500"
                           />
                           <div className={`flex gap-1 p-0.5 rounded ${isReadMode ? "bg-white/10" : "border border-[#0a0a0f] bg-zinc-50"}`}>
-                            {[0.7, 0.85, 1.0, 1.2, 1.4].map((scale) => {
-                              const label = scale === 0.7 ? "A--" : scale === 0.85 ? "A-" : scale === 1.0 ? "A" : scale === 1.2 ? "A+" : "A++";
+                            {[0.7, 0.8, 1.0, 1.2, 1.4].map((scale) => {
+                              const label = scale === 0.7 ? "A--" : scale === 0.8 ? "A-" : scale === 1.0 ? "A" : scale === 1.2 ? "A+" : "A++";
                               const active = Math.abs(textScale - scale) < 0.03;
                               return (
                                 <button

@@ -1,6 +1,7 @@
 {
   "title": "La noche que volvió",
   "number": 1,
-  "status": "draft",
+  "status": "published",
+  "nuevo": true,
   "portada": "PORTADA.webp"
 }

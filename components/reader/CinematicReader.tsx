@@ -26,6 +26,12 @@ import { UnlockNotificationModal } from "@/components/UnlockNotificationModal";
 import { markChapterCompletionUnlock } from "@/lib/characterData/completionUnlocks";
 import { isPreviewAuthBypassedClient } from "@/lib/previewAuthClient";
 import { readEditorVersion, writeEditorVersion, type EditorVersion } from "@/lib/editorVersion";
+import {
+  READER_DEFAULT_AUTOPLAY,
+  READER_DEFAULT_BUBBLE_OPACITY,
+  READER_DEFAULT_FOCUS_ENABLED,
+  READER_DEFAULT_TEXT_SCALE,
+} from "@/lib/readerPreferences";
 import { readPageFlipSoundEnabled, writePageFlipSoundEnabled } from "@/lib/readerSystemSounds";
 import { EditorV2 } from "@/components/editor-v2/EditorV2";
 
@@ -204,13 +210,13 @@ export function CinematicReader({
     imgRef,
   });
 
-  const [textScale, setTextScale] = useState<number>(1.0);
+  const [textScale, setTextScale] = useState<number>(READER_DEFAULT_TEXT_SCALE);
   const [showInstructions, setShowInstructions] = useState(false);
-  const [autoplay, setAutoplay] = useState<boolean>(false);
+  const [autoplay, setAutoplay] = useState<boolean>(READER_DEFAULT_AUTOPLAY);
   // Dialogue speed: 0.5 = slow, 1.0 = normal, 1.5 = fast
   const [speedMultiplier, setSpeedMultiplierState] = useState<number>(1.0);
-  const [focusEnabled, setFocusEnabled] = useState<boolean>(true);
-  const [bubbleOpacity, setBubbleOpacityState] = useState<number>(0.90);
+  const [focusEnabled, setFocusEnabled] = useState<boolean>(READER_DEFAULT_FOCUS_ENABLED);
+  const [bubbleOpacity, setBubbleOpacityState] = useState<number>(READER_DEFAULT_BUBBLE_OPACITY);
   const [pageFlipSoundEnabled, setPageFlipSoundEnabledState] = useState<boolean>(true);
 
   useEffect(() => {
@@ -219,14 +225,13 @@ export function CinematicReader({
       if (saved) {
         setTextScale(parseFloat(saved));
       } else {
-        const isMobile = window.innerWidth < 768;
-        setTextScale(isMobile ? 0.85 : 1.0);
+        setTextScale(READER_DEFAULT_TEXT_SCALE);
       }
       const savedAutoplay = localStorage.getItem("reader_autoplay");
       if (savedAutoplay !== null) {
         setAutoplay(savedAutoplay === "true");
       } else {
-        setAutoplay(false);
+        setAutoplay(READER_DEFAULT_AUTOPLAY);
       }
       const savedSpeed = localStorage.getItem("reader_dialogue_speed");
       if (savedSpeed !== null) {
@@ -241,14 +246,13 @@ export function CinematicReader({
         localStorage.setItem("reader_focus_dialogue", String(nextFocus));
         localStorage.setItem("reader_focus_panel", String(nextFocus));
       } else {
-        const isMobile = window.innerWidth < 768;
-        if (isMobile) {
-          setFocusEnabled(false);
-        }
+        setFocusEnabled(READER_DEFAULT_FOCUS_ENABLED);
       }
       const savedBubbleOpacity = localStorage.getItem("reader_bubble_opacity");
       if (savedBubbleOpacity !== null) {
         setBubbleOpacityState(parseFloat(savedBubbleOpacity));
+      } else {
+        setBubbleOpacityState(READER_DEFAULT_BUBBLE_OPACITY);
       }
       setPageFlipSoundEnabledState(readPageFlipSoundEnabled());
       const hasRead = localStorage.getItem("has_read_instructions") === "true";

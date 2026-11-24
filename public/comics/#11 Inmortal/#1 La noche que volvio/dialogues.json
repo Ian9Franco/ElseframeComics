@@ -166,7 +166,7 @@
           "focusY": 0.88,
           "dialogue": [
             { "text": "¡No te muevas!", "size": "small", "posX": -6.0524232845174915, "posY": 77.94752453214988, "tailX": 27.739470852260084, "tailY": 78.17629578814044, "tailWidth": 6, "tailCurvature": -22, "width": 72, "fontSize": 8, "borderRadius": 18, "speaker": "Ladrón" },
-            { "text": "Dame todo", "size": "small", "posX": 0, "posY": 89.08187025603914, "tailX": 27.239053433316837, "tailY": 81.36313643081147, "tailWidth": 6, "tailCurvature": -22, "width": 72, "fontSize": 8, "borderRadius": 18, "speaker": "Ladrón" }
+            { "text": "Te quedas calladito, y nadie sale lastimado me escuchaste?", "size": "small", "posX": 0, "posY": 89.08187025603914, "tailX": 27.239053433316837, "tailY": 81.36313643081147, "tailWidth": 6, "tailCurvature": -22, "width": 123.81817626953125, "fontSize": 8, "borderRadius": 18, "speaker": "Ladrón" }
           ],
           "zoomRects": [
             { "x": 0, "y": 76, "w": 100, "h": 24 }
@@ -177,10 +177,10 @@
     "14": {
       "panels": [
         {
-          "focusY": 0.15,
+          "focusY": 0.15878827449390187,
           "dialogue": [
-            { "text": "Quedate quieto que te quemo", "size": "small", "posX": 4.9688071351275624, "posY": 4.661526930078167, "tailX": 19.612497893309897, "tailY": 10.763984899932408, "tailWidth": 6, "tailCurvature": -22, "width": 115, "fontSize": 8, "borderRadius": 18, "speaker": "Ladrón" },
-            { "text": "Para loco", "size": "small", "posX": 75, "posY": 0, "tailX": 57.44497840996304, "tailY": 13.143495756778949, "tailWidth": 6, "tailCurvature": -22, "width": 70, "fontSize": 8, "borderRadius": 18, "speaker": "Ladrón" }
+            { "text": "Date vuelta despacito", "size": "small", "posX": 4.9688071351275624, "posY": 4.661526930078167, "tailX": 19.612497893309897, "tailY": 10.763984899932408, "tailWidth": 6, "tailCurvature": -22, "width": 115, "fontSize": 8, "borderRadius": 18, "speaker": "Ladrón" },
+            { "text": "Si si, tranquilo", "size": "small", "posX": 75, "posY": 0, "tailX": 57.44497840996304, "tailY": 13.143495756778949, "tailWidth": 6, "tailCurvature": -22, "width": 130.9090576171875, "fontSize": 8, "borderRadius": 18, "speaker": "Ladrón" }
           ],
           "zoomRects": [
             { "x": 0, "y": 0, "w": 100.42035063191233, "h": 29.205172595840946 }
@@ -215,13 +215,23 @@
           ]
         },
         {
-          "focusY": 0.88,
+          "focusY": 0.850130299713292,
           "dialogue": [
             { "text": "BANG.", "size": "small", "posX": 34.43350389666937, "posY": 75, "tailX": 40, "tailY": 24, "tailWidth": 6, "tailCurvature": -22, "width": 80, "fontSize": 8, "borderRadius": 18, "speaker": "Narración", "style": "caption", "tail": "none" },
             { "text": "Pará—", "size": "small", "posX": 100, "posY": 67.87167496624537, "tailX": 79.7241045424858, "tailY": 77.8363621645661, "tailWidth": 6, "tailCurvature": -22, "width": 70, "fontSize": 8, "borderRadius": 18, "speaker": "Uandi" }
           ],
           "zoomRects": [
             { "x": 0, "y": 68.93800207935189, "w": 99.85679114592467, "h": 31.061997920648114 }
+          ],
+          "sounds": [
+            {
+              "sound": "/sounds/sfx/disparo4.mp3",
+              "soundConfig": {
+                "volume": 0.3,
+                "fadeIn": 0,
+                "fadeOut": 0
+              }
+            }
           ]
         }
       ]
@@ -551,7 +561,7 @@
             { "text": "Desde el principio.", "size": "small", "posX": 22.42202938337571, "posY": 0, "tailX": 7.422029383375705, "tailY": 4.071619550323241, "tailWidth": 6, "tailCurvature": -22, "width": 87.36, "fontSize": 8, "borderRadius": 18, "speaker": "Sheriff" }
           ],
           "zoomRects": [
-            { "x": 0, "y": 0, "w": 100, "h": 24 }
+            { "x": 0, "y": 0, "w": 46.78750473170628, "h": 35.0741304219408 }
           ]
         },
         {
@@ -561,7 +571,7 @@
             { "text": "Él salió sin despertarme.", "size": "small", "posX": 97.8193387974529, "posY": 0, "tailX": 90.44329965849965, "tailY": 9.574231513856962, "tailWidth": 6, "tailCurvature": -22, "width": 165, "fontSize": 8, "borderRadius": 18, "speaker": "Peter" }
           ],
           "zoomRects": [
-            { "x": 0, "y": 0, "w": 100, "h": 35.451378893910956 }
+            { "x": 44.716378920257206, "y": 0, "w": 55.283621079742794, "h": 36.71698955069172 }
           ]
         },
         {
@@ -715,8 +725,9 @@
         {
           "focusY": 0.85,
           "dialogue": [
-            { "text": "Sí, señor.", "size": "small", "posX": -4.224474533968965, "posY": 75, "tailX": 8.19638137058498, "tailY": 84.46610977484406, "tailWidth": 6, "tailCurvature": -22, "width": 95, "fontSize": 8, "borderRadius": 18, "speaker": "Deputy" },
-            { "text": "Oficina del Sheriff.", "size": "small", "posX": 25, "posY": 75, "tailX": 40, "tailY": 24, "tailWidth": 6, "tailCurvature": -22, "width": 140, "fontSize": 8, "borderRadius": 18, "speaker": "Narración", "style": "caption", "tail": "none" }
+            { "text": "Oficina del Sheriff.", "size": "small", "posX": 25, "posY": 75, "tailX": 40, "tailY": 24, "tailWidth": 6, "tailCurvature": -22, "width": 100, "fontSize": 8, "borderRadius": 18, "speaker": "Narración", "style": "caption", "tail": "none" },
+            { "text": "Que nadie nos moleste, escuchaste pibe?", "size": "small", "posX": 61.76158896410655, "posY": 65.96311049614852, "tailX": 47.281681595225685, "tailY": 78.67334738588085, "tailWidth": 6, "tailCurvature": -22, "width": 96, "fontSize": 8, "borderRadius": 18 },
+            { "text": "Sí, señor.", "size": "small", "posX": -4.224474533968965, "posY": 75, "tailX": 8.19638137058498, "tailY": 84.46610977484406, "tailWidth": 6, "tailCurvature": -22, "width": 95, "fontSize": 8, "borderRadius": 18, "speaker": "Deputy" }
           ],
           "zoomRects": [
             { "x": 0, "y": 73.2718167058379, "w": 100, "h": 26.67693797045237 }
@@ -727,10 +738,12 @@
     "26": {
       "panels": [
         {
-          "focusY": 0.18,
+          "focusY": 0.06228524948517359,
           "dialogue": [
-            { "text": "Voy a preguntar cosas que les parezcan irrelevantes.", "size": "small", "posX": 10, "posY": 6, "tailX": 40, "tailY": 24, "tailWidth": 6, "tailCurvature": -22, "width": 230, "fontSize": 8, "borderRadius": 18, "speaker": "Sheriff" },
-            { "text": "Las irrelevantes suelen importar.", "size": "small", "posX": 12, "posY": 14, "tailX": 40, "tailY": 24, "tailWidth": 6, "tailCurvature": -22, "width": 210, "fontSize": 8, "borderRadius": 18, "speaker": "Ian" }
+            { "text": "Voy a preguntar cosas que les parezcan irrelevantes.", "size": "small", "posX": 9.552837561786703, "posY": 0, "tailX": 49.390441224463125, "tailY": 6.439599029868159, "tailWidth": 6, "tailCurvature": -22, "width": 230, "fontSize": 8, "borderRadius": 18, "speaker": "Sheriff" },
+            { "text": "Irrelevantes?", "size": "small", "posX": -17.740640302929084, "posY": 7.314703800394254, "tailX": 10.26360028736812, "tailY": 12.134868228301087, "tailWidth": 6, "tailCurvature": -22, "width": 72, "fontSize": 8, "borderRadius": 18, "speaker": "valery" },
+            { "text": "Irrelevante para quien? para usted?! mi amigo fue asesinado y no me dejan verlo", "size": "small", "posX": -20, "posY": 19.196645071916734, "tailX": 33.63141634426414, "tailY": 13.796950702609518, "tailWidth": 6, "tailCurvature": -22, "width": 96, "fontSize": 8, "borderRadius": 18 },
+            { "text": "Entiendo, pero mejor mantengamos la calma", "size": "small", "posX": 92.99830927129295, "posY": 0, "tailX": 58.28426463900852, "tailY": 9.279874472663975, "tailWidth": 6, "tailCurvature": -22, "width": 96, "fontSize": 8, "borderRadius": 18 }
           ],
           "zoomRects": [
             { "x": 0, "y": 0, "w": 100, "h": 27.271820790533564 }
@@ -739,10 +752,10 @@
         {
           "focusY": 0.38,
           "dialogue": [
-            { "text": "¿Uandi tenía problemas económicos?", "size": "small", "posX": 12, "posY": 32, "tailX": 40, "tailY": 24, "tailWidth": 6, "tailCurvature": -22, "width": 210, "fontSize": 8, "borderRadius": 18, "speaker": "Sheriff" },
-            { "text": "No especialmente.", "size": "small", "posX": 55, "posY": 36, "tailX": 40, "tailY": 24, "tailWidth": 6, "tailCurvature": -22, "width": 140, "fontSize": 8, "borderRadius": 18, "speaker": "Ian" },
-            { "text": "¿Deudas?", "size": "small", "posX": 12, "posY": 42, "tailX": 40, "tailY": 24, "tailWidth": 6, "tailCurvature": -22, "width": 80, "fontSize": 8, "borderRadius": 18, "speaker": "Sheriff" },
-            { "text": "No que sepamos.", "size": "small", "posX": 55, "posY": 46, "tailX": 40, "tailY": 24, "tailWidth": 6, "tailCurvature": -22, "width": 140, "fontSize": 8, "borderRadius": 18, "speaker": "Jaz" }
+            { "text": "¿Uandi tenía problemas económicos?", "size": "small", "posX": -20, "posY": 36, "tailX": 12.346454421062184, "tailY": 33.159052441070656, "tailWidth": 6, "tailCurvature": -22, "width": 210, "fontSize": 8, "borderRadius": 18, "speaker": "Sheriff" },
+            { "text": "No, siempre usa la misma  ropa", "size": "small", "posX": 55, "posY": 25, "tailX": 38.82325674154395, "tailY": 37.11409971911547, "tailWidth": 6, "tailCurvature": -22, "width": 140, "fontSize": 8, "borderRadius": 18, "speaker": "Ian" },
+            { "text": "¿Deudas?", "size": "small", "posX": -10.522067861800897, "posY": 47.420624682398035, "tailX": 6.744108351984492, "tailY": 40.42656478521703, "tailWidth": 6, "tailCurvature": -22, "width": 80, "fontSize": 8, "borderRadius": 18, "speaker": "Sheriff" },
+            { "text": "No que sepamos.", "size": "small", "posX": 55, "posY": 38.949694380814364, "tailX": 37.32673813514227, "tailY": 43.94718797972793, "tailWidth": 6, "tailCurvature": -22, "width": 140, "fontSize": 8, "borderRadius": 18, "speaker": "Jaz" }
           ],
           "zoomRects": [
             { "x": 0, "y": 27.12310110668718, "w": 50.397424696438584, "h": 29.205176680536592 }
@@ -751,9 +764,8 @@
         {
           "focusY": 0.55,
           "dialogue": [
-            { "text": "¿Alguien quería verlo muerto?", "size": "small", "posX": 12, "posY": 50, "tailX": 40, "tailY": 24, "tailWidth": 6, "tailCurvature": -22, "width": 195, "fontSize": 8, "borderRadius": 18, "speaker": "Sheriff" },
-            { "text": "No conozco a nadie.", "size": "small", "posX": 12, "posY": 58, "tailX": 40, "tailY": 24, "tailWidth": 6, "tailCurvature": -22, "width": 155, "fontSize": 8, "borderRadius": 18, "speaker": "Ian" },
-            { "text": "Uandi se mete donde no lo llaman.", "size": "small", "posX": 48, "posY": 62, "tailX": 40, "tailY": 24, "tailWidth": 6, "tailCurvature": -22, "width": 195, "fontSize": 8, "borderRadius": 18, "speaker": "Jaz" }
+            { "text": "¿Alguien quería verlo muerto?", "size": "small", "posX": 75, "posY": 25, "tailX": 59.19887918249678, "tailY": 37.75667798143126, "tailWidth": 6, "tailCurvature": -22, "width": 195, "fontSize": 8, "borderRadius": 18, "speaker": "Sheriff" },
+            { "text": "No conozco a nadie.", "size": "small", "posX": 105.80718017611889, "posY": 45.7010334406201, "tailX": 86.66057518196087, "tailY": 39.82017939001933, "tailWidth": 6, "tailCurvature": -22, "width": 87.36, "fontSize": 8, "borderRadius": 18, "speaker": "Ian" }
           ],
           "zoomRects": [
             { "x": 51.073860243038546, "y": 27.722955282398996, "w": 48.926139756961454, "h": 29.50261604822937 }
@@ -762,8 +774,9 @@
         {
           "focusY": 0.72,
           "dialogue": [
-            { "text": "El empleado dijo algo parecido.", "size": "small", "posX": 10, "posY": 66, "tailX": 40, "tailY": 24, "tailWidth": 6, "tailCurvature": -22, "width": 210, "fontSize": 8, "borderRadius": 18, "speaker": "Sheriff" },
-            { "text": "Demasiado.", "size": "small", "posX": 58, "posY": 70, "tailX": 40, "tailY": 24, "tailWidth": 6, "tailCurvature": -22, "width": 95, "fontSize": 8, "borderRadius": 18, "speaker": "Ian" }
+            { "text": "El empleado..", "size": "small", "posX": -11.47563359639097, "posY": 61.004154484470995, "tailX": 11.758082791834159, "tailY": 68.12996406197121, "tailWidth": 6, "tailCurvature": -22, "width": 72, "fontSize": 8, "borderRadius": 18, "speaker": "Ian", "style": "thought" },
+            { "text": "Demasiado obvio", "size": "small", "posX": -11.47563359639097, "posY": 69.16734743440773, "tailX": 40, "tailY": 24, "tailWidth": 6, "tailCurvature": -22, "width": 95, "fontSize": 8, "borderRadius": 18, "speaker": "Ian", "style": "thought" },
+            { "text": "Primero volvo, despues julian y mati. Ahora uandi.", "style": "thought", "size": "small", "posX": 100, "posY": 61.004154484470995, "tailX": 119.44568214709548, "tailY": 79.6380449606686, "tailWidth": 6, "tailCurvature": -22, "width": 96, "fontSize": 8, "borderRadius": 18 }
           ],
           "zoomRects": [
             { "x": 0, "y": 55.47176945930707, "w": 99.57962627697408, "h": 13.1434916720833 }
@@ -772,8 +785,7 @@
         {
           "focusY": 0.88,
           "dialogue": [
-            { "text": "Entonces veamos lo que sí sabemos.", "size": "small", "posX": 12, "posY": 80, "tailX": 40, "tailY": 24, "tailWidth": 6, "tailCurvature": -22, "width": 215, "fontSize": 8, "borderRadius": 18, "speaker": "Sheriff" },
-            { "text": "Fotos del playón sobre el escritorio.", "size": "small", "posX": 12, "posY": 88, "tailX": 40, "tailY": 24, "tailWidth": 6, "tailCurvature": -22, "width": 210, "fontSize": 8, "borderRadius": 18, "speaker": "Narración", "style": "caption", "tail": "none" }
+            { "text": "conozco esa cara, que pensas?", "size": "small", "posX": -20, "posY": 81.24897186058594, "tailX": 17.641799084114414, "tailY": 72.29318496311777, "tailWidth": 6, "tailCurvature": -22, "width": 120.96, "fontSize": 8, "borderRadius": 18, "speaker": "Sheriff" }
           ],
           "zoomRects": [
             { "x": 0, "y": 68.4307439264693, "w": 100, "h": 31.584683452687486 }
@@ -786,60 +798,42 @@
         {
           "focusY": 0.15,
           "dialogue": [
-            { "text": "La imagen de seguridad de la YPF.", "size": "small", "posX": 12, "posY": 6, "tailX": 40, "tailY": 24, "tailWidth": 6, "tailCurvature": -22, "width": 200, "fontSize": 8, "borderRadius": 18, "speaker": "Narración", "style": "caption", "tail": "none" },
-            { "text": "Sin sonido. Baja calidad.", "size": "small", "posX": 52, "posY": 10, "tailX": 40, "tailY": 24, "tailWidth": 6, "tailCurvature": -22, "width": 155, "fontSize": 8, "borderRadius": 18, "speaker": "Sheriff" }
+            { "text": "La imagen de seguridad de la YPF.", "size": "small", "posX": 89.80648941399286, "posY": 0, "tailX": 40, "tailY": 24, "tailWidth": 6, "tailCurvature": -22, "width": 200, "fontSize": 8, "borderRadius": 18, "speaker": "Narración", "style": "caption", "tail": "none" },
+            { "text": "Sin sonido. Baja calidad.?", "size": "small", "posX": 25, "posY": -3.285853985791748, "tailX": 40.4471624382133, "tailY": 4.541177733967135, "tailWidth": 6, "tailCurvature": -22, "width": 110.88, "fontSize": 8, "borderRadius": 18, "speaker": "Sheriff" },
+            { "text": "Es todo lo que tenemos", "size": "small", "posX": 103.69808584581435, "posY": 13.411880571762865, "tailX": 86.25870572251992, "tailY": 11.484284930021403, "tailWidth": 6, "tailCurvature": -22, "width": 96, "fontSize": 8, "borderRadius": 18 },
+            { "text": "todo lo que tienen?", "size": "small", "posX": -3.285853985791748, "posY": 17.886557572499648, "tailX": 21.084566446296698, "tailY": 8.520475459533635, "tailWidth": 6, "tailCurvature": -22, "width": 96, "fontSize": 8, "borderRadius": 18 }
           ],
           "zoomRects": [
             { "x": 0, "y": 0.14871968384638679, "w": 100, "h": 24 }
           ]
         },
         {
-          "focusY": 0.32,
+          "focusY": 0.4141677756967755,
           "dialogue": [
-            { "text": "¿Lo reconocen?", "size": "small", "posX": 12, "posY": 26, "tailX": 40, "tailY": 24, "tailWidth": 6, "tailCurvature": -22, "width": 125, "fontSize": 8, "borderRadius": 18, "speaker": "Sheriff" },
-            { "text": "No.", "size": "small", "posX": 62, "posY": 30, "tailX": 40, "tailY": 24, "tailWidth": 6, "tailCurvature": -22, "width": 50, "fontSize": 8, "borderRadius": 18, "speaker": "Jaz" },
-            { "text": "Nunca le vi la cara.", "size": "small", "posX": 12, "posY": 36, "tailX": 40, "tailY": 24, "tailWidth": 6, "tailCurvature": -22, "width": 155, "fontSize": 8, "borderRadius": 18, "speaker": "Ian" }
+            { "text": "Mire.. entiendo que deben tener mucho que hacer", "size": "small", "posX": -7.690409256039922, "posY": 29.400648042449674, "tailX": 20.704488130960144, "tailY": 28.738663057488978, "tailWidth": 6, "tailCurvature": -22, "width": 96, "fontSize": 8, "borderRadius": 18 },
+            { "text": "no lo molestamos mas", "size": "small", "posX": -12.162048649164834, "posY": 45.7285481011753, "tailX": -1.7207779465492443, "tailY": 36.71746909444119, "tailWidth": 6, "tailCurvature": -22, "width": 96, "fontSize": 8, "borderRadius": 18 }
           ],
           "zoomRects": [
             { "x": 0, "y": 23.800047246530845, "w": 99.78980159293025, "h": 27.271824875229214 }
           ]
         },
         {
-          "focusY": 0.5,
+          "focusY": 0.6224180767943208,
           "dialogue": [
-            { "text": "Sale del local. Va al surtidor.", "size": "small", "posX": 10, "posY": 44, "tailX": 40, "tailY": 24, "tailWidth": 6, "tailCurvature": -22, "width": 200, "fontSize": 8, "borderRadius": 18, "speaker": "Sheriff" },
-            { "text": "Entra después de Uandi.", "size": "small", "posX": 48, "posY": 50, "tailX": 40, "tailY": 24, "tailWidth": 6, "tailCurvature": -22, "width": 175, "fontSize": 8, "borderRadius": 18, "speaker": "Sheriff" },
-            { "text": "Eso reduce que lo esperara adentro.", "size": "small", "posX": 10, "posY": 56, "tailX": 40, "tailY": 24, "tailWidth": 6, "tailCurvature": -22, "width": 220, "fontSize": 8, "borderRadius": 18, "speaker": "Ian" }
+            { "text": "Esperamos nos avise en cuanto tengan algo", "size": "small", "posX": 57.93086243641275, "posY": 44.44562712038325, "tailX": 38.92640627387581, "tailY": 53.90857518623753, "tailWidth": 6, "tailCurvature": -22, "width": 96, "fontSize": 8, "borderRadius": 18 }
           ],
           "zoomRects": [
             { "x": 0, "y": 50.277044717601, "w": 100.84072435493825, "h": 19.9845807902345 }
           ]
         },
         {
-          "focusY": 0.68,
+          "focusY": 0.8856785476330623,
           "dialogue": [
-            { "text": "Arma. Manos arriba. Disparo.", "size": "small", "posX": 28, "posY": 62, "tailX": 40, "tailY": 24, "tailWidth": 6, "tailCurvature": -22, "width": 160, "fontSize": 8, "borderRadius": 18, "speaker": "Narración", "style": "caption", "tail": "none" },
-            { "text": "Ya está.", "size": "small", "posX": 18, "posY": 68, "tailX": 40, "tailY": 24, "tailWidth": 6, "tailCurvature": -22, "width": 80, "fontSize": 8, "borderRadius": 18, "speaker": "Jaz" },
-            { "text": "¿Fue un robo?", "size": "small", "posX": 52, "posY": 72, "tailX": 40, "tailY": 24, "tailWidth": 6, "tailCurvature": -22, "width": 115, "fontSize": 8, "borderRadius": 18, "speaker": "Jaz" },
-            { "text": "Eso parece.", "size": "small", "posX": 12, "posY": 78, "tailX": 40, "tailY": 24, "tailWidth": 6, "tailCurvature": -22, "width": 100, "fontSize": 8, "borderRadius": 18, "speaker": "Sheriff" },
-            { "text": "Parece.", "size": "small", "posX": 55, "posY": 82, "tailX": 40, "tailY": 24, "tailWidth": 6, "tailCurvature": -22, "width": 75, "fontSize": 8, "borderRadius": 18, "speaker": "Ian" },
-            { "text": "¿Tenés otra teoría?", "size": "small", "posX": 12, "posY": 88, "tailX": 40, "tailY": 24, "tailWidth": 6, "tailCurvature": -22, "width": 155, "fontSize": 8, "borderRadius": 18, "speaker": "Sheriff" },
-            { "text": "Todavía no.", "size": "small", "posX": 58, "posY": 92, "tailX": 40, "tailY": 24, "tailWidth": 6, "tailCurvature": -22, "width": 100, "fontSize": 8, "borderRadius": 18, "speaker": "Ian" }
+            { "text": "mh", "style": "thought", "size": "small", "posX": 77.9381093289223, "posY": 75, "tailX": 90.18189636687663, "tailY": 93.33594812328056, "tailWidth": 6, "tailCurvature": -22, "width": 96, "fontSize": 8, "borderRadius": 18 },
+            { "text": "esa sensacion de nuevo", "style": "thought", "size": "small", "posX": 102.85154881955985, "posY": 75, "tailX": 109.50576070427675, "tailY": 93.13525627372279, "tailWidth": 6, "tailCurvature": -22, "width": 96, "fontSize": 8, "borderRadius": 18 }
           ],
           "zoomRects": [
-            { "x": 0, "y": 51.62049322784911, "w": 100.63054903898208, "h": 18.646107720312667 }
-          ]
-        },
-        {
-          "focusY": 0.88,
-          "dialogue": [
-            { "text": "Si encontramos algo, los llamo.", "size": "small", "posX": 10, "posY": 80, "tailX": 40, "tailY": 24, "tailWidth": 6, "tailCurvature": -22, "width": 210, "fontSize": 8, "borderRadius": 18, "speaker": "Sheriff" },
-            { "text": "Gracias.", "size": "small", "posX": 55, "posY": 84, "tailX": 40, "tailY": 24, "tailWidth": 6, "tailCurvature": -22, "width": 80, "fontSize": 8, "borderRadius": 18, "speaker": "Jaz" },
-            { "text": "No hagas mi trabajo por tu cuenta.", "size": "small", "posX": 10, "posY": 90, "tailX": 40, "tailY": 24, "tailWidth": 6, "tailCurvature": -22, "width": 215, "fontSize": 8, "borderRadius": 18, "speaker": "Sheriff" },
-            { "text": "No estaba planeando hacerlo.", "size": "small", "posX": 48, "posY": 94, "tailX": 40, "tailY": 24, "tailWidth": 6, "tailCurvature": -22, "width": 195, "fontSize": 8, "borderRadius": 18, "speaker": "Ian" }
-          ],
-          "zoomRects": [
-            { "x": 0, "y": 70.66152693007817, "w": 100.21019840706975, "h": 26.825661738994405 }
+            { "x": 0, "y": 71.20738804385942, "w": 100.89670822185195, "h": 29.19290112727051 }
           ]
         }
       ]
@@ -983,18 +977,18 @@
       "panels": [
         {
           "focusY": 0.2,
-          "dialogue": [
-            { "text": "Balanar despega entre los edificios.", "size": "small", "posX": 88.29549852673158, "posY": 2.6560504315739095, "tailX": 40, "tailY": 24, "tailWidth": 6, "tailCurvature": -22, "width": 200, "fontSize": 8, "borderRadius": 18, "speaker": "Narración", "style": "caption", "tail": "none" },
-            { "text": "Ug que asco", "size": "small", "posX": 30.190468509934192, "posY": 6.876898893312821, "tailX": 40, "tailY": 24, "tailWidth": 6, "tailCurvature": -22, "width": 115, "fontSize": 8, "borderRadius": 18, "speaker": "Uandi" },
-            { "text": "Usas colgate?", "size": "small", "posX": 15.339936847608861, "posY": 19.50261196353372, "tailX": 40, "tailY": 24, "tailWidth": 6, "tailCurvature": -22, "width": 75, "fontSize": 8, "borderRadius": 18, "speaker": "Peter" }
-          ],
+          "dialogue": [],
           "zoomRects": [
             { "x": 0.4203621774691236, "y": 0, "w": 21.812865901878972, "h": 71.59015995119174 }
           ]
         },
         {
           "focusY": 0.45,
-          "dialogue": [],
+          "dialogue": [
+            { "text": "Balanar despega entre los edificios.", "size": "small", "posX": 88.29549852673158, "posY": 2.6560504315739095, "tailX": 40, "tailY": 24, "tailWidth": 6, "tailCurvature": -22, "width": 200, "fontSize": 8, "borderRadius": 18, "speaker": "Narración", "style": "caption", "tail": "none" },
+            { "text": "Ug que asco", "size": "small", "posX": 30.190468509934192, "posY": 6.876898893312821, "tailX": 40, "tailY": 24, "tailWidth": 6, "tailCurvature": -22, "width": 115, "fontSize": 8, "borderRadius": 18, "speaker": "Uandi" },
+            { "text": "Usas colgate?", "size": "small", "posX": 15.339936847608861, "posY": 19.50261196353372, "tailX": 40, "tailY": 24, "tailWidth": 6, "tailCurvature": -22, "width": 75, "fontSize": 8, "borderRadius": 18, "speaker": "Peter" }
+          ],
           "zoomRects": [
             { "x": 20.387513652246902, "y": 0, "w": 79.6124863477531, "h": 64.89778643219128 }
           ]
@@ -1029,7 +1023,7 @@
             { "text": "AAAAGh!!", "size": "small", "posX": 95.8619946300622, "posY": 5.853160870816854, "tailX": 84.51360053219365, "tailY": 14.904385771048325, "tailWidth": 6, "tailCurvature": -22, "width": 96, "fontSize": 8, "borderRadius": 18 }
           ],
           "zoomRects": [
-            { "x": 0, "y": 30, "w": 100, "h": 24 }
+            { "x": 38.67967849888171, "y": 0, "w": 61.32032150111829, "h": 62.91764453206573 }
           ]
         },
         {
@@ -1039,7 +1033,7 @@
             { "text": "El avatar va a aprender por las malas a cepillarse los dientes", "size": "small", "posX": 91.18197229001147, "posY": 77.27334536887271, "tailX": 91.18197229001147, "tailY": 92.27334536887271, "tailWidth": 6, "tailCurvature": -22, "width": 96, "fontSize": 8, "borderRadius": 18 }
           ],
           "zoomRects": [
-            { "x": 34.67976995841312, "y": 0, "w": 65.32023004158688, "h": 63.26188216396797 }
+            { "x": 0, "y": 64.58163725688684, "w": 100.64616773738096, "h": 35.41836274311317 }
           ]
         }
       ]
@@ -1080,10 +1074,10 @@
     "07": {
       "panels": [
         {
-          "focusY": 0.2,
+          "focusY": 0.1445501811587676,
           "dialogue": [
-            { "text": "Dejame dos.", "size": "small", "posX": -9.323472262152249, "posY": 7.902509301080733, "tailX": 40, "tailY": 24, "tailWidth": 6, "tailCurvature": -22, "width": 72, "fontSize": 8, "borderRadius": 18, "speaker": "Uandi" },
-            { "text": "No especificaste cuáles.", "size": "small", "posX": 55, "posY": 14, "tailX": 40, "tailY": 24, "tailWidth": 6, "tailCurvature": -22, "width": 165, "fontSize": 8, "borderRadius": 18, "speaker": "Peter" }
+            { "text": "No te agrandes", "size": "small", "posX": 33.380668180649145, "posY": 0, "tailX": 29.49166018549959, "tailY": 11.976666896203492, "tailWidth": 6, "tailCurvature": -22, "width": 72, "fontSize": 8, "borderRadius": 18, "speaker": "Uandi" },
+            { "text": "Para nada", "size": "small", "posX": -11.179090977316323, "posY": 22.06829449062674, "tailX": 18.983305360007254, "tailY": 11.976661585473623, "tailWidth": 6, "tailCurvature": -22, "width": 165, "fontSize": 8, "borderRadius": 18, "speaker": "Peter" }
           ],
           "zoomRects": [
             { "x": 0, "y": 0, "w": 50.18723783492563, "h": 43.779656681134725 }
@@ -1092,8 +1086,8 @@
         {
           "focusY": 0.45,
           "dialogue": [
-            { "text": "Las que tengan comida arriba.", "size": "small", "posX": 12, "posY": 38, "tailX": 40, "tailY": 24, "tailWidth": 6, "tailCurvature": -22, "width": 175, "fontSize": 8, "borderRadius": 18, "speaker": "Uandi" },
-            { "text": "Complicado.", "size": "small", "posX": 58, "posY": 42, "tailX": 40, "tailY": 24, "tailWidth": 6, "tailCurvature": -22, "width": 100, "fontSize": 8, "borderRadius": 18, "speaker": "Peter" }
+            { "text": "Pero tendrias que haber visto tu cara de miedo", "size": "small", "posX": 86.0056161946758, "posY": 0, "tailX": 61.240283364595356, "tailY": 15.298900180982875, "tailWidth": 6, "tailCurvature": -22, "width": 175, "fontSize": 8, "borderRadius": 18, "speaker": "Uandi" },
+            { "text": "No tenia miedo, te deje lucirte", "size": "small", "posX": 111.21249526829372, "posY": 35.67192547317668, "tailX": 85.1635413584705, "tailY": 20.20315740819796, "tailWidth": 6, "tailCurvature": -22, "width": 100, "fontSize": 8, "borderRadius": 18, "speaker": "Peter" }
           ],
           "zoomRects": [
             { "x": 51.704397736463825, "y": 0, "w": 48.295602263536175, "h": 44.0770960488275 }
@@ -1102,8 +1096,8 @@
         {
           "focusY": 0.68,
           "dialogue": [
-            { "text": "Podría haberte acompañado antes.", "size": "small", "posX": 12, "posY": 60, "tailX": 40, "tailY": 24, "tailWidth": 6, "tailCurvature": -22, "width": 195, "fontSize": 8, "borderRadius": 18, "speaker": "Peter" },
-            { "text": "No vamos a empezar con esto.", "size": "small", "posX": 48, "posY": 64, "tailX": 40, "tailY": 24, "tailWidth": 6, "tailCurvature": -22, "width": 195, "fontSize": 8, "borderRadius": 18, "speaker": "Uandi" }
+            { "text": "Cuidado!", "size": "small", "posX": -8.080968335933935, "posY": 50, "tailX": 29.85601643267249, "tailY": 52.710705550922526, "tailWidth": 6, "tailCurvature": -22, "width": 195, "fontSize": 8, "borderRadius": 18, "speaker": "Peter" },
+            { "text": "Auch!", "size": "small", "posX": 103.41123579760985, "posY": 52.2930670033806, "tailX": 71.88112298089581, "tailY": 60.034860965551474, "tailWidth": 6, "tailCurvature": -22, "width": 72, "fontSize": 8, "borderRadius": 18, "speaker": "Uandi" }
           ],
           "zoomRects": [
             { "x": 2.3119977488585732, "y": 42.835612619646945, "w": 97.05745321215934, "h": 36.34369699698927 }
@@ -1120,11 +1114,11 @@
           ]
         },
         {
-          "focusY": 0.88,
+          "focusY": 0.8960087391288934,
           "dialogue": [
-            { "text": "Ese tipo vino por vos.", "size": "small", "posX": 12, "posY": 80, "tailX": 40, "tailY": 24, "tailWidth": 6, "tailCurvature": -22, "width": 155, "fontSize": 8, "borderRadius": 18, "speaker": "Peter" },
-            { "text": "Estoy bien.", "size": "small", "posX": 55, "posY": 84, "tailX": 40, "tailY": 24, "tailWidth": 6, "tailCurvature": -22, "width": 95, "fontSize": 8, "borderRadius": 18, "speaker": "Uandi" },
-            { "text": "Dormí.", "size": "small", "posX": 12, "posY": 90, "tailX": 40, "tailY": 24, "tailWidth": 6, "tailCurvature": -22, "width": 70, "fontSize": 8, "borderRadius": 18, "speaker": "Uandi" }
+            { "text": "No te olvides que sigo siendo mas fuerte", "size": "small", "posX": 90, "posY": 78.73439996467897, "tailX": 67.05341007236017, "tailY": 84.90769342239, "tailWidth": 6, "tailCurvature": -22, "width": 155, "fontSize": 8, "borderRadius": 18, "speaker": "Peter" },
+            { "text": "Se se ", "size": "small", "posX": 90, "posY": 97.13074773920955, "tailX": 71.52504946548507, "tailY": 90.12835862453014, "tailWidth": 6, "tailCurvature": -22, "width": 95, "fontSize": 8, "borderRadius": 18, "speaker": "Uandi" },
+            { "text": "Jefa, tengo algo que podria interesarle", "size": "small", "posX": -6.557278713331719, "posY": 87.31056142215127, "tailX": 22.11345743849227, "tailY": 88.22993732862912, "tailWidth": 6, "tailCurvature": -22, "width": 103.6363525390625, "fontSize": 8, "borderRadius": 18, "style": "electronic" }
           ],
           "zoomRects": [
             { "x": 0, "y": 78.52822237130164, "w": 98.94912342021918, "h": 21.471777628698366 }
@@ -1287,6 +1281,25 @@
       },
       "soundConfig": {
         "volume": 0.8,
+        "playbackRate": 1,
+        "loop": true,
+        "fadeIn": 1000,
+        "fadeOut": 1000
+      }
+    },
+    {
+      "id": "track-1795479819364-lzplr",
+      "layer": "music",
+      "src": "/sounds/sfx/murcielagos.mp3",
+      "title": "muzaproduction-metal-design-explosion-13491",
+      "startPageKey": "06",
+      "startPanelIdx": 1,
+      "stopTrigger": {
+        "type": "pageEnd",
+        "pageKey": "06"
+      },
+      "soundConfig": {
+        "volume": 0.11,
         "playbackRate": 1,
         "loop": true,
         "fadeIn": 1000,
