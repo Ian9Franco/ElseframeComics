@@ -12,6 +12,7 @@ import {
   buildExitVariant,
   buildAnimTransition,
   computeBubbleDelay,
+  bubbleLayoutMaxWidth,
   comicTextContainment,
   resolveBgColor,
   renderStyledText,
@@ -99,7 +100,11 @@ export function ThoughtBubble({
     ...comicTextContainment(finalFontSize, 0, { mobile: isMobile }),
   };
 
-  const layoutWidth = line.width ? line.width * bubbleLayoutScale * textScale : undefined;
+  const layoutWidth = bubbleLayoutMaxWidth(line, {
+    textScale,
+    bubbleLayoutScale,
+    mobile: isMobile,
+  });
   if (layoutWidth)       thoughtStyles.maxWidth   = `${layoutWidth}px`;
   if (customFontFamily) thoughtStyles.fontFamily = customFontFamily;
 

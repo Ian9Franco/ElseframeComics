@@ -30,6 +30,7 @@ import {
   READER_DEFAULT_AUTOPLAY,
   READER_DEFAULT_BUBBLE_OPACITY,
   READER_DEFAULT_FOCUS_ENABLED,
+  READER_DEFAULT_PAGE_END_NAV,
   READER_DEFAULT_TEXT_SCALE,
 } from "@/lib/readerPreferences";
 import { readPageFlipSoundEnabled, writePageFlipSoundEnabled } from "@/lib/readerSystemSounds";
@@ -197,6 +198,7 @@ export function CinematicReader({
     handleMoveBubbleToPanel,
     handleReorderPanels,
     handleReorderBubbles,
+    handleReflowBubbleWidths,
     hasUnsavedChanges,
     hasLocalBackup,
     backupTimestamp,
@@ -218,6 +220,7 @@ export function CinematicReader({
   const [focusEnabled, setFocusEnabled] = useState<boolean>(READER_DEFAULT_FOCUS_ENABLED);
   const [bubbleOpacity, setBubbleOpacityState] = useState<number>(READER_DEFAULT_BUBBLE_OPACITY);
   const [pageFlipSoundEnabled, setPageFlipSoundEnabledState] = useState<boolean>(true);
+  const [pageEndNavEnabled, setPageEndNavEnabled] = useState<boolean>(READER_DEFAULT_PAGE_END_NAV);
 
   useEffect(() => {
     if (typeof window !== "undefined") {
@@ -255,6 +258,10 @@ export function CinematicReader({
         setBubbleOpacityState(READER_DEFAULT_BUBBLE_OPACITY);
       }
       setPageFlipSoundEnabledState(readPageFlipSoundEnabled());
+      const savedPageEndNav = localStorage.getItem("reader_page_end_nav");
+      setPageEndNavEnabled(
+        savedPageEndNav === null ? READER_DEFAULT_PAGE_END_NAV : savedPageEndNav === "true"
+      );
       const hasRead = localStorage.getItem("has_read_instructions") === "true";
       if (!hasRead) {
         setShowInstructions(true);
@@ -308,6 +315,13 @@ export function CinematicReader({
   const handleSetPageFlipSoundEnabled = (value: boolean) => {
     setPageFlipSoundEnabledState(value);
     writePageFlipSoundEnabled(value);
+  };
+
+  const handleSetPageEndNav = (value: boolean) => {
+    setPageEndNavEnabled(value);
+    if (typeof window !== "undefined") {
+      localStorage.setItem("reader_page_end_nav", String(value));
+    }
   };
 
   useEffect(() => {
@@ -1068,6 +1082,9 @@ export function CinematicReader({
         setBubbleOpacity={handleSetBubbleOpacity}
         pageFlipSoundEnabled={pageFlipSoundEnabled}
         setPageFlipSoundEnabled={handleSetPageFlipSoundEnabled}
+        onReflowBubbles={handleReflowBubbleWidths}
+        pageEndNavEnabled={pageEndNavEnabled}
+        setPageEndNavEnabled={handleSetPageEndNav}
         editorVersion={editorVersion}
         setEditorVersion={handleSetEditorVersion}
       />
@@ -1182,6 +1199,7 @@ export function CinematicReader({
           setPanOffset={setPanOffset}
           nextChapter={nextChapter}
           pageFlip={mode === "read" ? pageFlip : undefined}
+          showPageEndNav={pageEndNavEnabled}
           viewportSize={containerSize}
           neighborMasks={neighborMasks}
           pageLoading={pageLoading}

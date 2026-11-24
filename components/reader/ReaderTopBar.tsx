@@ -57,6 +57,9 @@ interface ReaderTopBarProps {
   setBubbleOpacity?: (val: number) => void;
   pageFlipSoundEnabled?: boolean;
   setPageFlipSoundEnabled?: (value: boolean) => void;
+  onReflowBubbles?: () => void;
+  pageEndNavEnabled?: boolean;
+  setPageEndNavEnabled?: (value: boolean) => void;
   editorVersion?: EditorVersion;
   setEditorVersion?: (v: EditorVersion) => void;
 }
@@ -92,6 +95,9 @@ export function ReaderTopBar({
   setBubbleOpacity,
   pageFlipSoundEnabled = true,
   setPageFlipSoundEnabled,
+  onReflowBubbles,
+  pageEndNavEnabled = true,
+  setPageEndNavEnabled,
   editorVersion = "v1",
   setEditorVersion,
 }: ReaderTopBarProps) {
@@ -261,8 +267,19 @@ export function ReaderTopBar({
                         animate={{ opacity: 1, y: 0, scale: 1 }}
                         exit={{ opacity: 0, y: -10, scale: 0.95 }}
                         transition={{ duration: 0.15, ease: "easeOut" }}
-                        className={`absolute left-auto right-[-60px] sm:right-auto sm:left-0 mt-2 w-60 z-[70] p-3 rounded-md flex flex-col gap-3 ${dropdownBg}`}
+                        className={`absolute left-auto right-[-60px] sm:right-auto sm:left-0 mt-2 w-60 z-[70] p-3 rounded-md flex flex-col gap-3 max-h-[min(70vh,28rem)] overflow-y-auto ${dropdownBg}`}
                       >
+
+                        {onReflowBubbles && (
+                          <button
+                            type="button"
+                            onClick={onReflowBubbles}
+                            className="w-full font-[var(--font-bangers)] text-xs uppercase tracking-wide px-2.5 py-2 rounded-sm bg-[#e8185a] text-white border border-[#e8185a] hover:bg-[#ff2d6a]"
+                            title="Ensancha los globos del capítulo para que el texto no quede en columna"
+                          >
+                            Reajustar globos
+                          </button>
+                        )}
 
                         {/* Font size */}
                         <div className="flex flex-col gap-1.5">
@@ -358,6 +375,26 @@ export function ReaderTopBar({
                               }`}
                             >
                               {pageFlipSoundEnabled ? "ON" : "OFF"}
+                            </button>
+                          </div>
+                        )}
+
+                        {setPageEndNavEnabled && (
+                          <div className={`flex items-center justify-between pt-2 ${isReadMode ? "border-t border-white/10" : "border-t border-zinc-100"}`}>
+                            <span className={`font-[var(--font-bangers)] text-[10px] uppercase tracking-wider ${isReadMode ? "text-zinc-400" : "text-zinc-500"}`}>
+                              Botones fin de página:
+                            </span>
+                            <button
+                              type="button"
+                              onClick={() => setPageEndNavEnabled(!pageEndNavEnabled)}
+                              className={`font-[var(--font-bangers)] text-xs px-2.5 py-1 border transition-all rounded-sm ${
+                                pageEndNavEnabled
+                                  ? "bg-emerald-500 border-emerald-400 text-white"
+                                  : "bg-rose-500 border-rose-400 text-white"
+                              }`}
+                              title="Muestra anterior y siguiente al terminar la página"
+                            >
+                              {pageEndNavEnabled ? "ON" : "OFF"}
                             </button>
                           </div>
                         )}

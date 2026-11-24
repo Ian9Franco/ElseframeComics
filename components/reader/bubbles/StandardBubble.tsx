@@ -13,6 +13,7 @@ import {
   buildAnimTransition,
   buildComicBalloonPath,
   comicBalloonSeed,
+  bubbleLayoutMaxWidth,
   comicTextContainment,
   computeBubbleDelay,
   resolveBgColor,
@@ -306,7 +307,12 @@ export function StandardBubble({
 
 
   const wrapperStyles: React.CSSProperties = { pointerEvents: "none" };
-  const layoutWidth = line.width ? line.width * bubbleLayoutScale * textScale : undefined;
+  const layoutWidth = bubbleLayoutMaxWidth(line, {
+    textScale,
+    bubbleLayoutScale,
+    mobile: isMobile,
+    speechBalloon: organicBalloon,
+  });
   if (layoutWidth) wrapperStyles.maxWidth = `${layoutWidth}px`;
 
   const bubbleStyles: React.CSSProperties = {

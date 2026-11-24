@@ -5,7 +5,7 @@ import type { DialogueLine } from "./DialogueBubble";
 import type { Dialogues, PageData, PanelStop as PanelConfig, ChapterSettings, AudioTrack } from "./audioPlayer";
 import type { AiDialogueProposal } from "./dialogueAi";
 import { createDialogueLine } from "./dialogueDefaults";
-import { snapMaskRect } from "./readerUtils";
+import { reflowHorizontalWidth, snapMaskRect } from "./readerUtils";
 import { stripReaderSystemSoundsFromDialogues } from "@/lib/readerSystemSounds";
 
 interface UseDialogueEditorProps {
@@ -820,6 +820,26 @@ export function useDialogueEditor({
     setActiveBubbleIdx(endIndex);
   };
 
+  const handleReflowBubbleWidths = () => {
+    const pages = localDialogues.pages || {};
+    let changed = false;
+    const updatedPages: Record<string, PageData> = {};
+    for (const [key, page] of Object.entries(pages)) {
+      const panels = (page.panels || []).map((panel) => {
+        const dialogue = (panel.dialogue || []).map((line) => {
+          const width = reflowHorizontalWidth(line);
+          if (line.width === width) return line;
+          changed = true;
+          return { ...line, width };
+        });
+        return { ...panel, dialogue };
+      });
+      updatedPages[key] = { ...page, panels };
+    }
+    if (!changed) return;
+    updateDialoguesState(updatedPages);
+  };
+
   return {
     localDialogues,
     setLocalDialogues,
@@ -861,6 +881,7 @@ export function useDialogueEditor({
     handleMoveBubbleToPanel,
     handleReorderPanels,
     handleReorderBubbles,
+    handleReflowBubbleWidths,
     hasUnsavedChanges,
     hasLocalBackup,
     backupTimestamp,

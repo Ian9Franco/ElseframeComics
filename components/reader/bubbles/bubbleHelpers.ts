@@ -880,3 +880,45 @@ export function comicTextContainment(
     lineHeight: 1.2,
   };
 }
+
+/**
+ * Pixel max-width for a bubble on screen.
+ * Saved width is scaled with the page, but padding and the font floor can leave
+ * a box narrower than one glyph. The result never drops below the longest word.
+ */
+export function bubbleLayoutMaxWidth(
+  line: Pick<DialogueLine, "text" | "width" | "fontSize" | "size" | "style">,
+  opts: { textScale: number; bubbleLayoutScale: number; mobile: boolean; speechBalloon?: boolean }
+): number | undefined {
+  if (!line.width || line.width <= 0) return undefined;
+  const textScale = opts.textScale || 1;
+  const layoutScale = opts.bubbleLayoutScale || 1;
+  const scaled = line.width * layoutScale * textScale;
+  const size = line.size ?? "medium";
+  const style = line.style ?? "normal";
+  let baseFont = line.fontSize;
+  if (!baseFont) {
+    baseFont =
+      style === "sfx"
+        ? size === "small"
+          ? 18
+          : size === "large"
+            ? 48
+            : 32
+        : size === "small"
+          ? 12
+          : size === "large"
+            ? 18
+            : 14;
+  }
+  const minFont = style === "sfx" ? 10 : opts.mobile ? 6 : 10;
+  const font = Math.max(minFont * textScale, baseFont * textScale * layoutScale);
+  const padX = parseFloat(
+    comicTextContainment(font, 0, { mobile: opts.mobile, speechBalloon: opts.speechBalloon }).paddingLeft
+  ) || 10;
+  const longest = (line.text || "")
+    .split(/\s+/)
+    .reduce((max, word) => Math.max(max, word.length), 1);
+  const wordBox = longest * font * 0.9 + padX * 2 + 8;
+  return Math.ceil(Math.max(scaled, wordBox));
+}

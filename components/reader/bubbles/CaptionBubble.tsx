@@ -12,6 +12,7 @@ import {
   buildExitVariant,
   buildAnimTransition,
   computeBubbleDelay,
+  bubbleLayoutMaxWidth,
   comicTextContainment,
   resolveBgColor,
   renderStyledText,
@@ -123,7 +124,11 @@ export function CaptionBubble({
   const finalFontSize = Math.max(minFont * textScale, baseFontSize * textScale * fontLayoutScale);
   Object.assign(captionStyles, comicTextContainment(finalFontSize, 0, { mobile: isMobile }));
   captionStyles.fontSize = `${finalFontSize}px`;
-  const layoutWidth = line.width ? line.width * bubbleLayoutScale * textScale : undefined;
+  const layoutWidth = bubbleLayoutMaxWidth(line, {
+    textScale,
+    bubbleLayoutScale,
+    mobile: isMobile,
+  });
   if (layoutWidth)    captionStyles.maxWidth = `${layoutWidth}px`;
   if (line.textColor) captionStyles.color    = line.textColor;
 
@@ -144,6 +149,7 @@ export function CaptionBubble({
         background: "transparent",
         border: "none",
         filter: "none",
+        padding: 0,
         position: "relative",
       }}
     >

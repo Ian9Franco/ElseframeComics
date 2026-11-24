@@ -73,6 +73,43 @@ export function suggestBubbleWidth(
 }
 
 /**
+ * Width that keeps speech/caption text from stacking into a tall column.
+ * Uses the saved width when it already wraps in about two lines per paragraph.
+ */
+export function reflowHorizontalWidth(line: DialogueLine): number {
+  const style = line.style ?? "normal";
+  if (style === "sfx" || style === "cinematic") {
+    return line.width ?? suggestBubbleWidth(line);
+  }
+  const size = line.size ?? "medium";
+  const font =
+    line.fontSize ??
+    (size === "small" ? 12 : size === "large" ? 18 : 14);
+  const charW = Math.max(4, font * 0.55);
+  const pad = 28;
+  const current = line.width ?? suggestBubbleWidth(line);
+  const paragraphs = (line.text || "")
+    .split("\n")
+    .map((part) => part.trim())
+    .filter((part) => part.length > 0);
+  if (paragraphs.length === 0) return current;
+
+  let needed = current;
+  for (const paragraph of paragraphs) {
+    const words = paragraph.split(/\s+/).filter(Boolean);
+    const longestWord = words.reduce((max, word) => Math.max(max, word.length), 1);
+    const wordFloor = longestWord * charW + pad;
+    const charsPerLine = Math.max(1, (current - pad) / charW);
+    const wraps = Math.ceil(paragraph.length / charsPerLine);
+    if (wraps > 2 || wordFloor > current) {
+      const twoLines = Math.ceil(paragraph.length / 2) * charW + pad;
+      needed = Math.max(needed, wordFloor, Math.min(420, twoLines));
+    }
+  }
+  return Math.round(needed * 100) / 100;
+}
+
+/**
  * Estimate bubble half-dimensions from width/fontSize settings (approximate)
  */
 export function estimateBubbleSize(

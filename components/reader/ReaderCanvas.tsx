@@ -81,6 +81,7 @@ interface ReaderCanvasProps {
   setPanOffset: React.Dispatch<React.SetStateAction<{ x: number; y: number }>> | ((val: { x: number; y: number }) => void);
   nextChapter: any;
   pageFlip?: PageFlipController;
+  showPageEndNav?: boolean;
   viewportSize?: { w: number; h: number };
   neighborMasks?: { prev: SpoilerMask[]; next: SpoilerMask[] };
   pageLoading?: boolean;
@@ -149,6 +150,7 @@ export function ReaderCanvas({
   setZoomScale,
   setPanOffset,
   pageFlip,
+  showPageEndNav = true,
   viewportSize,
   neighborMasks,
   pageLoading = false,
@@ -678,7 +680,14 @@ export function ReaderCanvas({
       )}
 
       {mode === "read" && zoomedOut && !showAllDialogues && !sheetActive && (
-        <PageEndGesture onReplay={() => resetPage(pageIdx)} />
+        <PageEndGesture
+          onReplay={() => resetPage(pageIdx)}
+          showPageNav={showPageEndNav}
+          canPrev={pageIdx > 0}
+          canNext={pageIdx < pages.length - 1}
+          onPrev={() => pageFlip?.flipTo("prev")}
+          onNext={() => pageFlip?.flipTo("next")}
+        />
       )}
 
       {mode === "edit" && (
