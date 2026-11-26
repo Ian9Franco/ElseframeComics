@@ -60,6 +60,8 @@ interface ReaderTopBarProps {
   onReflowBubbles?: () => void;
   pageEndNavEnabled?: boolean;
   setPageEndNavEnabled?: (value: boolean) => void;
+  modoUandiEnabled?: boolean;
+  setModoUandiEnabled?: (value: boolean) => void;
   editorVersion?: EditorVersion;
   setEditorVersion?: (v: EditorVersion) => void;
 }
@@ -98,6 +100,8 @@ export function ReaderTopBar({
   onReflowBubbles,
   pageEndNavEnabled = true,
   setPageEndNavEnabled,
+  modoUandiEnabled = false,
+  setModoUandiEnabled,
   editorVersion = "v1",
   setEditorVersion,
 }: ReaderTopBarProps) {
@@ -395,6 +399,26 @@ export function ReaderTopBar({
                               title="Muestra anterior y siguiente al terminar la página"
                             >
                               {pageEndNavEnabled ? "ON" : "OFF"}
+                            </button>
+                          </div>
+                        )}
+
+                        {setModoUandiEnabled && (
+                          <div className={`flex items-center justify-between pt-2 ${isReadMode ? "border-t border-white/10" : "border-t border-zinc-100"}`}>
+                            <span className={`font-[var(--font-bangers)] text-[10px] uppercase tracking-wider ${isReadMode ? "text-zinc-400" : "text-zinc-500"}`}>
+                              Modo Uandi:
+                            </span>
+                            <button
+                              type="button"
+                              onClick={() => setModoUandiEnabled(!modoUandiEnabled)}
+                              className={`font-[var(--font-bangers)] text-xs px-2.5 py-1 border transition-all rounded-sm ${
+                                modoUandiEnabled
+                                  ? "bg-emerald-500 border-emerald-400 text-white"
+                                  : "bg-rose-500 border-rose-400 text-white"
+                              }`}
+                              title="Mitad izquierda: página anterior. Mitad derecha: siguiente (al terminar la página)."
+                            >
+                              {modoUandiEnabled ? "ON" : "OFF"}
                             </button>
                           </div>
                         )}

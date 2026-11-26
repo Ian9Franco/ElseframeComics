@@ -6,3 +6,5 @@ export const READER_DEFAULT_AUTOPLAY = false;
 export const READER_DEFAULT_FOCUS_ENABLED = true;
 /** Prev / next buttons on the end-of-page overlay. */
 export const READER_DEFAULT_PAGE_END_NAV = true;
+/** Half-page tap to turn pages when the page vista is complete (Modo Uandi). */
+export const READER_DEFAULT_MODO_UANDI = false;

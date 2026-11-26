@@ -31,8 +31,10 @@ import {
   READER_DEFAULT_BUBBLE_OPACITY,
   READER_DEFAULT_FOCUS_ENABLED,
   READER_DEFAULT_PAGE_END_NAV,
+  READER_DEFAULT_MODO_UANDI,
   READER_DEFAULT_TEXT_SCALE,
 } from "@/lib/readerPreferences";
+import { READER_MODO_UANDI_STORAGE_KEY, uandiHalfFromClientX } from "./uandiMode";
 import { readPageFlipSoundEnabled, writePageFlipSoundEnabled } from "@/lib/readerSystemSounds";
 import { EditorV2 } from "@/components/editor-v2/EditorV2";
 
@@ -229,6 +231,7 @@ export function CinematicReader({
   const [bubbleOpacity, setBubbleOpacityState] = useState<number>(READER_DEFAULT_BUBBLE_OPACITY);
   const [pageFlipSoundEnabled, setPageFlipSoundEnabledState] = useState<boolean>(true);
   const [pageEndNavEnabled, setPageEndNavEnabled] = useState<boolean>(READER_DEFAULT_PAGE_END_NAV);
+  const [modoUandiEnabled, setModoUandiEnabled] = useState<boolean>(READER_DEFAULT_MODO_UANDI);
 
   useEffect(() => {
     if (typeof window !== "undefined") {
@@ -269,6 +272,10 @@ export function CinematicReader({
       const savedPageEndNav = localStorage.getItem("reader_page_end_nav");
       setPageEndNavEnabled(
         savedPageEndNav === null ? READER_DEFAULT_PAGE_END_NAV : savedPageEndNav === "true"
+      );
+      const savedModoUandi = localStorage.getItem(READER_MODO_UANDI_STORAGE_KEY);
+      setModoUandiEnabled(
+        savedModoUandi === null ? READER_DEFAULT_MODO_UANDI : savedModoUandi === "true"
       );
       const hasRead = localStorage.getItem("has_read_instructions") === "true";
       if (!hasRead) {
@@ -329,6 +336,13 @@ export function CinematicReader({
     setPageEndNavEnabled(value);
     if (typeof window !== "undefined") {
       localStorage.setItem("reader_page_end_nav", String(value));
+    }
+  };
+
+  const handleSetModoUandi = (value: boolean) => {
+    setModoUandiEnabled(value);
+    if (typeof window !== "undefined") {
+      localStorage.setItem(READER_MODO_UANDI_STORAGE_KEY, String(value));
     }
   };
 
@@ -964,6 +978,15 @@ export function CinematicReader({
     }
 
     if (zoomedOut) {
+      if (modoUandiEnabled) {
+        const frame = imgRef.current?.closest("[data-page-frame='true']") as HTMLElement | null;
+        const half = uandiHalfFromClientX(e.clientX, frame);
+        if (half === "right" && pageIdx < pages.length - 1) {
+          pageFlip.flipTo("next");
+        } else if (half === "left" && pageIdx > 0) {
+          pageFlip.flipTo("prev");
+        }
+      }
       return;
     }
 
@@ -1170,6 +1193,8 @@ export function CinematicReader({
         onReflowBubbles={handleReflowBubbleWidths}
         pageEndNavEnabled={pageEndNavEnabled}
         setPageEndNavEnabled={handleSetPageEndNav}
+        modoUandiEnabled={modoUandiEnabled}
+        setModoUandiEnabled={handleSetModoUandi}
         editorVersion={editorVersion}
         setEditorVersion={handleSetEditorVersion}
       />
@@ -1290,6 +1315,7 @@ export function CinematicReader({
           neighborMasks={neighborMasks}
           pageLoading={pageLoading}
           pageSheetLayout={pageSheetLayout}
+          modoUandiEnabled={modoUandiEnabled}
         />
 
         <DialogueEditorPanel

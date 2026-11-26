@@ -354,7 +354,9 @@ export function getComicAssetUrl(relativePath: string | null | undefined): strin
   }
   const baseUrl = getAssetsBaseUrl();
   const cleanPath = relativePath.startsWith("/") ? relativePath : `/${relativePath}`;
-  return baseUrl ? `${baseUrl}${cleanPath}` : cleanPath;
+  // `#` in folder names (e.g. /comics/#3 saga/...) must be encoded or the browser treats it as a fragment.
+  const safePath = cleanPath.includes("#") ? cleanPath.replace(/#/g, "%23") : cleanPath;
+  return baseUrl ? `${baseUrl}${safePath}` : safePath;
 }
 
 export const getComicPageUrl = getComicAssetUrl;
