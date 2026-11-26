@@ -95,6 +95,7 @@ interface ReaderCanvasProps {
     imgTop: number;
     imgHeight: number;
   };
+  modoUandiEnabled?: boolean;
 }
 
 export function ReaderCanvas({
@@ -160,6 +161,7 @@ export function ReaderCanvas({
   neighborMasks,
   pageLoading = false,
   pageSheetLayout,
+  modoUandiEnabled = false,
 }: ReaderCanvasProps) {
   const isLastPage = pageIdx === pages.length - 1;
   const flipDir = pageFlip?.direction ?? null;
@@ -423,6 +425,16 @@ export function ReaderCanvas({
               }}
             />
             {renderReadSpoilerMasks()}
+            {modoUandiEnabled && zoomedOut && !sheetActive && zoomScale <= 1.01 && (
+              <div
+                className="absolute inset-0 flex pointer-events-none"
+                aria-hidden
+                data-modo-uandi-overlay
+              >
+                <div className="flex-1 bg-white/[0.035]" />
+                <div className="flex-1 bg-white/[0.065] border-l border-white/[0.06]" />
+              </div>
+            )}
           </div>
         )}
 
